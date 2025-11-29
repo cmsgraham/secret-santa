@@ -153,13 +153,9 @@
             Access all your Secret Santa events in one place
         </p>
         
-        {% if request.args.get('email') %}
-        <div class="error-message">
-            No events found for this email address
-        </div>
-        {% endif %}
+        <div id="message" class="error-message" style="display: none;"></div>
         
-        <form method="GET">
+        <form id="loginForm">
             <div class="form-group">
                 <label for="email">Your Email Address</label>
                 <input 
@@ -172,7 +168,7 @@
                 >
             </div>
             
-            <button type="submit" class="btn">📋 View My Events</button>
+            <button type="submit" class="btn">🔗 Send Login Link</button>
         </form>
         
         <div class="features">
@@ -199,5 +195,55 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const messageDiv = document.getElementById('message');
+            const originalBtnText = submitBtn.textContent;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            messageDiv.style.display = 'none';
+            
+            const formData = {
+                email: document.getElementById('email').value
+            };
+            
+            try {
+                const response = await fetch('{{ url_for("participant_dashboard") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageDiv.textContent = '✅ ' + data.message;
+                    messageDiv.className = 'error-message';
+                    messageDiv.style.background = '#d1fae5';
+                    messageDiv.style.color = '#065f46';
+                    messageDiv.style.display = 'block';
+                    e.target.reset();
+                } else {
+                    messageDiv.textContent = '❌ ' + data.error;
+                    messageDiv.className = 'error-message';
+                    messageDiv.style.display = 'block';
+                }
+            } catch (error) {
+                messageDiv.textContent = '❌ Something went wrong. Please try again.';
+                messageDiv.className = 'error-message';
+                messageDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        });
+    </script>
 </body>
 </html>
