@@ -117,6 +117,47 @@
             border-color: #667eea;
         }
         
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        
+        .input-group input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn-remove {
+            background: #ef4444;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 40px;
+            height: 40px;
+        }
+        
+        .btn-remove:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        
         .char-count {
             text-align: right;
             color: #999;
@@ -384,9 +425,20 @@
                 {% endif %}
                 
                 {% if assignment.receiver.hints %}
-                <div class="info-section">
-                    <strong>💡 Hints about them:</strong><br>
-                    {{ assignment.receiver.hints }}
+                <div style="margin-top: 15px;">
+                    <strong style="color: #1e40af; font-size: 16px;">💡 Hints about them:</strong>
+                    {% set hints_list = assignment.receiver.hints.split('\n') %}
+                    {% if hints_list|length > 1 %}
+                        <ul style="list-style: none; padding: 0; margin: 10px 0 0 0;">
+                        {% for hint in hints_list %}
+                            {% if hint.strip() %}
+                            <li style="padding: 10px 15px; margin-bottom: 8px; background: #eff6ff; border-radius: 8px; border-left: 3px solid #3b82f6;">{{ hint.strip() }}</li>
+                            {% endif %}
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="info-section">{{ assignment.receiver.hints }}</div>
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>
@@ -396,16 +448,21 @@
         <!-- About You - Hints Section -->
         <div class="card">
             <h2><span class="icon">💡</span> Hints About You</h2>
-            <p>Add some fun hints about yourself so others can try to guess who you are! Be creative but not too obvious.</p>
+            <p>Add fun hints about yourself so others can try to guess who you are! Each hint in its own box.</p>
             <form id="hintsForm">
-                <textarea 
-                    id="hintsInput" 
-                    name="hints" 
-                    placeholder="Example: I'm obsessed with coffee ☕, I have 3 cats 🐱, I love hiking 🥾..."
-                    maxlength="1000"
-                >{{ participant.hints or '' }}</textarea>
-                <div class="char-count"><span id="hintsCount">{{ (participant.hints or '')|length }}</span>/1000</div>
-                <button type="submit" class="btn">Save Hints</button>
+                <div id="hintsContainer">
+                    {% set hints_list = (participant.hints or '').split('\n') if participant.hints else [''] %}
+                    {% for hint in hints_list %}
+                        {% if hint.strip() or loop.first %}
+                        <div class="input-group">
+                            <input type="text" class="hint-input" placeholder="Example: I'm obsessed with coffee ☕" value="{{ hint.strip() }}" maxlength="200">
+                            <button type="button" class="btn-remove" onclick="removeInput(this)">✕</button>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addHintInput()">+ Add Another Hint</button>
+                <button type="submit" class="btn" style="margin-left: 10px;">Save All Hints</button>
                 <div class="save-message" id="hintsSaved">✓ Hints saved successfully!</div>
             </form>
         </div>
@@ -413,26 +470,21 @@
         <!-- Gift Preferences Section -->
         <div class="card">
             <h2><span class="icon">🎁</span> Gift Preferences</h2>
-            <p>Help your Secret Santa by sharing your gift preferences, ideas, or links to things you'd love!</p>
-            <div class="help-text">
-                <strong>💡 Pro Tip:</strong>
-                Write each gift idea on a new line (press Enter) to create an organized numbered list!
-                You can include links to wishlists, specific products, or just describe what you like.
-            </div>
+            <p>Share gift ideas, preferences, or links. Each gift idea in its own box!</p>
             <form id="preferencesForm">
-                <textarea 
-                    id="preferencesInput" 
-                    name="gift_preferences" 
-                    placeholder="Example (one per line):
-Fantasy books (especially Brandon Sanderson)
-Coffee mugs with funny quotes
-Star Wars collectibles
-Amazon wishlist: https://...
-Etsy shop gift cards"
-                    maxlength="2000"
-                >{{ participant.gift_preferences or '' }}</textarea>
-                <div class="char-count"><span id="preferencesCount">{{ (participant.gift_preferences or '')|length }}</span>/2000</div>
-                <button type="submit" class="btn">Save Preferences</button>
+                <div id="preferencesContainer">
+                    {% set prefs_list = (participant.gift_preferences or '').split('\n') if participant.gift_preferences else [''] %}
+                    {% for pref in prefs_list %}
+                        {% if pref.strip() or loop.first %}
+                        <div class="input-group">
+                            <input type="text" class="pref-input" placeholder="Example: Fantasy books or Amazon wishlist: https://..." value="{{ pref.strip() }}" maxlength="300">
+                            <button type="button" class="btn-remove" onclick="removeInput(this)">✕</button>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addPrefInput()">+ Add Another Gift Idea</button>
+                <button type="submit" class="btn" style="margin-left: 10px;">Save All Preferences</button>
                 <div class="save-message" id="preferencesSaved">✓ Preferences saved successfully!</div>
             </form>
         </div>
@@ -486,7 +538,18 @@ Etsy shop gift cards"
                     {% set has_hints.value = true %}
                     <div class="receiver-info" style="margin-bottom: 15px;">
                         <h3>{{ p.nickname or p.name }}</h3>
-                        <div class="info-section">{{ p.hints }}</div>
+                        {% set hints_list = p.hints.split('\n') %}
+                        {% if hints_list|length > 1 %}
+                            <ul style="list-style: none; padding: 0; margin: 10px 0 0 0;">
+                            {% for hint in hints_list %}
+                                {% if hint.strip() %}
+                                <li style="padding: 10px 15px; margin-bottom: 8px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #3b82f6;">{{ hint.strip() }}</li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="info-section">{{ p.hints }}</div>
+                        {% endif %}
                     </div>
                 {% endif %}
             {% endfor %}
@@ -498,24 +561,55 @@ Etsy shop gift cards"
     </div>
 
     <script>
-        // Character counter for hints
-        const hintsInput = document.getElementById('hintsInput');
-        const hintsCount = document.getElementById('hintsCount');
-        hintsInput.addEventListener('input', () => {
-            hintsCount.textContent = hintsInput.value.length;
-        });
+        // Add new hint input
+        function addHintInput() {
+            const container = document.getElementById('hintsContainer');
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group';
+            inputGroup.innerHTML = `
+                <input type="text" class="hint-input" placeholder="Example: I'm obsessed with coffee ☕" maxlength="200">
+                <button type="button" class="btn-remove" onclick="removeInput(this)">✕</button>
+            `;
+            container.appendChild(inputGroup);
+        }
 
-        // Character counter for preferences
-        const preferencesInput = document.getElementById('preferencesInput');
-        const preferencesCount = document.getElementById('preferencesCount');
-        preferencesInput.addEventListener('input', () => {
-            preferencesCount.textContent = preferencesInput.value.length;
-        });
+        // Add new preference input
+        function addPrefInput() {
+            const container = document.getElementById('preferencesContainer');
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group';
+            inputGroup.innerHTML = `
+                <input type="text" class="pref-input" placeholder="Example: Fantasy books or Amazon wishlist: https://..." maxlength="300">
+                <button type="button" class="btn-remove" onclick="removeInput(this)">✕</button>
+            `;
+            container.appendChild(inputGroup);
+        }
+
+        // Remove input field
+        function removeInput(button) {
+            const inputGroup = button.parentElement;
+            const container = inputGroup.parentElement;
+            
+            // Keep at least one input field
+            if (container.children.length > 1) {
+                inputGroup.remove();
+            } else {
+                // Clear the input instead of removing
+                const input = inputGroup.querySelector('input');
+                input.value = '';
+            }
+        }
 
         // Save hints
         document.getElementById('hintsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
+            
+            // Collect all hint inputs
+            const hintInputs = document.querySelectorAll('.hint-input');
+            const hints = Array.from(hintInputs)
+                .map(input => input.value.trim())
+                .filter(value => value.length > 0)
+                .join('\n');
             
             try {
                 const response = await fetch(window.location.pathname, {
@@ -525,7 +619,7 @@ Etsy shop gift cards"
                     },
                     body: JSON.stringify({
                         action: 'save_hints',
-                        hints: formData.get('hints')
+                        hints: hints
                     })
                 });
                 
@@ -542,7 +636,13 @@ Etsy shop gift cards"
         // Save preferences
         document.getElementById('preferencesForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
+            
+            // Collect all preference inputs
+            const prefInputs = document.querySelectorAll('.pref-input');
+            const preferences = Array.from(prefInputs)
+                .map(input => input.value.trim())
+                .filter(value => value.length > 0)
+                .join('\n');
             
             try {
                 const response = await fetch(window.location.pathname, {
@@ -552,7 +652,7 @@ Etsy shop gift cards"
                     },
                     body: JSON.stringify({
                         action: 'save_preferences',
-                        gift_preferences: formData.get('gift_preferences')
+                        gift_preferences: preferences
                     })
                 });
                 
