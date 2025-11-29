@@ -228,6 +228,61 @@
             text-decoration: underline;
         }
         
+        .preference-list {
+            list-style: none;
+            counter-reset: preference-counter;
+            padding: 0;
+            margin: 10px 0 0 0;
+        }
+        
+        .preference-list li {
+            counter-increment: preference-counter;
+            padding: 12px 15px 12px 45px;
+            margin-bottom: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            position: relative;
+            line-height: 1.6;
+        }
+        
+        .preference-list li:before {
+            content: counter(preference-counter);
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preference-list li a {
+            color: #667eea;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+        
+        .help-text {
+            background: #eff6ff;
+            border-left: 3px solid #3b82f6;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1e40af;
+        }
+        
+        .help-text strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
         .empty-state {
             color: #9ca3af;
             font-style: italic;
@@ -311,9 +366,20 @@
                 <div class="assignment-email">{{ assignment.receiver.email }}</div>
                 
                 {% if assignment.receiver.gift_preferences %}
-                <div class="info-section">
-                    <strong>🎁 Gift Preferences:</strong><br>
-                    {{ assignment.receiver.gift_preferences }}
+                <div style="margin-top: 15px;">
+                    <strong style="color: #b45309; font-size: 16px;">🎁 Gift Ideas:</strong>
+                    {% set preferences = assignment.receiver.gift_preferences.split('\n') %}
+                    {% if preferences|length > 1 %}
+                        <ol class="preference-list">
+                        {% for pref in preferences %}
+                            {% if pref.strip() %}
+                            <li>{{ pref.strip()|urlize|safe }}</li>
+                            {% endif %}
+                        {% endfor %}
+                        </ol>
+                    {% else %}
+                        <div class="info-section">{{ assignment.receiver.gift_preferences|urlize|safe }}</div>
+                    {% endif %}
                 </div>
                 {% endif %}
                 
@@ -348,11 +414,21 @@
         <div class="card">
             <h2><span class="icon">🎁</span> Gift Preferences</h2>
             <p>Help your Secret Santa by sharing your gift preferences, ideas, or links to things you'd love!</p>
+            <div class="help-text">
+                <strong>💡 Pro Tip:</strong>
+                Write each gift idea on a new line (press Enter) to create an organized numbered list!
+                You can include links to wishlists, specific products, or just describe what you like.
+            </div>
             <form id="preferencesForm">
                 <textarea 
                     id="preferencesInput" 
                     name="gift_preferences" 
-                    placeholder="Example: I love books (fantasy genre), coffee mugs, or anything Star Wars related. Check out my Amazon wishlist: https://..."
+                    placeholder="Example (one per line):
+Fantasy books (especially Brandon Sanderson)
+Coffee mugs with funny quotes
+Star Wars collectibles
+Amazon wishlist: https://...
+Etsy shop gift cards"
                     maxlength="2000"
                 >{{ participant.gift_preferences or '' }}</textarea>
                 <div class="char-count"><span id="preferencesCount">{{ (participant.gift_preferences or '')|length }}</span>/2000</div>
