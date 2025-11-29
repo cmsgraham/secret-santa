@@ -152,13 +152,28 @@
                     messageDiv.className = 'message success';
                     messageDiv.style.display = 'block';
                     
+                    // Show member page link
+                    if (data.member_url) {
+                        const linkDiv = document.createElement('div');
+                        linkDiv.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #dbeafe; border-radius: 8px;';
+                        linkDiv.innerHTML = `
+                            <h3 style="margin: 0 0 0.5rem 0; color: #1e40af;">🎉 Registration Complete!</h3>
+                            <p style="margin: 0 0 0.5rem 0; color: #1e3a8a;">
+                                Bookmark this link to access your member page:
+                            </p>
+                            <a href="${data.member_url}" 
+                               style="display: inline-block; padding: 0.75rem 1.5rem; background: #667eea; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 0.5rem;">
+                                🎁 Go to My Member Page
+                            </a>
+                            <p style="margin: 0.75rem 0 0 0; font-size: 0.85rem; color: #6b7280;">
+                                You can add gift preferences, hints about yourself, and see your Secret Santa assignment when the draw happens!
+                            </p>
+                        `;
+                        messageDiv.parentNode.insertBefore(linkDiv, messageDiv.nextSibling);
+                    }
+                    
                     // Clear form
                     e.target.reset();
-                    
-                    // Update participant count
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
                 } else {
                     messageDiv.textContent = '❌ ' + data.error;
                     messageDiv.className = 'message error';

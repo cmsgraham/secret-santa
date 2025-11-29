@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ participant.nickname or participant.name }} - {{ event.name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header .event-name {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .header .participant-info {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        
+        .status-registration {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-drawn {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-closed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card h2 {
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 .icon {
+            font-size: 28px;
+        }
+        
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            min-height: 120px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .char-count {
+            text-align: right;
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .save-message {
+            display: none;
+            color: #059669;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .save-message.show {
+            display: block;
+        }
+        
+        .assignment-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+        
+        .assignment-box h3 {
+            color: #92400e;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .assignment-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #b45309;
+            margin: 10px 0;
+        }
+        
+        .assignment-email {
+            color: #78350f;
+            font-size: 14px;
+        }
+        
+        .receiver-info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+        
+        .receiver-info h3 {
+            color: #1e40af;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .receiver-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin: 10px 0;
+        }
+        
+        .info-section {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .info-section a {
+            color: #667eea;
+            text-decoration: underline;
+        }
+        
+        .empty-state {
+            color: #9ca3af;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .guessing-section {
+            margin-top: 20px;
+        }
+        
+        .participant-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .guess-result {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        
+        .guess-correct {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .guess-incorrect {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .guess-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .assignment-name {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👋 {{ participant.nickname or participant.name }}</h1>
+            <div class="event-name">🎁 {{ event.name }}</div>
+            <div class="participant-info">{{ participant.email }}</div>
+            {% if event.status.value == 'registration_open' %}
+                <span class="status-badge status-registration">Registration Open</span>
+            {% elif event.status.value == 'draw_completed' %}
+                <span class="status-badge status-drawn">Draw Completed</span>
+            {% elif event.status.value == 'event_closed' %}
+                <span class="status-badge status-closed">Event Closed</span>
+            {% endif %}
+        </div>
+
+        <!-- Your Secret Santa Assignment (if draw is complete) -->
+        {% if event.status.value in ['draw_completed', 'event_closed'] and assignment %}
+        <div class="card">
+            <h2><span class="icon">🎅</span> Your Secret Santa Assignment</h2>
+            <p>You are the Secret Santa for:</p>
+            <div class="assignment-box">
+                <h3>🎁 You're giving to:</h3>
+                <div class="assignment-name">{{ assignment.receiver.nickname or assignment.receiver.name }}</div>
+                <div class="assignment-email">{{ assignment.receiver.email }}</div>
+                
+                {% if assignment.receiver.gift_preferences %}
+                <div class="info-section">
+                    <strong>🎁 Gift Preferences:</strong><br>
+                    {{ assignment.receiver.gift_preferences }}
+                </div>
+                {% endif %}
+                
+                {% if assignment.receiver.hints %}
+                <div class="info-section">
+                    <strong>💡 Hints about them:</strong><br>
+                    {{ assignment.receiver.hints }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- About You - Hints Section -->
+        <div class="card">
+            <h2><span class="icon">💡</span> Hints About You</h2>
+            <p>Add some fun hints about yourself so others can try to guess who you are! Be creative but not too obvious.</p>
+            <form id="hintsForm">
+                <textarea 
+                    id="hintsInput" 
+                    name="hints" 
+                    placeholder="Example: I'm obsessed with coffee ☕, I have 3 cats 🐱, I love hiking 🥾..."
+                    maxlength="1000"
+                >{{ participant.hints or '' }}</textarea>
+                <div class="char-count"><span id="hintsCount">{{ (participant.hints or '')|length }}</span>/1000</div>
+                <button type="submit" class="btn">Save Hints</button>
+                <div class="save-message" id="hintsSaved">✓ Hints saved successfully!</div>
+            </form>
+        </div>
+
+        <!-- Gift Preferences Section -->
+        <div class="card">
+            <h2><span class="icon">🎁</span> Gift Preferences</h2>
+            <p>Help your Secret Santa by sharing your gift preferences, ideas, or links to things you'd love!</p>
+            <form id="preferencesForm">
+                <textarea 
+                    id="preferencesInput" 
+                    name="gift_preferences" 
+                    placeholder="Example: I love books (fantasy genre), coffee mugs, or anything Star Wars related. Check out my Amazon wishlist: https://..."
+                    maxlength="2000"
+                >{{ participant.gift_preferences or '' }}</textarea>
+                <div class="char-count"><span id="preferencesCount">{{ (participant.gift_preferences or '')|length }}</span>/2000</div>
+                <button type="submit" class="btn">Save Preferences</button>
+                <div class="save-message" id="preferencesSaved">✓ Preferences saved successfully!</div>
+            </form>
+        </div>
+
+        <!-- Who's Your Secret Santa? (Guessing Section - only if enabled) -->
+        {% if event.guessing_enabled and event.status.value in ['draw_completed', 'event_closed'] %}
+        <div class="card">
+            <h2><span class="icon">🔍</span> Guess Your Secret Santa</h2>
+            <p>The guessing phase is open! Who do you think is YOUR Secret Santa?</p>
+            
+            {% if participant.guessed_secret_santa_id %}
+                {% set actual_santa = receiving_assignment.giver if receiving_assignment else None %}
+                {% if actual_santa and participant.guessed_secret_santa_id == actual_santa.id %}
+                    <div class="guess-result guess-correct">
+                        🎉 Correct! {{ actual_santa.nickname or actual_santa.name }} was your Secret Santa!
+                    </div>
+                {% elif actual_santa %}
+                    <div class="guess-result guess-incorrect">
+                        ❌ Not quite! Your guess was {{ participant.guessed_secret_santa.nickname or participant.guessed_secret_santa.name }}, but your Secret Santa was actually {{ actual_santa.nickname or actual_santa.name }}!
+                    </div>
+                {% else %}
+                    <div class="guess-result guess-pending">
+                        🤔 You guessed: {{ participant.guessed_secret_santa.nickname or participant.guessed_secret_santa.name }}
+                        <br><small>The answer will be revealed soon!</small>
+                    </div>
+                {% endif %}
+            {% else %}
+                <form id="guessForm">
+                    <select class="participant-select" name="guess" required>
+                        <option value="">-- Select a participant --</option>
+                        {% for p in event.participants %}
+                            {% if p.id != participant.id %}
+                                <option value="{{ p.id }}">{{ p.nickname or p.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn">Submit Guess</button>
+                </form>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Other Participants' Hints (only if draw is complete) -->
+        {% if event.status.value in ['draw_completed', 'event_closed'] %}
+        <div class="card">
+            <h2><span class="icon">👥</span> Other Participants' Hints</h2>
+            <p>Try to figure out who is who based on their hints!</p>
+            {% set has_hints = namespace(value=false) %}
+            {% for p in event.participants %}
+                {% if p.id != participant.id and p.hints %}
+                    {% set has_hints.value = true %}
+                    <div class="receiver-info" style="margin-bottom: 15px;">
+                        <h3>{{ p.nickname or p.name }}</h3>
+                        <div class="info-section">{{ p.hints }}</div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% if not has_hints.value %}
+                <div class="empty-state">No one has added hints yet. Check back later!</div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Character counter for hints
+        const hintsInput = document.getElementById('hintsInput');
+        const hintsCount = document.getElementById('hintsCount');
+        hintsInput.addEventListener('input', () => {
+            hintsCount.textContent = hintsInput.value.length;
+        });
+
+        // Character counter for preferences
+        const preferencesInput = document.getElementById('preferencesInput');
+        const preferencesCount = document.getElementById('preferencesCount');
+        preferencesInput.addEventListener('input', () => {
+            preferencesCount.textContent = preferencesInput.value.length;
+        });
+
+        // Save hints
+        document.getElementById('hintsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch(window.location.pathname, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'save_hints',
+                        hints: formData.get('hints')
+                    })
+                });
+                
+                if (response.ok) {
+                    const saved = document.getElementById('hintsSaved');
+                    saved.classList.add('show');
+                    setTimeout(() => saved.classList.remove('show'), 3000);
+                }
+            } catch (error) {
+                alert('Failed to save hints. Please try again.');
+            }
+        });
+
+        // Save preferences
+        document.getElementById('preferencesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch(window.location.pathname, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'save_preferences',
+                        gift_preferences: formData.get('gift_preferences')
+                    })
+                });
+                
+                if (response.ok) {
+                    const saved = document.getElementById('preferencesSaved');
+                    saved.classList.add('show');
+                    setTimeout(() => saved.classList.remove('show'), 3000);
+                }
+            } catch (error) {
+                alert('Failed to save preferences. Please try again.');
+            }
+        });
+
+        // Submit guess
+        const guessForm = document.getElementById('guessForm');
+        if (guessForm) {
+            guessForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                
+                if (!confirm('Are you sure about your guess? You can only guess once!')) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(window.location.pathname, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action: 'submit_guess',
+                            guess: formData.get('guess')
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to submit guess. Please try again.');
+                    }
+                } catch (error) {
+                    alert('Failed to submit guess. Please try again.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

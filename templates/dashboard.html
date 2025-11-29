@@ -139,6 +139,11 @@
                     <button onclick="copyLink('{{ event.registration_url }}')" class="btn btn-secondary">
                         📋 Copy Link
                     </button>
+                    {% if event.status.value == 'event_closed' %}
+                    <button onclick="deleteEvent('{{ event.code }}', '{{ event.name }}')" class="btn" style="background: #ef4444; color: white;">
+                        🗑️
+                    </button>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -166,6 +171,33 @@
                 console.error('Failed to copy:', err);
                 prompt('Copy this link:', fullUrl);
             });
+        }
+
+        async function deleteEvent(code, name) {
+            if (!confirm(`Are you sure you want to delete "${name}"?\n\nThis action cannot be undone and will delete:\n- All participants\n- All assignments\n- All event data`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/event/${code}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Event deleted successfully!');
+                    window.location.reload();
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Failed to delete event');
+                console.error(error);
+            }
         }
     </script>
 </body>

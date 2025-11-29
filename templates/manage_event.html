@@ -170,6 +170,7 @@
                                 {% endif %}
                                 <div style="font-size: 0.85rem; color: #6b7280;">
                                     Registered {{ participant.registered_at.strftime('%b %d at %I:%M %p') }}
+                                    • <a href="{{ url_for('member_page', code=event.code, participant_id=participant.id) }}" target="_blank" style="color: #667eea; text-decoration: none;">View Member Page →</a>
                                 </div>
                             </div>
                         </div>
@@ -224,6 +225,9 @@
                         </button>
                         <button class="btn btn-warning" onclick="rerunDraw()">
                             🎲 Rerun Draw
+                        </button>
+                        <button class="btn {% if event.guessing_enabled %}btn-success{% else %}btn-secondary{% endif %}" onclick="toggleGuessing()">
+                            {% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}
                         </button>
                         <button class="btn btn-secondary" onclick="closeEvent()">
                             🔒 Close Event
@@ -337,6 +341,34 @@
                 }
             } catch (error) {
                 showMessage('error', '❌ Failed to close event.');
+            }
+        }
+
+        async function toggleGuessing() {
+            const currentState = {{ 'true' if event.guessing_enabled else 'false' }};
+            const action = currentState ? 'disable' : 'enable';
+            const message = currentState ? 'Disable guessing phase?' : 'Enable guessing? Participants will be able to guess who their Secret Santa is.';
+            
+            if (!confirm(message)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("toggle_guessing", code=event.code) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '✅ ' + data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('error', '❌ ' + data.error);
+                }
+            } catch (error) {
+                showMessage('error', '❌ Failed to toggle guessing.');
             }
         }
 
