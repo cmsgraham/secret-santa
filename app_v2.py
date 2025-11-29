@@ -378,7 +378,26 @@ def dashboard():
     # Get events where user is a participant
     participant_events = Participant.query.filter_by(email=user.email).all()
     
-    # Prepare participating events data
+    # Create a set of event IDs where user is participating
+    participating_event_ids = {p.event_id for p in participant_events}
+    
+    # Prepare created events with participation status
+    created_events_data = []
+    for event in created_events:
+        participant = None
+        for p in participant_events:
+            if p.event_id == event.id:
+                participant = p
+                break
+        
+        created_events_data.append({
+            'event': event,
+            'is_participating': event.id in participating_event_ids,
+            'participant': participant,
+            'member_url': url_for('member_page', code=event.code, participant_id=participant.id) if participant else None
+        })
+    
+    # Prepare participating events data (exclude ones they created)
     participating_events = []
     for p in participant_events:
         event = p.event
@@ -391,7 +410,7 @@ def dashboard():
             })
     
     return render_template('dashboard.html', 
-                         created_events=created_events,
+                         created_events=created_events_data,
                          participating_events=participating_events,
                          user=user)
 
