@@ -77,6 +77,14 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="nickname">Fun Nickname (Optional)</label>
+                    <input type="text" id="nickname" name="nickname" placeholder="Leave empty for auto-generated nickname">
+                    <small style="color: #6b7280; display: block; margin-top: 0.5rem;">
+                        If empty, we'll assign you a festive nickname automatically! 🎅
+                    </small>
+                </div>
+
+                <div class="form-group">
                     <label for="email">Your Email Address *</label>
                     <input type="email" id="email" name="email" placeholder="you@example.com" required>
                     <small style="color: #6b7280; display: block; margin-top: 0.5rem;">
@@ -124,6 +132,7 @@
             
             const formData = {
                 name: document.getElementById('name').value,
+                nickname: document.getElementById('nickname').value,
                 email: document.getElementById('email').value
             };
             
