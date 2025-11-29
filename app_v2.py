@@ -121,7 +121,8 @@ def send_email(to_email, subject, body):
         
         msg.attach(MIMEText(body, 'plain'))
         
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        # Connect with timeout to prevent hanging
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
         if SMTP_USE_TLS:
             server.starttls()
         server.login(SMTP_USERNAME, SMTP_PASSWORD)
