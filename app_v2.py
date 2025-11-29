@@ -428,6 +428,51 @@ def close_event(code):
     
     return jsonify({'success': True, 'message': 'Event closed'})
 
+@app.route('/event/<code>/toggle-guessing', methods=['POST'])
+@login_required
+def toggle_guessing(code):
+    """Toggle the guessing phase for participants"""
+    event = Event.query.filter_by(code=code).first_or_404()
+    
+    if event.organizer_id != session['user_id']:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    # Can only enable guessing if draw is completed
+    if not event.guessing_enabled and event.status != EventStatus.DRAW_COMPLETED:
+        return jsonify({
+            'success': False, 
+            'error': 'Can only enable guessing after the draw is completed'
+        }), 400
+    
+    event.guessing_enabled = not event.guessing_enabled
+    db.session.commit()
+    
+    status = 'enabled' if event.guessing_enabled else 'disabled'
+    return jsonify({'success': True, 'message': f'Guessing phase {status}'})
+
+@app.route('/event/<code>/delete', methods=['POST'])
+@login_required
+def delete_event(code):
+    """Delete a closed event"""
+    event = Event.query.filter_by(code=code).first_or_404()
+    
+    # Check authorization
+    if event.organizer_id != session['user_id']:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    # Only allow deleting closed events
+    if event.status != EventStatus.EVENT_CLOSED:
+        return jsonify({
+            'success': False, 
+            'error': 'Only closed events can be deleted'
+        }), 400
+    
+    # Delete all related data (cascade will handle participants, assignments, etc.)
+    db.session.delete(event)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Event deleted successfully'})
+
 # ============================================================================
 # Routes - Participant Registration
 # ============================================================================
@@ -491,13 +536,72 @@ def register_participant(code):
         db.session.add(participant)
         db.session.commit()
         
+        # Generate member page URL
+        member_url = url_for('member_page', code=event.code, participant_id=participant.id, _external=True)
+        
         return jsonify({
             'success': True,
             'message': f'Welcome, {name}! You have been registered.',
-            'participant_count': event.participant_count
+            'participant_count': event.participant_count,
+            'member_url': member_url,
+            'participant_id': participant.id
         })
     
     return render_template('register.html', event=event)
+
+@app.route('/event/<code>/member/<participant_id>', methods=['GET', 'POST'])
+def member_page(code, participant_id):
+    """Member landing page for participants to manage their info"""
+    event = Event.query.filter_by(code=code).first_or_404()
+    participant = Participant.query.filter_by(id=participant_id, event_id=event.id).first_or_404()
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        action = data.get('action')
+        
+        if action == 'save_hints':
+            participant.hints = data.get('hints', '').strip()[:1000]  # Limit to 1000 chars
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Hints saved successfully'})
+        
+        elif action == 'save_preferences':
+            participant.gift_preferences = data.get('gift_preferences', '').strip()[:2000]  # Limit to 2000 chars
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Preferences saved successfully'})
+        
+        elif action == 'submit_guess':
+            if not event.guessing_enabled:
+                return jsonify({'success': False, 'error': 'Guessing is not enabled yet'}), 400
+            
+            if participant.guessed_secret_santa_id:
+                return jsonify({'success': False, 'error': 'You have already submitted a guess'}), 400
+            
+            guess_id = data.get('guess')
+            if not guess_id or guess_id == participant.id:
+                return jsonify({'success': False, 'error': 'Invalid guess'}), 400
+            
+            participant.guessed_secret_santa_id = guess_id
+            participant.guessed_at = datetime.now(timezone.utc)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Guess submitted successfully'})
+        
+        return jsonify({'success': False, 'error': 'Invalid action'}), 400
+    
+    # GET request - load the member page
+    assignment = None
+    receiving_assignment = None
+    
+    if event.status in [EventStatus.DRAW_COMPLETED, EventStatus.EVENT_CLOSED]:
+        # Get who this participant is giving to
+        assignment = Assignment.query.filter_by(giver_id=participant.id).first()
+        # Get who is giving to this participant (their Secret Santa)
+        receiving_assignment = Assignment.query.filter_by(receiver_id=participant.id).first()
+    
+    return render_template('member.html', 
+                         event=event, 
+                         participant=participant,
+                         assignment=assignment,
+                         receiving_assignment=receiving_assignment)
 
 # ============================================================================
 # API Routes

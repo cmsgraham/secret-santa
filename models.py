@@ -55,6 +55,7 @@ class Event(Base):
     allow_self_assignment = Column(Boolean, default=False)
     min_participants = Column(Integer, default=3)
     max_participants = Column(Integer, default=100)
+    guessing_enabled = Column(Boolean, default=False)  # Allow participants to guess their Secret Santa
     
     # Relationships
     participants = relationship("Participant", back_populates="event", cascade="all, delete-orphan")
@@ -95,6 +96,14 @@ class Participant(Base):
     email = Column(String(255), nullable=False)
     registered_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     
+    # Member page content
+    hints = Column(Text)  # Hints about themselves for others to guess
+    gift_preferences = Column(Text)  # Gift ideas, preferences, links
+    
+    # Guessing
+    guessed_secret_santa_id = Column(String(36), ForeignKey('participants.id'))  # Their guess of who their Secret Santa is
+    guessed_at = Column(DateTime)  # When they made the guess
+    
     # Email status
     assignment_email_sent = Column(Boolean, default=False)
     assignment_email_sent_at = Column(DateTime)
@@ -103,6 +112,7 @@ class Participant(Base):
     event = relationship("Event", back_populates="participants")
     giving_to = relationship("Assignment", foreign_keys="Assignment.giver_id", back_populates="giver")
     receiving_from = relationship("Assignment", foreign_keys="Assignment.receiver_id", back_populates="receiver")
+    guessed_secret_santa = relationship("Participant", remote_side=[id], foreign_keys=[guessed_secret_santa_id])
     
     def __repr__(self):
         return f"<Participant {self.name} ({self.email})>"
