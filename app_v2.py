@@ -454,6 +454,7 @@ def register_participant(code):
             }), 400
         
         name = data.get('name', '').strip()
+        nickname = data.get('nickname', '').strip()
         email = data.get('email', '').strip().lower()
         
         # Validate
@@ -465,6 +466,11 @@ def register_participant(code):
             email = validated.normalized
         except EmailNotValidError:
             return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+        
+        # Auto-generate nickname if not provided
+        if not nickname:
+            from nickname_generator import generate_nickname
+            nickname = generate_nickname()
         
         # Check if already registered
         existing = Participant.query.filter_by(event_id=event.id, email=email).first()
@@ -478,6 +484,7 @@ def register_participant(code):
         participant = Participant(
             event_id=event.id,
             name=name,
+            nickname=nickname,
             email=email
         )
         db.session.add(participant)

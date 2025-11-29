@@ -91,6 +91,7 @@ class Participant(Base):
     
     # Participant details
     name = Column(String(255), nullable=False)
+    nickname = Column(String(255))  # Optional fun nickname
     email = Column(String(255), nullable=False)
     registered_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     

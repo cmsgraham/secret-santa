@@ -34,6 +34,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY app_v2.py .
 COPY models.py .
 COPY event_names.py .
+COPY nickname_generator.py .
 COPY init_db.py .
 COPY templates/ templates/
 COPY static/ static/
