@@ -226,18 +226,10 @@
                         ✅ Draw completed! All participants have been emailed their assignments.
                     </div>
                     <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="reopenRegistration()">
-                            ♻️ Reopen Registration
-                        </button>
-                        <button class="btn btn-dark" onclick="rerunDraw()">
-                            🎲 Rerun Draw
-                        </button>
-                        <button class="btn btn-secondary" onclick="toggleGuessing()">
-                            {% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}
-                        </button>
-                        <button class="btn btn-danger" onclick="closeEvent()">
-                            🔒 Close Event
-                        </button>
+                        <button class="btn btn-primary" onclick="reopenRegistration()">♻️ Reopen Registration</button>
+                        <button class="btn btn-dark" onclick="rerunDraw()">🎲 Rerun Draw</button>
+                        <button class="btn btn-secondary" onclick="toggleGuessing()">{% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}</button>
+                        <button class="btn btn-danger" onclick="closeEvent()">🔒 Close Event</button>
                     </div>
                 {% else %}
                     <div style="padding: 1rem; background: #f3f4f6; border-radius: 8px; text-align: center;">
