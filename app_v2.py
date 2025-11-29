@@ -751,6 +751,14 @@ def member_page(code, participant_id):
             db.session.commit()
             return jsonify({'success': True, 'message': 'Guess submitted successfully'})
         
+        elif action == 'update_profile_picture':
+            profile_picture = data.get('profile_picture', '').strip()
+            if profile_picture and len(profile_picture) <= 500:  # Validate length
+                participant.profile_picture = profile_picture
+                db.session.commit()
+                return jsonify({'success': True, 'message': 'Profile picture updated successfully'})
+            return jsonify({'success': False, 'error': 'Invalid profile picture'}), 400
+        
         return jsonify({'success': False, 'error': 'Invalid action'}), 400
     
     # GET request - load the member page

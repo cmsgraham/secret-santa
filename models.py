@@ -99,6 +99,7 @@ class Participant(Base):
     # Member page content
     hints = Column(Text)  # Hints about themselves for others to guess
     gift_preferences = Column(Text)  # Gift ideas, preferences, links
+    profile_picture = Column(String(500))  # Icon selection (emoji:🎅) or uploaded image path
     
     # Guessing
     guessed_secret_santa_id = Column(String(36), ForeignKey('participants.id'))  # Their guess of who their Secret Santa is
