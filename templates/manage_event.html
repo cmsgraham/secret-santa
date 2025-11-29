@@ -170,7 +170,6 @@
                                 {% endif %}
                                 <div style="font-size: 0.85rem; color: #6b7280;">
                                     Registered {{ participant.registered_at.strftime('%b %d at %I:%M %p') }}
-                                    • <a href="{{ url_for('member_page', code=event.code, participant_id=participant.id) }}" target="_blank" style="color: #667eea; text-decoration: none;">View Member Page →</a>
                                 </div>
                             </div>
                         </div>
