@@ -1,0 +1,154 @@
+<!-- Santa's Secret Wall Feed Template -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa's Secret Wall</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background: #f3f4f6;
+        }
+        .feed-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 2rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
+        .feed-top {
+            grid-column: 1 / 4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .member-avatar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 0.5rem;
+        }
+        .member-avatar img {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid #374151;
+            background: #fff;
+        }
+        .member-nickname {
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            color: #374151;
+            font-weight: 600;
+        }
+        .feed-left, .feed-right {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            min-height: 300px;
+        }
+        .feed-left h3, .feed-right h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .feed-main {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            min-height: 400px;
+        }
+        .feed-main h2 {
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .post-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .post-form textarea {
+            flex: 1;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 0.75rem;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        .post-form button {
+            background: #667eea;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .post {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .post-nickname {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .post-content {
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="feed-container">
+        <!-- Top: Member Avatars and Nicknames -->
+        <div class="feed-top">
+            {% for member in members %}
+            <div class="member-avatar">
+                <img src="{{ member.profile_picture_url }}" alt="Avatar">
+                <div class="member-nickname">{{ member.nickname }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Left: Hints -->
+        <div class="feed-left">
+            <h3>🎁 Hints</h3>
+            {% for member in members %}
+            <div style="margin-bottom: 1rem;">
+                <strong>{{ member.nickname }}:</strong>
+                <span>{{ member.hints or 'No hints yet.' }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Main: Santa's Secret Wall -->
+        <div class="feed-main">
+            <h2>Santa's Secret Wall</h2>
+            <form class="post-form" method="POST" action="{{ url_for('feed', code=event.code) }}">
+                <textarea name="content" rows="2" placeholder="Post something fun, ask a question, or share a thought..." required></textarea>
+                <button type="submit">Post</button>
+            </form>
+            {% for post in posts %}
+            <div class="post">
+                <div class="post-nickname">{{ post.nickname }}</div>
+                <div class="post-content">{{ post.content }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Right: Gift Ideas -->
+        <div class="feed-right">
+            <h3>🎈 Gift Ideas</h3>
+            {% for member in members %}
+            <div style="margin-bottom: 1rem;">
+                <strong>{{ member.nickname }}:</strong>
+                <span>{{ member.gift_preferences or 'No ideas yet.' }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
