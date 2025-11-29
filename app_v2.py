@@ -558,12 +558,11 @@ def member_page(code, participant_id):
     event = Event.query.filter_by(code=code).first_or_404()
     participant = Participant.query.filter_by(id=participant_id, event_id=event.id).first_or_404()
     
-    # Check authentication: must be the organizer OR the participant themselves
-    is_organizer = 'user_id' in session and session['user_id'] == event.organizer_id
+    # Check authentication: must be the participant themselves ONLY
     is_own_page = session.get('participant_id') == participant_id
     
     # If not authenticated, store the requested page and ask for email verification
-    if not is_organizer and not is_own_page:
+    if not is_own_page:
         # Check if email verification was just submitted
         if request.method == 'POST' and request.form.get('verify_email'):
             submitted_email = request.form.get('email', '').strip().lower()
@@ -625,8 +624,7 @@ def member_page(code, participant_id):
                          event=event, 
                          participant=participant,
                          assignment=assignment,
-                         receiving_assignment=receiving_assignment,
-                         is_organizer_view=is_organizer)
+                         receiving_assignment=receiving_assignment)
 
 # ============================================================================
 # API Routes
