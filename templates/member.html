@@ -383,6 +383,13 @@
 </head>
 <body>
     <div class="container">
+        {% if is_organizer_view %}
+        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; text-align: center;">
+            <strong style="color: #92400e;">👑 Organizer View</strong>
+            <p style="margin: 5px 0 0 0; color: #78350f; font-size: 14px;">You're viewing this member page as the event organizer.</p>
+        </div>
+        {% endif %}
+        
         <div class="header">
             <h1>👋 {{ participant.nickname or participant.name }}</h1>
             <div class="event-name">🎁 {{ event.name }}</div>

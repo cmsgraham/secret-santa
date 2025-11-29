@@ -536,6 +536,9 @@ def register_participant(code):
         db.session.add(participant)
         db.session.commit()
         
+        # Store participant_id in session for member page access
+        session['participant_id'] = participant.id
+        
         # Generate member page URL
         member_url = url_for('member_page', code=event.code, participant_id=participant.id, _external=True)
         
@@ -555,7 +558,28 @@ def member_page(code, participant_id):
     event = Event.query.filter_by(code=code).first_or_404()
     participant = Participant.query.filter_by(id=participant_id, event_id=event.id).first_or_404()
     
-    if request.method == 'POST':
+    # Check authentication: must be the organizer OR the participant themselves
+    is_organizer = 'user_id' in session and session['user_id'] == event.organizer_id
+    is_own_page = session.get('participant_id') == participant_id
+    
+    # If not authenticated, store the requested page and ask for email verification
+    if not is_organizer and not is_own_page:
+        # Check if email verification was just submitted
+        if request.method == 'POST' and request.form.get('verify_email'):
+            submitted_email = request.form.get('email', '').strip().lower()
+            if submitted_email == participant.email:
+                # Grant access by storing participant_id in session
+                session['participant_id'] = participant_id
+                return redirect(url_for('member_page', code=code, participant_id=participant_id))
+            else:
+                flash('Incorrect email address. Please try again.', 'error')
+                return render_template('member_auth.html', event=event, participant=participant, error=True)
+        
+        # Show email verification page
+        return render_template('member_auth.html', event=event, participant=participant)
+    
+    # User is authenticated, proceed with normal member page logic
+    if request.method == 'POST' and request.is_json:
         data = request.get_json()
         action = data.get('action')
         
@@ -601,7 +625,8 @@ def member_page(code, participant_id):
                          event=event, 
                          participant=participant,
                          assignment=assignment,
-                         receiving_assignment=receiving_assignment)
+                         receiving_assignment=receiving_assignment,
+                         is_organizer_view=is_organizer)
 
 # ============================================================================
 # API Routes
