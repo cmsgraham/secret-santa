@@ -11,6 +11,13 @@ services:
       - DATABASE_URL=postgresql://secret_santa:password@db:5432/secret_santa_db
       - SECRET_KEY=your-super-secret-key-change-this
       - DEBUG=false
+      - SMTP_HOST=172.233.171.101
+      - SMTP_PORT=2587
+      - SMTP_USER=secretsanta@nameinahat.com
+      - SMTP_PASSWORD=xiWbEMsDXggUKUXqYSwFIg==
+      - SMTP_FROM_EMAIL=secretsanta@nameinahat.com
+      - SMTP_FROM_NAME=Secret Santa
+      - APP_URL=http://nameinahat.com:5000
     depends_on:
       - db
       - redis
