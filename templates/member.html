@@ -582,7 +582,12 @@
             <p>You are the Secret Santa for:</p>
             <div class="assignment-box">
                 <h3>🎁 You're giving to:</h3>
-                <div class="assignment-name">{{ assignment.receiver.nickname or assignment.receiver.name }}</div>
+                <div class="assignment-name">{{ assignment.receiver.name }}</div>
+                {% if assignment.receiver.nickname and assignment.receiver.nickname != assignment.receiver.name %}
+                <div style="font-size: 20px; color: #92400e; margin-top: 5px;">
+                    "{{ assignment.receiver.nickname }}"
+                </div>
+                {% endif %}
                 <div class="assignment-email">{{ assignment.receiver.email }}</div>
                 
                 {% if assignment.receiver.gift_preferences %}
