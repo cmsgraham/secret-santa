@@ -78,6 +78,67 @@
             font-size: 4rem;
             margin-bottom: 1rem;
         }
+        
+        /* Unified Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn-dark {
+            background: #374151;
+            color: white;
+        }
+        
+        .btn-dark:hover {
+            background: #1f2937;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-icon {
+            padding: 10px 16px;
+            min-width: 44px;
+        }
     </style>
 </head>
 <body>
@@ -139,19 +200,19 @@
                         ⚙️ Manage
                     </a>
                     {% if item.is_participating %}
-                    <a href="{{ item.member_url }}" class="btn" style="background: #374151; color: white;">
+                    <a href="{{ item.member_url }}" class="btn btn-dark">
                         👤 My Page
                     </a>
                     {% elif item.event.status.value == 'registration_open' %}
-                    <button onclick="joinEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn" style="background: #374151; color: white;">
+                    <button onclick="joinEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-dark">
                         🎁 Join Event
                     </button>
                     {% endif %}
-                    <button onclick="copyLink('{{ item.event.registration_url }}')" class="btn btn-secondary">
+                    <button onclick="copyLink('{{ item.event.registration_url }}')" class="btn btn-secondary btn-icon">
                         📋
                     </button>
                     {% if item.event.status.value == 'event_closed' %}
-                    <button onclick="deleteEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn" style="background: #ef4444; color: white;">
+                    <button onclick="deleteEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-danger btn-icon">
                         🗑️
                     </button>
                     {% endif %}
