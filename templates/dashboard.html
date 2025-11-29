@@ -139,11 +139,11 @@
                         ⚙️ Manage
                     </a>
                     {% if item.is_participating %}
-                    <a href="{{ item.member_url }}" class="btn" style="background: #10b981; color: white;">
+                    <a href="{{ item.member_url }}" class="btn" style="background: #374151; color: white;">
                         👤 My Page
                     </a>
                     {% elif item.event.status.value == 'registration_open' %}
-                    <button onclick="joinEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn" style="background: #10b981; color: white;">
+                    <button onclick="joinEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn" style="background: #374151; color: white;">
                         🎁 Join Event
                     </button>
                     {% endif %}
