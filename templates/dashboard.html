@@ -281,12 +281,44 @@
     <script>
         function copyLink(url) {
             const fullUrl = window.location.origin + url;
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                alert('✅ Registration link copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-                prompt('Copy this link:', fullUrl);
-            });
+            
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    alert('✅ Registration link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Clipboard API failed:', err);
+                    fallbackCopy(fullUrl);
+                });
+            } else {
+                // Fallback for browsers that don't support clipboard API
+                fallbackCopy(fullUrl);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            // Create temporary textarea
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert('✅ Registration link copied to clipboard!');
+                } else {
+                    // If copy fails, show prompt
+                    prompt('Copy this link:', text);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                prompt('Copy this link:', text);
+            }
+            
+            document.body.removeChild(textarea);
         }
 
         async function deleteEvent(code, name) {
