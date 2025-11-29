@@ -121,11 +121,12 @@ def send_email(to_email, subject, body):
         
         msg.attach(MIMEText(body, 'plain'))
         
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            if SMTP_USE_TLS:
-                server.starttls()
-            server.login(SMTP_USERNAME, SMTP_PASSWORD)
-            server.send_message(msg)
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        if SMTP_USE_TLS:
+            server.starttls()
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
         
         return True
     except Exception as e:
