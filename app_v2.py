@@ -536,8 +536,9 @@ def register_participant(code):
         db.session.add(participant)
         db.session.commit()
         
-        # Store participant_id in session for member page access
+        # Store participant_id and email in session for member page access
         session['participant_id'] = participant.id
+        session['participant_email'] = participant.email
         
         # Generate member page URL
         member_url = url_for('member_page', code=event.code, participant_id=participant.id, _external=True)
@@ -552,6 +553,50 @@ def register_participant(code):
     
     return render_template('register.html', event=event)
 
+@app.route('/participant/dashboard', methods=['GET'])
+def participant_dashboard():
+    """Participant dashboard showing all events they're registered in"""
+    # Check if participant is authenticated
+    participant_email = session.get('participant_email')
+    
+    if not participant_email:
+        # Ask for email verification
+        if request.args.get('email'):
+            email = request.args.get('email').strip().lower()
+            # Check if this email exists as a participant
+            participants = Participant.query.filter_by(email=email).all()
+            if participants:
+                session['participant_email'] = email
+                return redirect(url_for('participant_dashboard'))
+            else:
+                flash('No events found for this email address.', 'error')
+        
+        return render_template('participant_login.html')
+    
+    # Get all events where this email is registered
+    participants = Participant.query.filter_by(email=participant_email).all()
+    
+    # Group by event
+    events_data = []
+    for p in participants:
+        event = p.event
+        events_data.append({
+            'event': event,
+            'participant': p,
+            'member_url': url_for('member_page', code=event.code, participant_id=p.id)
+        })
+    
+    return render_template('participant_dashboard.html', 
+                         events=events_data, 
+                         participant_email=participant_email)
+
+@app.route('/participant/logout')
+def participant_logout():
+    """Logout participant from dashboard"""
+    session.pop('participant_email', None)
+    session.pop('participant_id', None)
+    return redirect(url_for('participant_dashboard'))
+
 @app.route('/event/<code>/member/<participant_id>', methods=['GET', 'POST'])
 def member_page(code, participant_id):
     """Member landing page for participants to manage their info"""
@@ -559,7 +604,7 @@ def member_page(code, participant_id):
     participant = Participant.query.filter_by(id=participant_id, event_id=event.id).first_or_404()
     
     # Check authentication: must be the participant themselves ONLY
-    is_own_page = session.get('participant_id') == participant_id
+    is_own_page = session.get('participant_id') == participant_id or session.get('participant_email') == participant.email
     
     # If not authenticated, store the requested page and ask for email verification
     if not is_own_page:
@@ -567,8 +612,9 @@ def member_page(code, participant_id):
         if request.method == 'POST' and request.form.get('verify_email'):
             submitted_email = request.form.get('email', '').strip().lower()
             if submitted_email == participant.email:
-                # Grant access by storing participant_id in session
+                # Grant access by storing both participant_id and email in session
                 session['participant_id'] = participant_id
+                session['participant_email'] = participant.email
                 return redirect(url_for('member_page', code=code, participant_id=participant_id))
             else:
                 flash('Incorrect email address. Please try again.', 'error')
