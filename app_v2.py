@@ -631,24 +631,19 @@ def member_page(code, participant_id):
     participant = Participant.query.filter_by(id=participant_id, event_id=event.id).first_or_404()
     
     # Check authentication: must be the participant themselves ONLY
-    is_own_page = session.get('participant_id') == participant_id or session.get('participant_email') == participant.email
+    # They must have either:
+    # 1. participant_id in session (directly registered and stored)
+    # 2. participant_email in session that matches this participant
+    is_own_page = (
+        str(session.get('participant_id')) == str(participant_id) or 
+        session.get('participant_email') == participant.email
+    )
     
-    # If not authenticated, store the requested page and ask for email verification
+    # If not authenticated, redirect to participant dashboard login
+    # No direct email verification on this page to prevent organizers from accessing
     if not is_own_page:
-        # Check if email verification was just submitted
-        if request.method == 'POST' and request.form.get('verify_email'):
-            submitted_email = request.form.get('email', '').strip().lower()
-            if submitted_email == participant.email:
-                # Grant access by storing both participant_id and email in session
-                session['participant_id'] = participant_id
-                session['participant_email'] = participant.email
-                return redirect(url_for('member_page', code=code, participant_id=participant_id))
-            else:
-                flash('Incorrect email address. Please try again.', 'error')
-                return render_template('member_auth.html', event=event, participant=participant, error=True)
-        
-        # Show email verification page
-        return render_template('member_auth.html', event=event, participant=participant)
+        flash('Please log in through the participant dashboard to access your member page.', 'warning')
+        return redirect(url_for('participant_dashboard'))
     
     # User is authenticated, proceed with normal member page logic
     if request.method == 'POST' and request.is_json:

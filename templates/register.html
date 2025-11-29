@@ -152,14 +152,14 @@
                     messageDiv.className = 'message success';
                     messageDiv.style.display = 'block';
                     
-                    // Show member page link
+                    // Show participant dashboard access info
                     if (data.member_url) {
                         const linkDiv = document.createElement('div');
                         linkDiv.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #dbeafe; border-radius: 8px;';
                         linkDiv.innerHTML = `
                             <h3 style="margin: 0 0 0.5rem 0; color: #1e40af;">🎉 Registration Complete!</h3>
                             <p style="margin: 0 0 0.5rem 0; color: #1e3a8a;">
-                                Bookmark this link to access your member page:
+                                Access your member page and all your Secret Santa events:
                             </p>
                             <a href="${data.member_url}" 
                                style="display: inline-block; padding: 0.75rem 1.5rem; background: #667eea; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 0.5rem;">
