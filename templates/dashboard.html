@@ -208,8 +208,8 @@
                         🎁 Join Event
                     </button>
                     {% endif %}
-                    <button onclick="copyLink('{{ item.event.registration_url }}')" class="btn btn-secondary btn-icon">
-                        📋
+                    <button onclick="copyLink('{{ item.event.registration_url }}')" class="btn btn-secondary">
+                        📋 Copy Link
                     </button>
                     {% if item.event.status.value == 'event_closed' %}
                     <button onclick="deleteEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-danger btn-icon">
