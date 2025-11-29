@@ -230,7 +230,6 @@ def login():
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
         email = data.get('email', '').strip().lower()
-        name = data.get('name', '').strip()
         
         # Validate email
         try:
@@ -239,8 +238,8 @@ def login():
         except EmailNotValidError:
             return jsonify({'success': False, 'error': 'Invalid email address'}), 400
         
-        # Create or get user
-        user = create_or_get_user(email, name or email.split('@')[0])
+        # Create or get user (use email prefix as default name)
+        user = create_or_get_user(email, email.split('@')[0])
         
         # Create magic link token
         token = create_magic_link_token(user)
