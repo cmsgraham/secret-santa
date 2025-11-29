@@ -84,7 +84,7 @@
     <div class="container">
         <div class="dashboard-header">
             <div>
-                <h1>🎅 My Events</h1>
+                <h1>🎅 My Dashboard</h1>
                 <p>Welcome back, {{ user.name }}!</p>
             </div>
             <div style="display: flex; gap: 1rem;">
@@ -97,9 +97,11 @@
             </div>
         </div>
 
-        {% if events %}
+        <!-- Events I Created -->
+        {% if created_events %}
+        <h2 style="margin: 2rem 0 1rem 0; color: #374151;">🎄 Events I Created</h2>
         <div class="event-grid">
-            {% for event in events %}
+            {% for event in created_events %}
             <div class="event-card">
                 <h3>{{ event.name }}</h3>
                 
@@ -148,7 +150,51 @@
             </div>
             {% endfor %}
         </div>
-        {% else %}
+        {% endif %}
+
+        <!-- Events I'm Participating In -->
+        {% if participating_events %}
+        <h2 style="margin: 2rem 0 1rem 0; color: #374151;">🎁 Events I'm Participating In</h2>
+        <div class="event-grid">
+            {% for item in participating_events %}
+            <div class="event-card">
+                <h3>{{ item.event.name }}</h3>
+                
+                <span class="event-status status-{{ item.event.status.value }}">
+                    {% if item.event.status.value == 'registration_open' %}
+                        📝 Registration Open
+                    {% elif item.event.status.value == 'draw_completed' %}
+                        🎅 Draw Completed
+                    {% else %}
+                        🔒 Closed
+                    {% endif %}
+                </span>
+
+                <div style="background: #f3f4f6; padding: 10px; border-radius: 8px; margin: 1rem 0; font-size: 0.9rem;">
+                    <strong>Your nickname:</strong> {{ item.participant.nickname or item.participant.name }}
+                </div>
+
+                <div class="event-stats">
+                    <div>
+                        <strong>{{ item.event.participant_count }}</strong> participants
+                    </div>
+                    <div>
+                        Registered {{ item.participant.registered_at.strftime('%b %d') }}
+                    </div>
+                </div>
+
+                <div class="event-actions">
+                    <a href="{{ item.member_url }}" class="btn btn-primary" style="flex: 1;">
+                        View My Page →
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Empty state if no events at all -->
+        {% if not created_events and not participating_events %}
         <div class="empty-state">
             <div class="empty-state-icon">🎁</div>
             <h2>No Events Yet</h2>

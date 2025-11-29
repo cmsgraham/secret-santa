@@ -369,10 +369,31 @@ def create_event():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    """User dashboard showing all their events"""
+    """Unified dashboard showing all events (created and participating)"""
     user = get_current_user()
-    events = Event.query.filter_by(organizer_id=user.id).order_by(Event.created_at.desc()).all()
-    return render_template('dashboard.html', events=events, user=user)
+    
+    # Get events where user is the organizer
+    created_events = Event.query.filter_by(organizer_id=user.id).order_by(Event.created_at.desc()).all()
+    
+    # Get events where user is a participant
+    participant_events = Participant.query.filter_by(email=user.email).all()
+    
+    # Prepare participating events data
+    participating_events = []
+    for p in participant_events:
+        event = p.event
+        # Skip if already in created_events (avoid duplicates)
+        if event.organizer_id != user.id:
+            participating_events.append({
+                'event': event,
+                'participant': p,
+                'member_url': url_for('member_page', code=event.code, participant_id=p.id)
+            })
+    
+    return render_template('dashboard.html', 
+                         created_events=created_events,
+                         participating_events=participating_events,
+                         user=user)
 
 @app.route('/event/<code>/manage')
 @login_required
@@ -581,8 +602,12 @@ def register_participant(code):
 
 @app.route('/participant/dashboard', methods=['GET', 'POST'])
 def participant_dashboard():
-    """Participant dashboard showing all events they're registered in"""
-    # Check if participant is authenticated
+    """Redirect to unified dashboard - kept for backwards compatibility"""
+    # If user is already logged in via user_id, redirect to dashboard
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    
+    # Check if participant is authenticated via participant_email
     participant_email = session.get('participant_email')
     
     if not participant_email:
@@ -612,20 +637,20 @@ def participant_dashboard():
             # Create magic link token
             token = create_magic_link_token(user)
             
-            # Send magic link email for participant dashboard access
-            magic_link = url_for('verify_participant_magic_link', token=token, _external=True)
+            # Send magic link email for dashboard access
+            magic_link = url_for('verify_magic_link', token=token, _external=True)
             subject = "🎄 Your Secret Santa Dashboard Login Link"
             body = f"""
 Hi {participant_name}!
 
-Click the link below to access your Secret Santa participant dashboard:
+Click the link below to access your Secret Santa dashboard:
 
 {magic_link}
 
 This link will expire in 1 hour.
 
 From your dashboard, you can:
-- View all Secret Santa events you're registered in
+- View all Secret Santa events (created and participating)
 - Manage your gift preferences and hints
 - Create new Secret Santa events
 
@@ -645,22 +670,16 @@ Happy gifting! 🎁
         
         return render_template('participant_login.html')
     
-    # Get all events where this email is registered
-    participants = Participant.query.filter_by(email=participant_email).all()
+    # Participant is authenticated via participant_email, log them in as user
+    user = User.query.filter_by(email=participant_email).first()
+    if user:
+        session['user_id'] = user.id
+        session['user_email'] = user.email
+        session['user_name'] = user.name
+        session.pop('participant_email', None)  # Remove old session key
+        session.pop('participant_id', None)
     
-    # Group by event
-    events_data = []
-    for p in participants:
-        event = p.event
-        events_data.append({
-            'event': event,
-            'participant': p,
-            'member_url': url_for('member_page', code=event.code, participant_id=p.id)
-        })
-    
-    return render_template('participant_dashboard.html', 
-                         events=events_data, 
-                         participant_email=participant_email)
+    return redirect(url_for('dashboard'))
 
 @app.route('/participant/logout')
 def participant_logout():
@@ -671,33 +690,8 @@ def participant_logout():
 
 @app.route('/participant/auth/verify/<token>')
 def verify_participant_magic_link(token):
-    """Verify magic link token and log in participant to dashboard"""
-    auth_token = AuthToken.query.filter_by(token=token).first()
-    
-    if not auth_token or not auth_token.is_valid:
-        flash('Invalid or expired login link', 'error')
-        return redirect(url_for('participant_dashboard'))
-    
-    # Mark token as used
-    auth_token.used = True
-    auth_token.used_at = datetime.now(timezone.utc)
-    
-    # Get user email
-    user = auth_token.user
-    
-    # Check if this email has participant registrations
-    participants = Participant.query.filter_by(email=user.email).all()
-    if not participants:
-        flash('No events found for this email address', 'error')
-        return redirect(url_for('participant_dashboard'))
-    
-    # Log in participant by setting email in session
-    session['participant_email'] = user.email
-    
-    db.session.commit()
-    
-    flash(f'Welcome back, {user.name}!', 'success')
-    return redirect(url_for('participant_dashboard'))
+    """Verify magic link token - redirects to unified dashboard"""
+    return verify_magic_link(token)
 
 @app.route('/event/<code>/member/<participant_id>', methods=['GET', 'POST'])
 def member_page(code, participant_id):
@@ -709,9 +703,11 @@ def member_page(code, participant_id):
     # They must have either:
     # 1. participant_id in session (directly registered and stored)
     # 2. participant_email in session that matches this participant
+    # 3. user_email in session that matches this participant (unified auth)
     is_own_page = (
         str(session.get('participant_id')) == str(participant_id) or 
-        session.get('participant_email') == participant.email
+        session.get('participant_email') == participant.email or
+        session.get('user_email') == participant.email
     )
     
     # If not authenticated, redirect to participant dashboard login
