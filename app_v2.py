@@ -301,9 +301,30 @@ def logout():
 # ============================================================================
 
 @app.route('/create-event', methods=['GET', 'POST'])
-@login_required
 def create_event():
     """Create a new Secret Santa event"""
+    # Check if coming from participant dashboard with authentication
+    participant_email = session.get('participant_email')
+    from_dashboard = False
+    
+    # If not logged in as organizer but has participant_email, auto-create user account
+    if 'user_id' not in session and participant_email:
+        # Get or create user from participant email
+        # Try to get name from a recent participant record
+        participant = Participant.query.filter_by(email=participant_email).first()
+        if participant:
+            # Auto-create/get user account without magic link
+            user = create_or_get_user(participant_email, participant.name)
+            session['user_id'] = user.id
+            session['user_email'] = user.email
+            session['user_name'] = user.name
+            from_dashboard = True
+    
+    # Require login for creating events
+    if 'user_id' not in session:
+        flash('Please log in to create an event', 'warning')
+        return redirect(url_for('login', next=request.url))
+    
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
         
@@ -334,7 +355,13 @@ def create_event():
     
     # GET request - show form with name suggestions
     suggestions = get_random_event_names(5)
-    return render_template('create_event.html', suggestions=suggestions)
+    user_email = session.get('user_email', '')
+    user_name = session.get('user_name', '')
+    return render_template('create_event.html', 
+                         suggestions=suggestions,
+                         user_email=user_email,
+                         user_name=user_name,
+                         from_dashboard=from_dashboard or bool(participant_email))
 
 # ============================================================================
 # Routes - Event Management

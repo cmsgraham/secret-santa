@@ -54,17 +54,29 @@
 <body>
     <div class="container">
         <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            {% if from_dashboard %}
+            <a href="{{ url_for('participant_dashboard') }}" style="color: #667eea; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            {% else %}
             <a href="{{ url_for('dashboard') }}" style="color: #667eea; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            {% endif %}
             <div>
-                <span>Hello, {{ session.user_name }}!</span>
+                <span>Hello, {{ user_name }}!</span>
+                {% if from_dashboard %}
+                <a href="{{ url_for('participant_logout') }}" style="margin-left: 1rem; color: #6b7280;">Logout</a>
+                {% else %}
                 <a href="{{ url_for('logout') }}" style="margin-left: 1rem; color: #6b7280;">Logout</a>
+                {% endif %}
             </div>
         </nav>
 
         <div class="create-container">
             <div style="text-align: center; margin-bottom: 2rem;">
                 <h1>🎄 Create New Event</h1>
+                {% if from_dashboard %}
+                <p>Creating as {{ user_email }}</p>
+                {% else %}
                 <p>Let's set up your Secret Santa gift exchange!</p>
+                {% endif %}
             </div>
 
             <div id="message" class="message" style="display: none;"></div>
