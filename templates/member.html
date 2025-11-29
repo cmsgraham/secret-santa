@@ -551,10 +551,19 @@
                     {{ participant.profile_picture or '👤' }}
                 </div>
                 <div class="profile-details">
-                    <h1 style="margin-bottom: 5px;">👋 {{ participant.nickname or participant.name }}</h1>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                        <h1 id="nicknameDisplay" style="margin: 0;">👋 {{ participant.nickname or participant.name }}</h1>
+                        <button class="edit-profile-btn" onclick="editNickname()" style="margin: 0;">✏️</button>
+                    </div>
+                    <div id="nicknameEdit" style="display: none; margin-bottom: 5px;">
+                        <input type="text" id="nicknameInput" value="{{ participant.nickname or participant.name }}" maxlength="100" style="padding: 8px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; font-weight: bold; width: 300px; max-width: 100%;">
+                        <button class="btn" onclick="saveNickname()" style="padding: 8px 15px; margin-left: 5px;">Save</button>
+                        <button class="btn btn-secondary" onclick="cancelEditNickname()" style="padding: 8px 15px; margin-left: 5px;">Cancel</button>
+                    </div>
                     <div class="event-name">🎁 {{ event.name }}</div>
                     <div class="participant-info">{{ participant.email }}</div>
                     <button class="edit-profile-btn" onclick="openProfileModal()">✏️ Change Picture</button>
+                    <div class="save-message" id="nicknameSaved" style="margin-top: 5px;">✓ Nickname saved!</div>
                 </div>
             </div>
             {% if event.status.value == 'registration_open' %}
@@ -994,6 +1003,70 @@
                 closeProfileModal();
             }
         }
+        
+        // Nickname editing functions
+        function editNickname() {
+            document.getElementById('nicknameDisplay').style.display = 'none';
+            document.getElementById('nicknameEdit').style.display = 'block';
+            document.getElementById('nicknameInput').focus();
+        }
+        
+        function cancelEditNickname() {
+            document.getElementById('nicknameDisplay').style.display = 'flex';
+            document.getElementById('nicknameEdit').style.display = 'none';
+        }
+        
+        async function saveNickname() {
+            const nickname = document.getElementById('nicknameInput').value.trim();
+            
+            if (!nickname) {
+                alert('Nickname cannot be empty');
+                return;
+            }
+            
+            try {
+                const response = await fetch(window.location.pathname, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'update_nickname',
+                        nickname: nickname
+                    })
+                });
+                
+                if (response.ok) {
+                    // Update the display
+                    document.getElementById('nicknameDisplay').innerHTML = '👋 ' + nickname;
+                    document.getElementById('nicknameDisplay').style.display = 'flex';
+                    document.getElementById('nicknameEdit').style.display = 'none';
+                    
+                    // Show success message
+                    const savedMsg = document.getElementById('nicknameSaved');
+                    savedMsg.classList.add('show');
+                    setTimeout(() => savedMsg.classList.remove('show'), 3000);
+                } else {
+                    alert('Failed to save nickname. Please try again.');
+                }
+            } catch (error) {
+                alert('Failed to save nickname. Please try again.');
+            }
+        }
+        
+        // Allow Enter key to save nickname
+        document.addEventListener('DOMContentLoaded', function() {
+            const nicknameInput = document.getElementById('nicknameInput');
+            if (nicknameInput) {
+                nicknameInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        saveNickname();
+                    } else if (e.key === 'Escape') {
+                        cancelEditNickname();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
