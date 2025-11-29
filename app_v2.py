@@ -774,6 +774,14 @@ def member_page(code, participant_id):
                 return jsonify({'success': True, 'message': 'Profile picture updated successfully'})
             return jsonify({'success': False, 'error': 'Invalid profile picture'}), 400
         
+        elif action == 'update_nickname':
+            nickname = data.get('nickname', '').strip()
+            if nickname and len(nickname) <= 100:  # Validate length
+                participant.nickname = nickname
+                db.session.commit()
+                return jsonify({'success': True, 'message': 'Nickname updated successfully'})
+            return jsonify({'success': False, 'error': 'Invalid nickname'}), 400
+        
         return jsonify({'success': False, 'error': 'Invalid action'}), 400
     
     # GET request - load the member page
