@@ -541,9 +541,9 @@
 <body>
     <div class="container">
         <div class="header">
-            {% if session.get('participant_email') %}
-            <a href="{{ url_for('participant_dashboard') }}" class="dashboard-link">
-                ← Back to All Events
+            {% if session.get('user_id') or session.get('participant_email') %}
+            <a href="{{ url_for('dashboard') }}" class="dashboard-link">
+                ← Back to Dashboard
             </a>
             {% endif %}
             <div class="profile-section">
