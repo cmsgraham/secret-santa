@@ -875,6 +875,30 @@ def join_own_event(code):
         'participant_id': participant.id
     })
 
+@app.route('/event/<code>/participant/<participant_id>/remove', methods=['POST'])
+@login_required
+def remove_participant(code, participant_id):
+    """Remove a participant from an event"""
+    event = Event.query.filter_by(code=code).first_or_404()
+    participant = Participant.query.filter_by(id=participant_id, event_id=event.id).first_or_404()
+    
+    # Check if user is the organizer
+    if event.organizer_id != session['user_id']:
+        return jsonify({'success': False, 'error': 'Only the organizer can remove participants'}), 403
+    
+    # Check if draw has been completed
+    if event.status != EventStatus.REGISTRATION_OPEN:
+        return jsonify({'success': False, 'error': 'Cannot remove participants after draw is completed'}), 400
+    
+    participant_name = participant.name
+    db.session.delete(participant)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': f'{participant_name} has been removed from the event'
+    })
+
 # ============================================================================
 # Health Check
 # ============================================================================
