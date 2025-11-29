@@ -1,0 +1,7 @@
+# Quota configuration for nameinahat.com mailboxes
+# Format: user@domain:storage_quota
+# Storage quota in bytes (500M = 524288000)
+
+secretsanta@nameinahat.com:524288000
+noreply@nameinahat.com:104857600
+admin@nameinahat.com:1073741824

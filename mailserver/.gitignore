@@ -1,0 +1,13 @@
+# Mail server sensitive files
+.mail-credentials
+ssl/privkey.pem
+config/opendkim/keys/*/mail.private
+
+# Mail data and state
+data/
+mailserver_backup_*.tar.gz
+
+# Logs and temporary files
+*.log
+.env
+.env.local

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Santa Organizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎅 Secret Santa Organizer</h1>
+            <p>Organize your Secret Santa gift exchange with ease!</p>
+        </header>
+
+        <div class="card">
+            <h2>Setup Your Secret Santa</h2>
+            <form id="secretSantaForm">
+                <div class="form-group">
+                    <label for="eventName">Event Name</label>
+                    <input 
+                        type="text" 
+                        id="eventName" 
+                        name="event_name" 
+                        placeholder="Christmas Secret Santa 2025"
+                        value="Secret Santa Exchange"
+                    >
+                    <small>Give your Secret Santa exchange a memorable name</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="emails">Participant Emails</label>
+                    <textarea 
+                        id="emails" 
+                        name="emails" 
+                        rows="8" 
+                        placeholder="Enter participant emails (one per line)&#10;example1@email.com&#10;example2@email.com&#10;example3@email.com"
+                        required
+                    ></textarea>
+                    <small>Enter at least 2 email addresses, one per line</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="senderEmail">Organizer Email (optional)</label>
+                    <input 
+                        type="email" 
+                        id="senderEmail" 
+                        name="sender_email" 
+                        placeholder="organizer@example.com (optional)"
+                    >
+                    <small>Your email will appear as the sender. If left empty, uses default system email.</small>
+                </div>
+
+                <button type="submit" class="btn-primary" id="assignBtn">
+                    <span id="btnText">🎁 Create & Send Assignments</span>
+                    <span id="spinner" class="spinner" style="display: none;">⏳ Processing...</span>
+                </button>
+            </form>
+        </div>
+
+        <div id="result" class="result" style="display: none;"></div>
+
+        <div class="info-card">
+            <h3>How it works:</h3>
+            <ul>
+                <li>📧 Enter participant emails (minimum 2)</li>
+                <li>🔀 We randomly assign Secret Santa pairs</li>
+                <li>📨 Each participant gets an email with their assignment</li>
+                <li>🤐 No one can be assigned to themselves</li>
+                <li>🎄 Spread holiday cheer!</li>
+            </ul>
+            
+            <div class="security-note">
+                <h4>🎁 Secret Santa Tips:</h4>
+                <p>Make your gift exchange special with thoughtful presents, surprise reveals, and lots of holiday fun! Remember to keep the assignments secret until the big day.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

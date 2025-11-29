@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  nameinahat-mail:
+    image: mailserver/docker-mailserver:latest
+    hostname: mail
+    domainname: nameinahat.com
+    container_name: nameinahat-mailserver
+    ports:
+      - "2525:25"      # Alternative SMTP port to avoid conflicts
+      - "2143:143"     # Alternative IMAP port
+      - "2465:465"     # Alternative SMTPS port  
+      - "2587:587"     # Alternative submission port
+      - "2993:993"     # Alternative IMAPS port
+    volumes:
+      - ./data/maildata:/var/mail
+      - ./data/mailstate:/var/mail-state
+      - ./config:/tmp/docker-mailserver
+      - ./ssl:/etc/letsencrypt:ro
+    environment:
+      - ENABLE_SPAMASSASSIN=1
+      - ENABLE_CLAMAV=1
+      - ENABLE_FAIL2BAN=1
+      - ENABLE_POSTGREY=1
+      - SSL_TYPE=manual
+      - SSL_CERT_PATH=/etc/letsencrypt/fullchain.pem
+      - SSL_KEY_PATH=/etc/letsencrypt/privkey.pem
+      - ONE_DIR=1
+      - DMS_DEBUG=0
+      - PERMIT_DOCKER=connected-networks
+      - OVERRIDE_HOSTNAME=mail.nameinahat.com
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+    restart: always
+    networks:
+      - mailnet
+
+networks:
+  mailnet:
+    driver: bridge
