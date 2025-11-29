@@ -101,48 +101,57 @@
         {% if created_events %}
         <h2 style="margin: 2rem 0 1rem 0; color: #374151;">🎄 Events I Created</h2>
         <div class="event-grid">
-            {% for event in created_events %}
+            {% for item in created_events %}
             <div class="event-card">
-                <h3>{{ event.name }}</h3>
+                <h3>{{ item.event.name }}</h3>
                 
-                <span class="event-status status-{{ event.status.value }}">
-                    {% if event.status.value == 'registration_open' %}
+                <span class="event-status status-{{ item.event.status.value }}">
+                    {% if item.event.status.value == 'registration_open' %}
                         🟢 Registration Open
-                    {% elif event.status.value == 'draw_completed' %}
+                    {% elif item.event.status.value == 'draw_completed' %}
                         🎲 Draw Completed
                     {% else %}
                         🔒 Closed
                     {% endif %}
                 </span>
 
-                {% if event.description %}
+                {% if item.event.description %}
                 <p style="color: #6b7280; font-size: 0.9rem; margin: 1rem 0;">
-                    {{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}
+                    {{ item.event.description[:100] }}{% if item.event.description|length > 100 %}...{% endif %}
                 </p>
                 {% endif %}
 
                 <div class="event-stats">
                     <div>
-                        <strong>{{ event.participant_count }}</strong> participants
+                        <strong>{{ item.event.participant_count }}</strong> participants
                     </div>
                     <div>
-                        Code: <strong>{{ event.code }}</strong>
+                        Code: <strong>{{ item.event.code }}</strong>
                     </div>
                 </div>
 
                 <div style="font-size: 0.85rem; color: #9ca3af; margin: 0.5rem 0;">
-                    Created {{ event.created_at.strftime('%b %d, %Y') }}
+                    Created {{ item.event.created_at.strftime('%b %d, %Y') }}
                 </div>
 
                 <div class="event-actions">
-                    <a href="{{ event.management_url }}" class="btn btn-primary" style="flex: 1;">
+                    <a href="{{ item.event.management_url }}" class="btn btn-primary" style="flex: 1;">
                         ⚙️ Manage
                     </a>
-                    <button onclick="copyLink('{{ event.registration_url }}')" class="btn btn-secondary">
-                        📋 Copy Link
+                    {% if item.is_participating %}
+                    <a href="{{ item.member_url }}" class="btn" style="background: #10b981; color: white;">
+                        👤 My Page
+                    </a>
+                    {% elif item.event.status.value == 'registration_open' %}
+                    <a href="{{ item.event.registration_url }}" class="btn" style="background: #10b981; color: white;">
+                        🎁 Join Event
+                    </a>
+                    {% endif %}
+                    <button onclick="copyLink('{{ item.event.registration_url }}')" class="btn btn-secondary">
+                        📋
                     </button>
-                    {% if event.status.value == 'event_closed' %}
-                    <button onclick="deleteEvent('{{ event.code }}', '{{ event.name }}')" class="btn" style="background: #ef4444; color: white;">
+                    {% if item.event.status.value == 'event_closed' %}
+                    <button onclick="deleteEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn" style="background: #ef4444; color: white;">
                         🗑️
                     </button>
                     {% endif %}
