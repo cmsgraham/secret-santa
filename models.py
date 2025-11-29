@@ -150,4 +150,16 @@ class AuthToken(Base):
     
     @property
     def is_valid(self):
-        return not self.used and datetime.now(timezone.utc) < self.expires_at
+        """Check if token is valid (not used and not expired)"""
+        if self.used:
+            return False
+        
+        now = datetime.now(timezone.utc)
+        expires = self.expires_at
+        
+        # Ensure both datetimes have timezone info for comparison
+        if expires.tzinfo is None:
+            # If expires_at is naive, assume it's UTC
+            expires = expires.replace(tzinfo=timezone.utc)
+        
+        return now < expires
