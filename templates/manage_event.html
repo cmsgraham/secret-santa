@@ -174,9 +174,16 @@
                                 </div>
                             </div>
                         </div>
-                        {% if participant.assignment_email_sent %}
-                        <span style="color: #10b981;">✅ Email Sent</span>
-                        {% endif %}
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            {% if participant.assignment_email_sent %}
+                            <span style="color: #10b981;">✅ Email Sent</span>
+                            {% endif %}
+                            {% if event.status.value == 'registration_open' %}
+                            <button onclick="removeParticipant('{{ participant.id }}', '{{ participant.name }}')" class="btn" style="background: #ef4444; color: white; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                🗑️ Remove
+                            </button>
+                            {% endif %}
+                        </div>
                     </li>
                     {% endfor %}
                 </ul>
@@ -369,6 +376,30 @@
                 }
             } catch (error) {
                 showMessage('error', '❌ Failed to toggle guessing.');
+            }
+        }
+
+        async function removeParticipant(participantId, participantName) {
+            if (!confirm(`Remove ${participantName} from this event?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`{{ url_for("remove_participant", code=event.code, participant_id="PARTICIPANT_ID") }}`.replace('PARTICIPANT_ID', participantId), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '✅ ' + data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('error', '❌ ' + data.error);
+                }
+            } catch (error) {
+                showMessage('error', '❌ Failed to remove participant.');
             }
         }
 
