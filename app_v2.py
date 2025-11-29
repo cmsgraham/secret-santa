@@ -548,11 +548,43 @@ def health():
 
 @app.errorhandler(404)
 def not_found(e):
-    return render_template('404.html'), 404
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>404 - Page Not Found</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+            h1 { color: #667eea; }
+        </style>
+    </head>
+    <body>
+        <h1>🎅 404 - Page Not Found</h1>
+        <p>The page you're looking for doesn't exist.</p>
+        <a href="/">← Back to Home</a>
+    </body>
+    </html>
+    ''', 404
 
 @app.errorhandler(500)
 def server_error(e):
-    return render_template('500.html'), 500
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>500 - Server Error</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+            h1 { color: #ef4444; }
+        </style>
+    </head>
+    <body>
+        <h1>🎄 500 - Server Error</h1>
+        <p>Something went wrong on our end.</p>
+        <a href="/">← Back to Home</a>
+    </body>
+    </html>
+    ''', 500
 
 # ============================================================================
 # Initialize Database
