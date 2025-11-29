@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Secret Santa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .event-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .event-card h3 {
+            margin: 0 0 1rem 0;
+            color: #374151;
+        }
+        .event-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .status-registration_open {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-draw_completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .status-event_closed {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        .event-stats {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        .event-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-header">
+            <div>
+                <h1>🎅 My Events</h1>
+                <p>Welcome back, {{ user.name }}!</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="{{ url_for('create_event') }}" class="btn btn-primary">
+                    ➕ Create New Event
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        {% if events %}
+        <div class="event-grid">
+            {% for event in events %}
+            <div class="event-card">
+                <h3>{{ event.name }}</h3>
+                
+                <span class="event-status status-{{ event.status.value }}">
+                    {% if event.status.value == 'registration_open' %}
+                        🟢 Registration Open
+                    {% elif event.status.value == 'draw_completed' %}
+                        🎲 Draw Completed
+                    {% else %}
+                        🔒 Closed
+                    {% endif %}
+                </span>
+
+                {% if event.description %}
+                <p style="color: #6b7280; font-size: 0.9rem; margin: 1rem 0;">
+                    {{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}
+                </p>
+                {% endif %}
+
+                <div class="event-stats">
+                    <div>
+                        <strong>{{ event.participant_count }}</strong> participants
+                    </div>
+                    <div>
+                        Code: <strong>{{ event.code }}</strong>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.85rem; color: #9ca3af; margin: 0.5rem 0;">
+                    Created {{ event.created_at.strftime('%b %d, %Y') }}
+                </div>
+
+                <div class="event-actions">
+                    <a href="{{ event.management_url }}" class="btn btn-primary" style="flex: 1;">
+                        ⚙️ Manage
+                    </a>
+                    <button onclick="copyLink('{{ event.registration_url }}')" class="btn btn-secondary">
+                        📋 Copy Link
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🎁</div>
+            <h2>No Events Yet</h2>
+            <p style="color: #6b7280; margin: 1rem 0;">
+                Get started by creating your first Secret Santa event!
+            </p>
+            <a href="{{ url_for('create_event') }}" class="btn btn-primary" style="margin-top: 1rem;">
+                ➕ Create Your First Event
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function copyLink(url) {
+            const fullUrl = window.location.origin + url;
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                alert('✅ Registration link copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                prompt('Copy this link:', fullUrl);
+            });
+        }
+    </script>
+</body>
+</html>

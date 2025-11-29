@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event - Secret Santa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .create-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .suggestions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .suggestion-card {
+            padding: 1rem;
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .suggestion-card:hover {
+            border-color: #667eea;
+            background: #eef2ff;
+            transform: translateY(-2px);
+        }
+        .suggestion-card.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+            font-weight: bold;
+        }
+        .form-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <a href="{{ url_for('dashboard') }}" style="color: #667eea; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            <div>
+                <span>Hello, {{ session.user_name }}!</span>
+                <a href="{{ url_for('logout') }}" style="margin-left: 1rem; color: #6b7280;">Logout</a>
+            </div>
+        </nav>
+
+        <div class="create-container">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h1>🎄 Create New Event</h1>
+                <p>Let's set up your Secret Santa gift exchange!</p>
+            </div>
+
+            <div id="message" class="message" style="display: none;"></div>
+
+            <form id="createEventForm">
+                <div class="form-section">
+                    <h3>Choose a Fun Event Name</h3>
+                    <p style="color: #6b7280; margin-bottom: 1rem;">Pick one of our suggestions or create your own:</p>
+                    
+                    <div class="suggestions" id="suggestions">
+                        {% for name in suggestions %}
+                        <div class="suggestion-card" onclick="selectSuggestion('{{ name }}')">
+                            {{ name }}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <button type="button" class="btn btn-secondary" onclick="loadMoreSuggestions()">
+                            🎲 Generate More Names
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event_name">Or Enter Your Own Name:</label>
+                        <input type="text" id="event_name" name="event_name" placeholder="My Awesome Secret Santa" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Event Description (Optional)</h3>
+                    <div class="form-group">
+                        <label for="description">Add some details about your event:</label>
+                        <textarea id="description" name="description" rows="3" 
+                                  placeholder="Annual family gift exchange, $25 limit, bring gifts to Christmas dinner!"
+                                  style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section" style="background: #eef2ff; border: 2px solid #667eea;">
+                    <h3>📋 What Happens Next?</h3>
+                    <ol style="color: #374151; margin: 0;">
+                        <li>You'll get a unique event link to share</li>
+                        <li>Participants register themselves using the link</li>
+                        <li>When ready, you run the draw and everyone gets emailed!</li>
+                    </ol>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1rem;">
+                    🎁 Create Event
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let selectedSuggestion = null;
+
+        function selectSuggestion(name) {
+            // Remove previous selection
+            document.querySelectorAll('.suggestion-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select this card
+            event.target.classList.add('selected');
+            selectedSuggestion = name;
+            
+            // Update input field
+            document.getElementById('event_name').value = name;
+        }
+
+        async function loadMoreSuggestions() {
+            const suggestionsDiv = document.getElementById('suggestions');
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Generating...';
+            
+            try {
+                const response = await fetch('{{ url_for("get_suggestions") }}?count=5');
+                const data = await response.json();
+                
+                if (data.names) {
+                    suggestionsDiv.innerHTML = data.names.map(name => 
+                        `<div class="suggestion-card" onclick="selectSuggestion('${name}')">${name}</div>`
+                    ).join('');
+                }
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+            } finally {
+                button.disabled = false;
+                button.textContent = '🎲 Generate More Names';
+            }
+        }
+
+        document.getElementById('createEventForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const messageDiv = document.getElementById('message');
+            const originalBtnText = submitBtn.textContent;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            messageDiv.style.display = 'none';
+            
+            const formData = {
+                event_name: document.getElementById('event_name').value,
+                description: document.getElementById('description').value
+            };
+            
+            try {
+                const response = await fetch('{{ url_for("create_event") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Redirect to event management page
+                    window.location.href = data.management_url;
+                } else {
+                    messageDiv.textContent = '❌ ' + (data.error || 'Failed to create event');
+                    messageDiv.className = 'message error';
+                    messageDiv.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }
+            } catch (error) {
+                messageDiv.textContent = '❌ Something went wrong. Please try again.';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        });
+    </script>
+</body>
+</html>

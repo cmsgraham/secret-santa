@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage {{ event.name }} - Secret Santa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .manage-container {
+            max-width: 900px;
+            margin: 2rem auto;
+        }
+        .event-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .share-box {
+            background: #f3f4f6;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .share-link {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .share-link input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .participant-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+        .participant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .participant-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .participant-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .success-box {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav style="margin-bottom: 2rem;">
+            <a href="{{ url_for('dashboard') }}" style="color: #667eea; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+        </nav>
+
+        <div class="manage-container">
+            <div class="event-header">
+                <h1>{{ event.name }}</h1>
+                
+                <span class="status-badge {% if event.status.value == 'registration_open' %}status-registration_open{% elif event.status.value == 'draw_completed' %}status-draw_completed{% else %}status-event_closed{% endif %}">
+                    {% if event.status.value == 'registration_open' %}
+                        🟢 Registration Open
+                    {% elif event.status.value == 'draw_completed' %}
+                        🎲 Draw Completed
+                    {% else %}
+                        🔒 Event Closed
+                    {% endif %}
+                </span>
+
+                {% if event.description %}
+                <p style="color: #6b7280; margin: 1rem 0;">{{ event.description }}</p>
+                {% endif %}
+
+                <div style="display: flex; gap: 2rem; margin-top: 1rem; color: #6b7280; font-size: 0.9rem;">
+                    <div><strong>Event Code:</strong> {{ event.code }}</div>
+                    <div><strong>Created:</strong> {{ event.created_at.strftime('%b %d, %Y') }}</div>
+                    {% if event.draw_date %}
+                    <div><strong>Draw Run:</strong> {{ event.draw_date.strftime('%b %d, %Y') }}</div>
+                    {% endif %}
+                </div>
+
+                {% if event.status.value == 'registration_open' %}
+                <div class="share-box">
+                    <strong>📤 Share this link with participants:</strong>
+                    <div class="share-link">
+                        <input type="text" id="registrationLink" value="{{ request.url_root }}{{ event.registration_url[1:] }}" readonly>
+                        <button class="btn btn-primary" onclick="copyRegistrationLink()">📋 Copy</button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div id="message" class="message" style="display: none;"></div>
+
+            <!-- Participants Section -->
+            <div class="section">
+                <h2>👥 Participants ({{ event.participant_count }})</h2>
+                
+                {% if event.participant_count == 0 %}
+                <div style="text-align: center; padding: 2rem; color: #6b7280;">
+                    <p>No participants yet. Share the registration link above!</p>
+                </div>
+                {% else %}
+                <ul class="participant-list">
+                    {% for participant in event.participants %}
+                    <li class="participant-item">
+                        <div class="participant-info">
+                            <div class="participant-avatar">
+                                {{ participant.name[0].upper() }}
+                            </div>
+                            <div>
+                                <strong>{{ participant.name }}</strong>
+                                <div style="font-size: 0.85rem; color: #6b7280;">
+                                    Registered {{ participant.registered_at.strftime('%b %d at %I:%M %p') }}
+                                </div>
+                            </div>
+                        </div>
+                        {% if participant.assignment_email_sent %}
+                        <span style="color: #10b981;">✅ Email Sent</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                {% if event.participant_count < event.min_participants and event.status.value == 'registration_open' %}
+                <div class="warning-box">
+                    ⚠️ Need at least {{ event.min_participants }} participants to run the draw. 
+                    ({{ event.min_participants - event.participant_count }} more needed)
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Actions Section -->
+            <div class="section">
+                <h2>⚙️ Event Actions</h2>
+                
+                {% if event.status.value == 'registration_open' %}
+                    {% if event.can_run_draw %}
+                    <div class="success-box">
+                        ✅ Ready to run the draw! Everyone will receive their Secret Santa assignment via email.
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="runDraw()" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                            🎲 Run the Draw!
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="warning-box">
+                        ⚠️ Not ready yet. Need at least {{ event.min_participants }} participants to run the draw.
+                    </div>
+                    {% endif %}
+                    
+                    <div class="action-buttons" style="margin-top: 1rem;">
+                        <button class="btn btn-secondary" onclick="closeEvent()">
+                            🔒 Close Event
+                        </button>
+                    </div>
+                {% elif event.status.value == 'draw_completed' %}
+                    <div class="success-box">
+                        ✅ Draw completed! All participants have been emailed their assignments.
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="reopenRegistration()">
+                            ♻️ Reopen Registration
+                        </button>
+                        <button class="btn btn-warning" onclick="rerunDraw()">
+                            🎲 Rerun Draw
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeEvent()">
+                            🔒 Close Event
+                        </button>
+                    </div>
+                {% else %}
+                    <div style="padding: 1rem; background: #f3f4f6; border-radius: 8px; text-align: center;">
+                        🔒 This event is closed.
+                    </div>
+                    <div class="action-buttons" style="margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="reopenRegistration()">
+                            ♻️ Reopen Registration
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyRegistrationLink() {
+            const input = document.getElementById('registrationLink');
+            input.select();
+            navigator.clipboard.writeText(input.value).then(() => {
+                alert('✅ Link copied to clipboard!');
+            });
+        }
+
+        async function runDraw() {
+            if (!confirm('Ready to run the draw? All participants will be emailed their assignments.')) {
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Running draw...';
+
+            try {
+                const response = await fetch('{{ url_for("run_draw", code=event.code) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '🎉 ' + data.message);
+                    setTimeout(() => window.location.reload(), 2000);
+                } else {
+                    showMessage('error', '❌ ' + data.error);
+                    btn.disabled = false;
+                    btn.textContent = '🎲 Run the Draw!';
+                }
+            } catch (error) {
+                showMessage('error', '❌ Failed to run draw. Please try again.');
+                btn.disabled = false;
+                btn.textContent = '🎲 Run the Draw!';
+            }
+        }
+
+        async function reopenRegistration() {
+            if (!confirm('Reopen registration? This will allow new participants to join.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("reopen_event", code=event.code) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '✅ ' + data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('error', '❌ ' + data.error);
+                }
+            } catch (error) {
+                showMessage('error', '❌ Failed to reopen registration.');
+            }
+        }
+
+        async function rerunDraw() {
+            if (!confirm('Rerun the draw? Everyone will receive NEW assignments.')) {
+                return;
+            }
+
+            await runDraw();
+        }
+
+        async function closeEvent() {
+            if (!confirm('Close this event? You can reopen it later if needed.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("close_event", code=event.code) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '✅ ' + data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('error', '❌ ' + data.error);
+                }
+            } catch (error) {
+                showMessage('error', '❌ Failed to close event.');
+            }
+        }
+
+        function showMessage(type, text) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Auto-refresh participant count every 10 seconds during registration
+        {% if event.status.value == 'registration_open' %}
+        setInterval(async () => {
+            try {
+                const response = await fetch('{{ url_for("get_participants", code=event.code) }}');
+                const data = await response.json();
+                
+                // Only reload if participant count changed
+                if (data.count !== {{ event.participant_count }}) {
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Failed to check for updates:', error);
+            }
+        }, 10000);
+        {% endif %}
+    </script>
+</body>
+</html>

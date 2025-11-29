@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - {{ event.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .register-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .event-info {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .event-info h1 {
+            margin: 0 0 0.5rem 0;
+        }
+        .status-closed {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-container">
+            <div class="event-info">
+                <h1>🎄 {{ event.name }}</h1>
+                {% if event.description %}
+                <p style="margin: 0.5rem 0 0 0;">{{ event.description }}</p>
+                {% endif %}
+                <p style="margin: 1rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
+                    Organized by {{ event.organizer.name }}
+                </p>
+            </div>
+
+            {% if event.status.value != 'registration_open' %}
+            <div class="status-closed">
+                <h2 style="margin: 0 0 0.5rem 0;">🔒 Registration Closed</h2>
+                <p style="margin: 0;">
+                    {% if event.status.value == 'draw_completed' %}
+                    The draw has been completed for this event.
+                    {% else %}
+                    This event is no longer accepting registrations.
+                    {% endif %}
+                </p>
+            </div>
+            {% else %}
+            
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2>Join the Secret Santa!</h2>
+                <p style="color: #6b7280;">
+                    Register to participate in this gift exchange
+                </p>
+            </div>
+
+            <div id="message" class="message" style="display: none;"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="name">Your Name *</label>
+                    <input type="text" id="name" name="name" placeholder="Santa Claus" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Your Email Address *</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    <small style="color: #6b7280; display: block; margin-top: 0.5rem;">
+                        You'll receive your Secret Santa assignment here
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1rem;">
+                    🎁 Register for Secret Santa
+                </button>
+            </form>
+
+            <div style="margin-top: 2rem; padding: 1rem; background: #f3f4f6; border-radius: 8px; text-align: center; font-size: 0.9rem;">
+                <p style="margin: 0; color: #6b7280;">
+                    <strong>{{ event.participant_count }}</strong> 
+                    {{ 'participant' if event.participant_count == 1 else 'participants' }} registered so far
+                </p>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1rem; background: #eef2ff; border: 2px solid #667eea; border-radius: 8px;">
+                <h3 style="margin-top: 0; color: #374151;">What Happens Next?</h3>
+                <ol style="color: #6b7280; margin: 0; padding-left: 1.5rem;">
+                    <li>You'll be registered for this event</li>
+                    <li>The organizer will run the draw when ready</li>
+                    <li>You'll receive an email with your Secret Santa assignment</li>
+                    <li>Keep it secret and have fun! 🎅</li>
+                </ol>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        {% if event.status.value == 'registration_open' %}
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const messageDiv = document.getElementById('message');
+            const originalBtnText = submitBtn.textContent;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registering...';
+            messageDiv.style.display = 'none';
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value
+            };
+            
+            try {
+                const response = await fetch('{{ url_for("register_participant", code=event.code) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageDiv.textContent = '✅ ' + data.message;
+                    messageDiv.className = 'message success';
+                    messageDiv.style.display = 'block';
+                    
+                    // Clear form
+                    e.target.reset();
+                    
+                    // Update participant count
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    messageDiv.textContent = '❌ ' + data.error;
+                    messageDiv.className = 'message error';
+                    messageDiv.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }
+            } catch (error) {
+                messageDiv.textContent = '❌ Something went wrong. Please try again.';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

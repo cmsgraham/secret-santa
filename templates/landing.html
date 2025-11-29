@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Santa - Organize Gift Exchanges</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 3rem;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .feature {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: #22c55e;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="margin: 0;">🎄 Secret Santa</h2>
+            <div>
+                {% if user %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Dashboard</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+                {% endif %}
+            </div>
+        </nav>
+
+        <div class="hero">
+            <h1>🎅 Secret Santa Made Easy</h1>
+            <p>Organize magical gift exchanges for your team, family, or friends</p>
+            <div class="cta-buttons">
+                {% if user %}
+                    <a href="{{ url_for('create_event') }}" class="btn-primary">Create New Event</a>
+                    <a href="{{ url_for('dashboard') }}" class="btn-secondary">My Events</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn-primary">Get Started Free</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🎁</div>
+                <h3>Easy Setup</h3>
+                <p>Create an event in seconds with funny auto-generated names</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔗</div>
+                <h3>Simple Sharing</h3>
+                <p>Share a unique link for participants to register themselves</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎲</div>
+                <h3>Fair Drawings</h3>
+                <p>Automated random assignment ensures no one gets themselves</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📧</div>
+                <h3>Email Notifications</h3>
+                <p>Everyone receives their assignment via email automatically</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <h3>Private & Secure</h3>
+                <p>Each event has its own space, organizer controls everything</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">♻️</div>
+                <h3>Flexible Management</h3>
+                <p>Reopen registration or rerun the draw anytime you need</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 4rem; padding: 2rem; background: #f3f4f6; border-radius: 8px;">
+            <h2>How It Works</h2>
+            <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <h3>1️⃣ Create Event</h3>
+                    <p>Sign in and create your Secret Santa event with a fun name</p>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <h3>2️⃣ Invite Participants</h3>
+                    <p>Share your unique event link for people to register</p>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <h3>3️⃣ Run the Draw</h3>
+                    <p>Click the button and everyone gets their assignment by email</p>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align: center; margin-top: 4rem; padding: 2rem; color: #6b7280;">
+            <p>Made with ❤️ for organizing gift exchanges</p>
+            <p><a href="https://github.com/cmsgraham/secret-santa" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+</body>
+</html>

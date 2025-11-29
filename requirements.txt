@@ -10,3 +10,4 @@ gunicorn==21.2.0
 flask-migrate==4.0.5
 pytest==7.4.3
 aiosmtpd==1.4.4.post2
+secrets-py==1.0.2
