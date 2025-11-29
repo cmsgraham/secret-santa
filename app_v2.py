@@ -579,23 +579,69 @@ def register_participant(code):
     
     return render_template('register.html', event=event)
 
-@app.route('/participant/dashboard', methods=['GET'])
+@app.route('/participant/dashboard', methods=['GET', 'POST'])
 def participant_dashboard():
     """Participant dashboard showing all events they're registered in"""
     # Check if participant is authenticated
     participant_email = session.get('participant_email')
     
     if not participant_email:
-        # Ask for email verification
-        if request.args.get('email'):
-            email = request.args.get('email').strip().lower()
+        # Handle magic link request
+        if request.method == 'POST':
+            data = request.get_json() if request.is_json else request.form
+            email = data.get('email', '').strip().lower()
+            
+            # Validate email
+            try:
+                validated = validate_email(email)
+                email = validated.normalized
+            except EmailNotValidError:
+                return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+            
             # Check if this email exists as a participant
             participants = Participant.query.filter_by(email=email).all()
-            if participants:
-                session['participant_email'] = email
-                return redirect(url_for('participant_dashboard'))
+            if not participants:
+                return jsonify({'success': False, 'error': 'No events found for this email address'}), 404
+            
+            # Get participant name from first registration
+            participant_name = participants[0].name
+            
+            # Create or get user for this email
+            user = create_or_get_user(email, participant_name)
+            
+            # Create magic link token
+            token = create_magic_link_token(user)
+            
+            # Send magic link email for participant dashboard access
+            magic_link = url_for('verify_participant_magic_link', token=token, _external=True)
+            subject = "🎄 Your Secret Santa Dashboard Login Link"
+            body = f"""
+Hi {participant_name}!
+
+Click the link below to access your Secret Santa participant dashboard:
+
+{magic_link}
+
+This link will expire in 1 hour.
+
+From your dashboard, you can:
+- View all Secret Santa events you're registered in
+- Manage your gift preferences and hints
+- Create new Secret Santa events
+
+Happy gifting! 🎁
+            """
+            
+            if send_email(email, subject, body):
+                return jsonify({
+                    'success': True,
+                    'message': 'Check your email for the login link!'
+                })
             else:
-                flash('No events found for this email address.', 'error')
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to send login email'
+                }), 500
         
         return render_template('participant_login.html')
     
@@ -621,6 +667,36 @@ def participant_logout():
     """Logout participant from dashboard"""
     session.pop('participant_email', None)
     session.pop('participant_id', None)
+    return redirect(url_for('participant_dashboard'))
+
+@app.route('/participant/auth/verify/<token>')
+def verify_participant_magic_link(token):
+    """Verify magic link token and log in participant to dashboard"""
+    auth_token = AuthToken.query.filter_by(token=token).first()
+    
+    if not auth_token or not auth_token.is_valid:
+        flash('Invalid or expired login link', 'error')
+        return redirect(url_for('participant_dashboard'))
+    
+    # Mark token as used
+    auth_token.used = True
+    auth_token.used_at = datetime.now(timezone.utc)
+    
+    # Get user email
+    user = auth_token.user
+    
+    # Check if this email has participant registrations
+    participants = Participant.query.filter_by(email=user.email).all()
+    if not participants:
+        flash('No events found for this email address', 'error')
+        return redirect(url_for('participant_dashboard'))
+    
+    # Log in participant by setting email in session
+    session['participant_email'] = user.email
+    
+    db.session.commit()
+    
+    flash(f'Welcome back, {user.name}!', 'success')
     return redirect(url_for('participant_dashboard'))
 
 @app.route('/event/<code>/member/<participant_id>', methods=['GET', 'POST'])
