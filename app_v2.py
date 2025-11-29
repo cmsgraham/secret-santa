@@ -827,6 +827,54 @@ def get_suggestions():
     names = get_random_event_names(count)
     return jsonify({'names': names})
 
+@app.route('/event/<code>/join', methods=['POST'])
+@login_required
+def join_own_event(code):
+    """Allow organizer to join their own event automatically"""
+    event = Event.query.filter_by(code=code).first_or_404()
+    user = get_current_user()
+    
+    # Check if user is the organizer
+    if event.organizer_id != user.id:
+        return jsonify({'success': False, 'error': 'Only the organizer can auto-join'}), 403
+    
+    # Check if registration is open
+    if event.status != EventStatus.REGISTRATION_OPEN:
+        return jsonify({'success': False, 'error': 'Registration is closed'}), 400
+    
+    # Check if already registered
+    existing = Participant.query.filter_by(event_id=event.id, email=user.email).first()
+    if existing:
+        return jsonify({
+            'success': False, 
+            'error': 'Already registered',
+            'member_url': url_for('member_page', code=event.code, participant_id=existing.id)
+        }), 400
+    
+    # Create participant using user's information
+    participant = Participant(
+        event_id=event.id,
+        name=user.name,
+        nickname=user.name,  # Default nickname to their name
+        email=user.email
+    )
+    db.session.add(participant)
+    db.session.commit()
+    
+    # Store participant info in session for member page access
+    session['participant_id'] = participant.id
+    session['participant_email'] = participant.email
+    
+    # Generate member page URL
+    member_url = url_for('member_page', code=event.code, participant_id=participant.id)
+    
+    return jsonify({
+        'success': True,
+        'message': f'Successfully joined {event.name}!',
+        'member_url': member_url,
+        'participant_id': participant.id
+    })
+
 # ============================================================================
 # Health Check
 # ============================================================================
