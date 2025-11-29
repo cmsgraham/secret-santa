@@ -188,7 +188,7 @@
     
     <div class="container">
         <div class="action-bar">
-            <a href="{{ url_for('create_event_page') }}" class="btn-create">
+            <a href="{{ url_for('create_event') }}" class="btn-create">
                 ➕ Create New Event
             </a>
             <a href="{{ url_for('participant_dashboard') }}?logout=1" class="btn-logout" onclick="return confirm('Log out from participant dashboard?');">
@@ -233,7 +233,7 @@
             <div class="empty-state-icon">🎄</div>
             <h2>No Events Yet</h2>
             <p>You haven't registered for any Secret Santa events yet.</p>
-            <a href="{{ url_for('create_event_page') }}" class="btn-create">
+            <a href="{{ url_for('create_event') }}" class="btn-create">
                 Create Your First Event
             </a>
         </div>
