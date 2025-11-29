@@ -675,21 +675,10 @@
             <p>The guessing phase is open! Who do you think is YOUR Secret Santa?</p>
             
             {% if participant.guessed_secret_santa_id %}
-                {% set actual_santa = receiving_assignment.giver if receiving_assignment else None %}
-                {% if actual_santa and participant.guessed_secret_santa_id == actual_santa.id %}
-                    <div class="guess-result guess-correct">
-                        🎉 Correct! {{ actual_santa.nickname or actual_santa.name }} was your Secret Santa!
-                    </div>
-                {% elif actual_santa %}
-                    <div class="guess-result guess-incorrect">
-                        ❌ Not quite! Your guess was {{ participant.guessed_secret_santa.nickname or participant.guessed_secret_santa.name }}, but your Secret Santa was actually {{ actual_santa.nickname or actual_santa.name }}!
-                    </div>
-                {% else %}
-                    <div class="guess-result guess-pending">
-                        🤔 You guessed: {{ participant.guessed_secret_santa.nickname or participant.guessed_secret_santa.name }}
-                        <br><small>The answer will be revealed soon!</small>
-                    </div>
-                {% endif %}
+                <div class="guess-result guess-pending">
+                    ✅ Guess submitted: {{ participant.guessed_secret_santa.nickname or participant.guessed_secret_santa.name }}
+                    <br><small>Results will be revealed by the organizer!</small>
+                </div>
             {% else %}
                 <form id="guessForm">
                     <select class="participant-select" name="guess" required>
