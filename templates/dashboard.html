@@ -143,9 +143,9 @@
                         👤 My Page
                     </a>
                     {% elif item.event.status.value == 'registration_open' %}
-                    <a href="{{ item.event.registration_url }}" class="btn" style="background: #10b981; color: white;">
+                    <button onclick="joinEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn" style="background: #10b981; color: white;">
                         🎁 Join Event
-                    </a>
+                    </button>
                     {% endif %}
                     <button onclick="copyLink('{{ item.event.registration_url }}')" class="btn btn-secondary">
                         📋
@@ -251,6 +251,34 @@
                 }
             } catch (error) {
                 alert('❌ Failed to delete event');
+                console.error(error);
+            }
+        }
+
+        async function joinEvent(code, name) {
+            if (!confirm(`Join "${name}" as a participant?\n\nYou'll be able to add hints, gift preferences, and get a Secret Santa assignment!`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/event/${code}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    // Redirect to member page
+                    window.location.href = data.member_url;
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Failed to join event');
                 console.error(error);
             }
         }
