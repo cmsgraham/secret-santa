@@ -381,6 +381,7 @@ def assign_secret_santa():
 # Initialize database
 def create_tables():
     """Create database tables."""
+
     try:
         with app.app_context():
             db.create_all()
@@ -388,7 +389,45 @@ def create_tables():
     except Exception as e:
         logger.error(f"Failed to create database tables: {str(e)}")
 
+# --- FEED ROUTE ---
+@app.route('/events/<event_id>/feed', methods=['GET', 'POST'])
+def feed(event_id):
+    event = SecretSantaEvent.query.get_or_404(event_id)
+    # Get all participants (members)
+    members = []
+    # You may have a Participant model; if so, replace with actual query
+    if hasattr(event, 'participants'):
+        members = event.participants
+    # Dummy fallback: get assignments and build member list from emails
+    else:
+        assignments = Assignment.query.filter_by(event_id=event_id).all()
+        emails = set([a.giver_email for a in assignments] + [a.receiver_email for a in assignments])
+        # You may want to fetch more info for each email
+        members = [{'nickname': email.split('@')[0], 'profile_picture_url': '/static/default_avatar.png', 'hints': '', 'gift_preferences': ''} for email in emails]
+
+    # Handle posts (for now, dummy list)
+    posts = []
+    # TODO: Replace with actual Post model/query if available
+
+    # Handle new post submission
+    if request.method == 'POST':
+        content = request.form.get('content', '').strip()
+        nickname = 'Anonymous'
+        # If user is logged in, use their nickname
+        if hasattr(request, 'user') and getattr(request.user, 'nickname', None):
+            nickname = request.user.nickname
+        elif hasattr(request, 'participant') and getattr(request.participant, 'nickname', None):
+            nickname = request.participant.nickname
+        # Save post logic here (not implemented)
+        # posts.append({'nickname': nickname, 'content': content})
+        flash('Post submitted! (Demo only, not saved)', 'success')
+
+    return render_template('feed.html', event=event, members=members, posts=posts)
+
 if __name__ == '__main__':
+
+
+
     # Create logs directory
     log_dir = os.getenv('LOG_DIR', './logs')
     os.makedirs(log_dir, exist_ok=True)
