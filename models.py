@@ -203,7 +203,7 @@ class FeedComment(Base):
     __tablename__ = 'feed_comments'
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    post_id = Column(String(36), ForeignKey('feed_posts.id'), nullable=False)
+    post_id = Column(String(100), nullable=False)  # Can be a UUID or pseudo-ID like "hint_<uuid>"
     participant_id = Column(String(36), ForeignKey('participants.id'), nullable=False)
     
     # Comment content
@@ -223,7 +223,7 @@ class FeedLike(Base):
     __tablename__ = 'feed_likes'
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    post_id = Column(String(36), ForeignKey('feed_posts.id'), nullable=False)
+    post_id = Column(String(100), nullable=False)  # Can be a UUID or pseudo-ID like "hint_<uuid>"
     participant_id = Column(String(36), ForeignKey('participants.id'), nullable=False)
     
     # Like metadata
