@@ -412,7 +412,7 @@
                     <!-- Existing Comments -->
                     {% if hint.comments %}
                     <div class="comments-list" style="margin-top: 0.5rem; border-top: 1px solid #e5e7eb; padding-top: 0.5rem;">
-                        {% for comment in hint.comments %}
+                        {% for comment in hint.comments|reverse %}
                         <div class="comment" style="font-size: 0.85rem; margin-bottom: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 4px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
                                 <strong class="comment-author">{{ comment.nickname }}</strong>
@@ -463,7 +463,7 @@
                     <!-- Existing Comments -->
                     {% if item.comments %}
                     <div class="comments-list" style="border-top: 1px solid #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem;">
-                        {% for comment in item.comments %}
+                        {% for comment in item.comments|reverse %}
                         <div class="comment" style="margin-bottom: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 4px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
                                 <strong class="comment-author">{{ comment.nickname }}</strong>
@@ -510,7 +510,7 @@
                     <!-- Existing Comments -->
                     {% if idea.comments %}
                     <div class="comments-list" style="margin-top: 0.5rem; border-top: 1px solid #e5e7eb; padding-top: 0.5rem;">
-                        {% for comment in idea.comments %}
+                        {% for comment in idea.comments|reverse %}
                         <div class="comment" style="font-size: 0.85rem; margin-bottom: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 4px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
                                 <strong class="comment-author">{{ comment.nickname }}</strong>
@@ -723,8 +723,8 @@
                     commentDiv.appendChild(commentHeader);
                     commentDiv.appendChild(contentDiv);
                     
-                    // Add to comments list
-                    commentsList.appendChild(commentDiv);
+                    // Add to comments list at the TOP (prepend, not append)
+                    commentsList.insertBefore(commentDiv, commentsList.firstChild);
                     
                     // Clear input and re-enable button
                     contentInput.value = '';
