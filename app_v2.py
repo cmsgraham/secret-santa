@@ -54,6 +54,7 @@ app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = 2592000  # 30 days in seconds
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
+app.config['SESSION_PERMANENT'] = True
 
 # Initialize database
 db = SQLAlchemy(app, model_class=Base)
@@ -64,6 +65,11 @@ i18n_context = add_i18n_to_jinja(app, DEFAULT_LOCALE)
 # ============================================================================
 # Language Detection Middleware
 # ============================================================================
+
+@app.before_request
+def make_session_permanent_on_request():
+    """Make sessions permanent to keep them alive"""
+    session.permanent = True
 
 @app.before_request
 def detect_language():
@@ -371,13 +377,7 @@ def create_secret_santa_assignments(event):
 # ============================================================================
 
 @app.before_request
-def make_session_permanent():
-    """Make sessions permanent to keep them alive"""
-    session.permanent = True
 
-# ============================================================================
-# Routes - Landing and Authentication
-# ============================================================================
 
 @app.route('/')
 def index():
