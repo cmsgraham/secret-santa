@@ -192,8 +192,8 @@ class FeedPost(Base):
     # Relationships
     event = relationship("Event", foreign_keys=[event_id])
     participant = relationship("Participant", foreign_keys=[participant_id])
-    comments = relationship("FeedComment", back_populates="post", cascade="all, delete-orphan")
-    likes = relationship("FeedLike", back_populates="post", cascade="all, delete-orphan")
+    comments = relationship("FeedComment", back_populates="post", cascade="all, delete-orphan", primaryjoin="FeedPost.id==FeedComment.post_id", foreign_keys="[FeedComment.post_id]")
+    likes = relationship("FeedLike", back_populates="post", cascade="all, delete-orphan", primaryjoin="FeedPost.id==FeedLike.post_id", foreign_keys="[FeedLike.post_id]")
     
     def __repr__(self):
         return f"<FeedPost {self.nickname} on {self.event_id}>"
@@ -212,7 +212,7 @@ class FeedComment(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     # Relationships
-    post = relationship("FeedPost", back_populates="comments")
+    post = relationship("FeedPost", back_populates="comments", primaryjoin="FeedPost.id==FeedComment.post_id", foreign_keys=[post_id])
     participant = relationship("Participant", foreign_keys=[participant_id])
     
     def __repr__(self):
@@ -230,7 +230,7 @@ class FeedLike(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     # Relationships
-    post = relationship("FeedPost", back_populates="likes")
+    post = relationship("FeedPost", back_populates="likes", primaryjoin="FeedPost.id==FeedLike.post_id", foreign_keys=[post_id])
     participant = relationship("Participant", foreign_keys=[participant_id])
     
     def __repr__(self):
