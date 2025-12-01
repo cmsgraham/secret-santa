@@ -17,10 +17,8 @@ def add_i18n_to_jinja(app, locale='en'):
     # Register as global function
     app.jinja_env.globals['t'] = i18n_ctx.get
     app.jinja_env.globals['_'] = i18n_ctx.get  # Shorthand
-    app.jinja_env.globals['locale'] = locale
-    app.jinja_env.globals['SUPPORTED_LOCALES'] = [
-        'en', 'es_MX', 'es_CR', 'es_CO', 'es_AR', 'es_ES'
-    ]
+    # NOTE: 'locale' and 'SUPPORTED_LOCALES' are now injected per-request via context_processor
+    # Do NOT set them as static globals here, as they would override context_processor values
 
     # Register filters
     def translate(key, **kwargs):
