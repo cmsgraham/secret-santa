@@ -649,6 +649,11 @@
             const form = event.target;
             const content = form.querySelector('input[name="content"]').value;
             
+            if (!content.trim()) {
+                alert('Please enter a comment');
+                return;
+            }
+            
             fetch(`/feed/post/${postId}/comment`, {
                 method: 'POST',
                 headers: {
@@ -662,20 +667,31 @@
                     alert(data.error);
                     return;
                 }
-                // Clear input
+                // Clear input and reload
                 form.querySelector('input[name="content"]').value = '';
-                // Show success message
-                alert('Comment added!');
-                // Reload page to show new comment
                 location.reload();
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add comment');
+            });
         }
 
         function submitHintComment(event, participantId) {
             event.preventDefault();
             const form = event.target;
-            const content = form.querySelector('input[name="content"]').value;
+            const input = form.querySelector('input[name="content"]');
+            const content = input.value;
+            
+            if (!content.trim()) {
+                alert('Please enter a comment');
+                return;
+            }
+            
+            // Disable submit button
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...';
             
             fetch(`/feed/hint/${participantId}/comment`, {
                 method: 'POST',
@@ -684,26 +700,51 @@
                 },
                 body: `content=${encodeURIComponent(content)}`
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
+                return response.text().then(text => {
+                    console.log('Response body:', text);
+                    return JSON.parse(text);
+                });
+            })
             .then(data => {
+                console.log('Parsed data:', data);
                 if (data.error) {
                     alert(data.error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '💬';
                     return;
                 }
-                // Clear input
-                form.querySelector('input[name="content"]').value = '';
-                // Show success message
-                alert('Comment added!');
-                // Reload page to show new comment
-                location.reload();
+                // Success - clear and reload
+                input.value = '';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💬';
+                setTimeout(() => location.reload(), 500);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add comment: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💬';
+            });
         }
 
         function submitIdeaComment(event, participantId) {
             event.preventDefault();
             const form = event.target;
-            const content = form.querySelector('input[name="content"]').value;
+            const input = form.querySelector('input[name="content"]');
+            const content = input.value;
+            
+            if (!content.trim()) {
+                alert('Please enter a comment');
+                return;
+            }
+            
+            // Disable submit button
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...';
             
             fetch(`/feed/idea/${participantId}/comment`, {
                 method: 'POST',
@@ -716,16 +757,22 @@
             .then(data => {
                 if (data.error) {
                     alert(data.error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '💬';
                     return;
                 }
-                // Clear input
-                form.querySelector('input[name="content"]').value = '';
-                // Show success message
-                alert('Comment added!');
-                // Reload page to show new comment
-                location.reload();
+                // Success - clear and reload
+                input.value = '';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💬';
+                setTimeout(() => location.reload(), 500);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add comment');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💬';
+            });
         }
     </script>
 </body>
