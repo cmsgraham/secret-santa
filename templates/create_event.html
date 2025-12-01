@@ -55,16 +55,16 @@
     <div class="container">
         <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             {% if from_dashboard %}
-            <a href="{{ url_for('participant_dashboard') }}" style="color: #667eea; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            <a href="{{ url_for('participant_dashboard') }}" style="color: #000000; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
             {% else %}
-            <a href="{{ url_for('dashboard') }}" style="color: #667eea; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            <a href="{{ url_for('dashboard') }}" style="color: #000000; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
             {% endif %}
             <div>
                 <span>Hello, {{ user_name }}!</span>
                 {% if from_dashboard %}
-                <a href="{{ url_for('participant_logout') }}" style="margin-left: 1rem; color: #6b7280;">Logout</a>
+                <a href="{{ url_for('participant_logout') }}" style="margin-left: 1rem; color: #000000;">Logout</a>
                 {% else %}
-                <a href="{{ url_for('logout') }}" style="margin-left: 1rem; color: #6b7280;">Logout</a>
+                <a href="{{ url_for('logout') }}" style="margin-left: 1rem; color: #000000;">Logout</a>
                 {% endif %}
             </div>
         </nav>
