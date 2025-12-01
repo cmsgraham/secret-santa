@@ -225,11 +225,18 @@
                     <div class="success-box">
                         ✅ Draw completed! All participants have been emailed their assignments.
                     </div>
+                    <style>
+                        div.action-buttons button { padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important; }
+                        div.action-buttons button:nth-child(1) { background: #667eea !important; color: white !important; }
+                        div.action-buttons button:nth-child(2) { background: #374151 !important; color: white !important; }
+                        div.action-buttons button:nth-child(3) { background: #6b7280 !important; color: white !important; }
+                        div.action-buttons button:nth-child(4) { background: #ef4444 !important; color: white !important; }
+                    </style>
                     <div class="action-buttons">
-                        <button onclick="reopenRegistration()" style="padding: 0.75rem 1.5rem !important; background: #667eea !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important;">♻️ Reopen Registration</button>
-                        <button onclick="rerunDraw()" style="padding: 0.75rem 1.5rem !important; background: #374151 !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important;">🎲 Rerun Draw</button>
-                        <button onclick="toggleGuessing()" style="padding: 0.75rem 1.5rem !important; background: #6b7280 !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important;">{% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}</button>
-                        <button onclick="closeEvent()" style="padding: 0.75rem 1.5rem !important; background: #ef4444 !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important;">🔒 Close Event</button>
+                        <button onclick="reopenRegistration()">♻️ Reopen Registration</button>
+                        <button onclick="rerunDraw()">🎲 Rerun Draw</button>
+                        <button onclick="toggleGuessing()">{% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}</button>
+                        <button onclick="closeEvent()">🔒 Close Event</button>
                     </div>
                 {% else %}
                     <div style="padding: 1rem; background: #f3f4f6; border-radius: 8px; text-align: center;">
