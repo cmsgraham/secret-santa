@@ -31,6 +31,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///sec
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = 2592000  # 30 days in seconds
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
 # Initialize database
 db = SQLAlchemy(app, model_class=Base)
@@ -213,6 +216,15 @@ def create_secret_santa_assignments(event):
             return True
     
     raise ValueError("Could not create valid assignments after multiple attempts")
+
+# ============================================================================
+# Session Management
+# ============================================================================
+
+@app.before_request
+def make_session_permanent():
+    """Make sessions permanent to keep them alive"""
+    session.permanent = True
 
 # ============================================================================
 # Routes - Landing and Authentication
