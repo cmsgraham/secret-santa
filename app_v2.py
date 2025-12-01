@@ -938,16 +938,24 @@ def feed(code):
             flash('Post cannot be empty', 'error')
             return redirect(url_for('feed', code=code))
         
-        # Get the current participant from session
+        # Get the current participant from session - try multiple sources
         participant_id = session.get('participant_id')
         participant_email = session.get('participant_email')
+        user_email = session.get('user_email')  # Organizer auth fallback
         
-        # Try to find participant by ID first, then by email
+        print(f"DEBUG: Feed POST attempt for event {code}")
+        print(f"DEBUG: participant_id={participant_id}, participant_email={participant_email}, user_email={user_email}")
+        print(f"DEBUG: Full session keys: {list(session.keys())}")
+        
+        # Try to find participant by ID first, then by email (participant_email), then by user_email
         participant = None
         if participant_id:
             participant = Participant.query.get(participant_id)
         elif participant_email:
             participant = Participant.query.filter_by(email=participant_email, event_id=event.id).first()
+        elif user_email:
+            # Check if the organizer is also a participant in this event
+            participant = Participant.query.filter_by(email=user_email, event_id=event.id).first()
         
         if not participant:
             flash('You must be logged in to post', 'warning')
@@ -960,6 +968,8 @@ def feed(code):
         # Update session with participant_id if it wasn't there
         if 'participant_id' not in session:
             session['participant_id'] = participant.id
+        if 'participant_email' not in session:
+            session['participant_email'] = participant.email
         
         # Create and save the post
         post = FeedPost(
