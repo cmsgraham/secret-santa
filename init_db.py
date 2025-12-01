@@ -9,7 +9,7 @@ Usage:
 
 import os
 from sqlalchemy import create_engine
-from models import Base, User, Event, Participant, Assignment, AuthToken
+from models import Base, User, Event, Participant, Assignment, AuthToken, FeedPost
 
 def init_database():
     """Initialize the database by creating all tables."""
@@ -32,6 +32,7 @@ def init_database():
     print("  - participants")
     print("  - assignments")
     print("  - auth_tokens")
+    print("  - feed_posts")
     print("\n🎉 Ready to start the application!")
 
 if __name__ == "__main__":
