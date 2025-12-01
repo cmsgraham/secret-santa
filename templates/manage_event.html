@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage {{ event.name }} - Secret Santa</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=5">
     <style>
         .manage-container {
             max-width: 900px;
@@ -97,38 +97,39 @@
             background: initial !important;
             box-shadow: none !important;
             transform: none !important;
+            color: white !important;
         }
-        .action-buttons .btn-primary {
+        button.btn.btn-primary {
             background: #667eea !important;
             color: white !important;
         }
-        .action-buttons .btn-primary:hover {
+        button.btn.btn-primary:hover {
             background: #5568d3 !important;
             transform: none !important;
             box-shadow: none !important;
         }
-        .action-buttons .btn-secondary {
+        button.btn.btn-secondary {
             background: #6b7280 !important;
             color: white !important;
         }
-        .action-buttons .btn-secondary:hover {
+        button.btn.btn-secondary:hover {
             background: #4b5563 !important;
         }
-        .action-buttons .btn-dark {
+        button.btn.btn-dark {
             background: #374151 !important;
             color: white !important;
         }
-        .action-buttons .btn-dark:hover {
+        button.btn.btn-dark:hover {
             background: #1f2937 !important;
         }
-        .action-buttons .btn-danger {
+        button.btn.btn-danger {
             background: #ef4444 !important;
             color: white !important;
         }
-        .action-buttons .btn-danger:hover {
+        button.btn.btn-danger:hover {
             background: #dc2626 !important;
         }
-        .action-buttons .btn:disabled {
+        button.btn:disabled {
             opacity: 0.6 !important;
             cursor: not-allowed !important;
         }
