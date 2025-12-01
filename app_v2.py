@@ -1182,12 +1182,19 @@ def like_hint(participant_id):
         
         current_participant = None
         if current_participant_id:
-            current_participant = Participant.query.get(current_participant_id)
-            print(f"DEBUG like_hint: Looked up by participant_id, found={current_participant is not None}")
-        elif participant_email:
+            found = Participant.query.get(current_participant_id)
+            # Only use if they're in the same event as the target
+            if found and found.event_id == participant.event_id:
+                current_participant = found
+                print(f"DEBUG like_hint: Looked up by participant_id in correct event, found={current_participant is not None}")
+            else:
+                print(f"DEBUG like_hint: participant_id found but wrong event or not found")
+        
+        if not current_participant and participant_email:
             current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
             print(f"DEBUG like_hint: Looked up by participant_email in event {participant.event_id}, found={current_participant is not None}")
-        elif user_email:
+        
+        if not current_participant and user_email:
             current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
             print(f"DEBUG like_hint: Looked up by user_email in event {participant.event_id}, found={current_participant is not None}")
         
@@ -1195,11 +1202,6 @@ def like_hint(participant_id):
         
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
-        
-        print(f"DEBUG like_hint: current_participant.event_id={current_participant.event_id}, participant.event_id={participant.event_id}")
-        if current_participant.event_id != participant.event_id:
-            print(f"DEBUG like_hint: Event mismatch! {current_participant.event_id} != {participant.event_id}")
-            return jsonify({'error': 'Invalid participant'}), 403
         
         # Update session with participant info if needed
         if 'participant_id' not in session:
@@ -1246,12 +1248,19 @@ def like_idea(participant_id):
         
         current_participant = None
         if current_participant_id:
-            current_participant = Participant.query.get(current_participant_id)
-            print(f"DEBUG like_idea: Looked up by participant_id, found={current_participant is not None}")
-        elif participant_email:
+            found = Participant.query.get(current_participant_id)
+            # Only use if they're in the same event as the target
+            if found and found.event_id == participant.event_id:
+                current_participant = found
+                print(f"DEBUG like_idea: Looked up by participant_id in correct event, found={current_participant is not None}")
+            else:
+                print(f"DEBUG like_idea: participant_id found but wrong event or not found")
+        
+        if not current_participant and participant_email:
             current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
             print(f"DEBUG like_idea: Looked up by participant_email in event {participant.event_id}, found={current_participant is not None}")
-        elif user_email:
+        
+        if not current_participant and user_email:
             current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
             print(f"DEBUG like_idea: Looked up by user_email in event {participant.event_id}, found={current_participant is not None}")
         
@@ -1259,11 +1268,6 @@ def like_idea(participant_id):
         
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
-        
-        print(f"DEBUG like_idea: current_participant.event_id={current_participant.event_id}, participant.event_id={participant.event_id}")
-        if current_participant.event_id != participant.event_id:
-            print(f"DEBUG like_idea: Event mismatch! {current_participant.event_id} != {participant.event_id}")
-            return jsonify({'error': 'Invalid participant'}), 403
         
         # Update session with participant info if needed
         if 'participant_id' not in session:
@@ -1310,12 +1314,19 @@ def comment_hint(participant_id):
         
         current_participant = None
         if current_participant_id:
-            current_participant = Participant.query.get(current_participant_id)
-            print(f"DEBUG comment_hint: Looked up by participant_id, found={current_participant is not None}")
-        elif participant_email:
+            found = Participant.query.get(current_participant_id)
+            # Only use if they're in the same event as the target
+            if found and found.event_id == participant.event_id:
+                current_participant = found
+                print(f"DEBUG comment_hint: Looked up by participant_id in correct event, found={current_participant is not None}")
+            else:
+                print(f"DEBUG comment_hint: participant_id found but wrong event or not found")
+        
+        if not current_participant and participant_email:
             current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
             print(f"DEBUG comment_hint: Looked up by participant_email in event {participant.event_id}, found={current_participant is not None}")
-        elif user_email:
+        
+        if not current_participant and user_email:
             current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
             print(f"DEBUG comment_hint: Looked up by user_email in event {participant.event_id}, found={current_participant is not None}")
         
@@ -1323,11 +1334,6 @@ def comment_hint(participant_id):
         
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
-        
-        print(f"DEBUG comment_hint: current_participant.event_id={current_participant.event_id}, participant.event_id={participant.event_id}")
-        if current_participant.event_id != participant.event_id:
-            print(f"DEBUG comment_hint: Event mismatch! {current_participant.event_id} != {participant.event_id}")
-            return jsonify({'error': 'Invalid participant'}), 403
         
         # Update session with participant info if needed
         if 'participant_id' not in session:
@@ -1372,12 +1378,19 @@ def comment_idea(participant_id):
         
         current_participant = None
         if current_participant_id:
-            current_participant = Participant.query.get(current_participant_id)
-            print(f"DEBUG comment_idea: Looked up by participant_id, found={current_participant is not None}")
-        elif participant_email:
+            found = Participant.query.get(current_participant_id)
+            # Only use if they're in the same event as the target
+            if found and found.event_id == participant.event_id:
+                current_participant = found
+                print(f"DEBUG comment_idea: Looked up by participant_id in correct event, found={current_participant is not None}")
+            else:
+                print(f"DEBUG comment_idea: participant_id found but wrong event or not found")
+        
+        if not current_participant and participant_email:
             current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
             print(f"DEBUG comment_idea: Looked up by participant_email in event {participant.event_id}, found={current_participant is not None}")
-        elif user_email:
+        
+        if not current_participant and user_email:
             current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
             print(f"DEBUG comment_idea: Looked up by user_email in event {participant.event_id}, found={current_participant is not None}")
         
@@ -1385,11 +1398,6 @@ def comment_idea(participant_id):
         
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
-        
-        print(f"DEBUG comment_idea: current_participant.event_id={current_participant.event_id}, participant.event_id={participant.event_id}")
-        if current_participant.event_id != participant.event_id:
-            print(f"DEBUG comment_idea: Event mismatch! {current_participant.event_id} != {participant.event_id}")
-            return jsonify({'error': 'Invalid participant'}), 403
         
         # Update session with participant info if needed
         if 'participant_id' not in session:
