@@ -235,7 +235,10 @@
         <!-- Header -->
         <div class="feed-header">
             <h1>🎉 Santa's Secret Wall</h1>
-            <a href="javascript:history.back()" class="back-link">← Back</a>
+            <div style="display: flex; gap: 1rem;">
+                <a href="{{ url_for('dashboard') }}" class="back-link">← Dashboard</a>
+                <a href="javascript:history.back()" class="back-link">← Back</a>
+            </div>
         </div>
         <!-- Top: Member Avatars and Nicknames -->
         <div class="feed-top">
