@@ -404,7 +404,7 @@
                 <!-- Hint Comments Section -->
                 <div class="comments-section" id="hint-comments-{{ hint.participant.id }}" style="display: none; margin-top: 0.5rem;">
                     <!-- Comment Form -->
-                    <form method="POST" action="{{ url_for('comment_hint', participant_id=hint.participant.id) }}" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
+                    <form onsubmit="submitHintComment(event, '{{ hint.participant.id }}')" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
                         <input type="text" name="content" placeholder="Say something..." required style="font-size: 0.85rem; padding: 0.4rem;">
                         <button type="submit" style="background: #667eea; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer;">💬</button>
                     </form>
@@ -452,7 +452,7 @@
                 <!-- Comments Section -->
                 <div class="comments-section" id="comments-{{ item.post.id }}" style="display: none;">
                     <!-- Comment Form -->
-                    <form method="POST" action="{{ url_for('comment_post', post_id=item.post.id) }}" class="comment-form">
+                    <form onsubmit="submitPostComment(event, '{{ item.post.id }}')" class="comment-form">
                         <input type="text" name="content" placeholder="Say something..." required>
                         <button type="submit">💬</button>
                     </form>
@@ -496,7 +496,7 @@
                 <!-- Idea Comments Section -->
                 <div class="comments-section" id="idea-comments-{{ idea.participant.id }}" style="display: none; margin-top: 0.5rem;">
                     <!-- Comment Form -->
-                    <form method="POST" action="{{ url_for('comment_idea', participant_id=idea.participant.id) }}" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
+                    <form onsubmit="submitIdeaComment(event, '{{ idea.participant.id }}')" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
                         <input type="text" name="content" placeholder="Say something..." required style="font-size: 0.85rem; padding: 0.4rem;">
                         <button type="submit" style="background: #667eea; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer;">💬</button>
                     </form>
@@ -642,6 +642,90 @@
             } else {
                 section.style.display = 'none';
             }
+        }
+
+        function submitPostComment(event, postId) {
+            event.preventDefault();
+            const form = event.target;
+            const content = form.querySelector('input[name="content"]').value;
+            
+            fetch(`/feed/post/${postId}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `content=${encodeURIComponent(content)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                // Clear input
+                form.querySelector('input[name="content"]').value = '';
+                // Show success message
+                alert('Comment added!');
+                // Reload page to show new comment
+                location.reload();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function submitHintComment(event, participantId) {
+            event.preventDefault();
+            const form = event.target;
+            const content = form.querySelector('input[name="content"]').value;
+            
+            fetch(`/feed/hint/${participantId}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `content=${encodeURIComponent(content)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                // Clear input
+                form.querySelector('input[name="content"]').value = '';
+                // Show success message
+                alert('Comment added!');
+                // Reload page to show new comment
+                location.reload();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function submitIdeaComment(event, participantId) {
+            event.preventDefault();
+            const form = event.target;
+            const content = form.querySelector('input[name="content"]').value;
+            
+            fetch(`/feed/idea/${participantId}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `content=${encodeURIComponent(content)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                // Clear input
+                form.querySelector('input[name="content"]').value = '';
+                // Show success message
+                alert('Comment added!');
+                // Reload page to show new comment
+                location.reload();
+            })
+            .catch(error => console.error('Error:', error));
         }
     </script>
 </body>
