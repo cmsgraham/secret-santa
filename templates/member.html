@@ -541,15 +541,22 @@
 <body>
     <div class="container">
         <div class="header">
-            {% if session.get('user_id') or session.get('participant_email') %}
-            <a href="{{ url_for('dashboard') }}" class="dashboard-link">
-                ← Back to Dashboard
-            </a>
-            <!-- Link to Santa's Secret Wall Feed -->
-            <a href="{{ url_for('feed', code=event.code) }}" class="btn" style="margin-bottom: 15px; margin-left: 10px;">
-                🎉 Santa's Secret Wall (Feed)
-            </a>
-            {% endif %}
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div>
+                    {% if session.get('user_id') or session.get('participant_email') %}
+                    <a href="{{ url_for('dashboard') }}" class="dashboard-link">
+                        ← Back to Dashboard
+                    </a>
+                    <!-- Link to Santa's Secret Wall Feed -->
+                    <a href="{{ url_for('feed', code=event.code) }}" class="btn" style="margin-bottom: 0; margin-left: 10px;">
+                        🎉 Santa's Secret Wall (Feed)
+                    </a>
+                    {% endif %}
+                </div>
+                <div>
+                    {% include 'components/language_selector.html' %}
+                </div>
+            </div>
             <div class="profile-section">
                 <div class="profile-picture" onclick="openProfileModal()" title="Click to change profile picture">
                     {{ participant.profile_picture or '👤' }}

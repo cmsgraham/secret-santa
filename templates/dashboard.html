@@ -148,7 +148,8 @@
                 <h1>🎅 My Dashboard</h1>
                 <p>Welcome back, {{ user.name }}!</p>
             </div>
-            <div style="display: flex; gap: 1rem;">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                {% include 'components/language_selector.html' %}
                 <a href="{{ url_for('create_event') }}" class="btn btn-primary">
                     ➕ Create New Event
                 </a>

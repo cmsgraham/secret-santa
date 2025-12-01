@@ -102,8 +102,9 @@
 </head>
 <body>
     <div class="container">
-        <nav style="margin-bottom: 2rem;">
+        <nav style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
             <a href="{{ url_for('dashboard') }}" style="color: #374151; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            {% include 'components/language_selector.html' %}
         </nav>
 
         <div class="manage-container">

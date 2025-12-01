@@ -366,7 +366,8 @@
         <!-- Header -->
         <div class="feed-header">
             <h1>🎉 Santa's Secret Wall</h1>
-            <div style="display: flex; gap: 1rem;">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                {% include 'components/language_selector.html' %}
                 <a href="{{ url_for('dashboard') }}" class="back-link">← Dashboard</a>
                 <a href="javascript:history.back()" class="back-link">← Back</a>
             </div>
