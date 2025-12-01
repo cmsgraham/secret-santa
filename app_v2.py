@@ -908,6 +908,21 @@ def remove_participant(code, participant_id):
     })
 
 # ============================================================================
+# Feed (Santa's Secret Wall)
+# ============================================================================
+
+@app.route('/event/<code>/feed')
+def feed(code):
+    """Santa's Secret Wall - Anonymous feed for event participants"""
+    event = Event.query.filter_by(code=code).first_or_404()
+    
+    # Get all participants in the event
+    members = event.participants
+    
+    # Return feed page
+    return render_template('feed.html', event=event, members=members, posts=[])
+
+# ============================================================================
 # Health Check
 # ============================================================================
 
