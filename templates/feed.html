@@ -383,15 +383,47 @@
         <!-- Left: Hints -->
         <div class="feed-left">
             <h3>🎁 Hints</h3>
-            {% for member in members %}
-            <div style="margin-bottom: 1rem;">
-                <strong>{{ member.nickname or member.name }}:</strong>
-                {% if member.hints %}
-                    <span>{{ member.hints }}</span>
-                {% else %}
-                    <span style="color: #999;">No hints yet.</span>
-                {% endif %}
+            {% for hint in hints_data %}
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                <div style="margin-bottom: 0.5rem;">
+                    <strong>{{ hint.participant.nickname or hint.participant.name }}:</strong>
+                    <div style="margin-top: 0.3rem; color: #374151;">{{ hint.content }}</div>
+                </div>
+                
+                <!-- Hint Actions -->
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.85rem;">
+                    <button class="action-btn like-btn" onclick="likeHint('{{ hint.participant.id }}', this)" data-liked="{{ 'true' if hint.user_has_liked else 'false' }}" style="background: none; border: none; cursor: pointer; padding: 0;">
+                        {% if hint.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
+                        <span class="like-count">{{ hint.like_count }}</span>
+                    </button>
+                    <button class="action-btn comment-btn" onclick="toggleHintComments('{{ hint.participant.id }}')" style="background: none; border: none; cursor: pointer; padding: 0;">
+                        💬 <span class="comment-count">{{ hint.comment_count }}</span>
+                    </button>
+                </div>
+                
+                <!-- Hint Comments Section -->
+                <div class="comments-section" id="hint-comments-{{ hint.participant.id }}" style="display: none; margin-top: 0.5rem;">
+                    <!-- Comment Form -->
+                    <form method="POST" action="{{ url_for('comment_hint', participant_id=hint.participant.id) }}" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
+                        <input type="text" name="content" placeholder="Say something..." required style="font-size: 0.85rem; padding: 0.4rem;">
+                        <button type="submit" style="background: #667eea; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer;">💬</button>
+                    </form>
+                    
+                    <!-- Existing Comments -->
+                    {% if hint.comments %}
+                    <div class="comments-list" style="margin-top: 0.5rem;">
+                        {% for comment in hint.comments %}
+                        <div class="comment" style="font-size: 0.85rem;">
+                            <strong class="comment-author">{{ comment.nickname }}</strong>
+                            <div class="comment-content">{{ comment.content }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
+            {% else %}
+            <div style="color: #999;">No hints shared yet.</div>
             {% endfor %}
         </div>
         <!-- Main: Santa's Secret Wall -->
@@ -443,15 +475,47 @@
         <!-- Right: Gift Ideas -->
         <div class="feed-right">
             <h3>🎈 Gift Ideas</h3>
-            {% for member in members %}
-            <div style="margin-bottom: 1rem;">
-                <strong>{{ member.nickname or member.name }}:</strong>
-                {% if member.gift_preferences %}
-                    <span>{{ member.gift_preferences }}</span>
-                {% else %}
-                    <span style="color: #999;">No ideas yet.</span>
-                {% endif %}
+            {% for idea in ideas_data %}
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                <div style="margin-bottom: 0.5rem;">
+                    <strong>{{ idea.participant.nickname or idea.participant.name }}:</strong>
+                    <div style="margin-top: 0.3rem; color: #374151;">{{ idea.content }}</div>
+                </div>
+                
+                <!-- Idea Actions -->
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.85rem;">
+                    <button class="action-btn like-btn" onclick="likeIdea('{{ idea.participant.id }}', this)" data-liked="{{ 'true' if idea.user_has_liked else 'false' }}" style="background: none; border: none; cursor: pointer; padding: 0;">
+                        {% if idea.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
+                        <span class="like-count">{{ idea.like_count }}</span>
+                    </button>
+                    <button class="action-btn comment-btn" onclick="toggleIdeaComments('{{ idea.participant.id }}')" style="background: none; border: none; cursor: pointer; padding: 0;">
+                        💬 <span class="comment-count">{{ idea.comment_count }}</span>
+                    </button>
+                </div>
+                
+                <!-- Idea Comments Section -->
+                <div class="comments-section" id="idea-comments-{{ idea.participant.id }}" style="display: none; margin-top: 0.5rem;">
+                    <!-- Comment Form -->
+                    <form method="POST" action="{{ url_for('comment_idea', participant_id=idea.participant.id) }}" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
+                        <input type="text" name="content" placeholder="Say something..." required style="font-size: 0.85rem; padding: 0.4rem;">
+                        <button type="submit" style="background: #667eea; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer;">💬</button>
+                    </form>
+                    
+                    <!-- Existing Comments -->
+                    {% if idea.comments %}
+                    <div class="comments-list" style="margin-top: 0.5rem;">
+                        {% for comment in idea.comments %}
+                        <div class="comment" style="font-size: 0.85rem;">
+                            <strong class="comment-author">{{ comment.nickname }}</strong>
+                            <div class="comment-content">{{ comment.content }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
+            {% else %}
+            <div style="color: #999;">No gift ideas shared yet.</div>
             {% endfor %}
         </div>
     </div>
@@ -490,6 +554,88 @@
 
         function toggleCommentForm(postId) {
             const section = document.getElementById(`comments-${postId}`);
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                section.querySelector('input')?.focus();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function likeHint(participantId, button) {
+            fetch(`/feed/hint/${participantId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                // Update like count
+                const likeCountSpan = button.querySelector('.like-count');
+                likeCountSpan.textContent = data.like_count;
+                
+                // Toggle heart
+                const heartSpan = button.querySelector('span:first-child');
+                if (data.liked) {
+                    heartSpan.textContent = '❤️';
+                    heartSpan.style.color = '#ef4444';
+                } else {
+                    heartSpan.textContent = '🤍';
+                    heartSpan.style.color = '';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function likeIdea(participantId, button) {
+            fetch(`/feed/idea/${participantId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                // Update like count
+                const likeCountSpan = button.querySelector('.like-count');
+                likeCountSpan.textContent = data.like_count;
+                
+                // Toggle heart
+                const heartSpan = button.querySelector('span:first-child');
+                if (data.liked) {
+                    heartSpan.textContent = '❤️';
+                    heartSpan.style.color = '#ef4444';
+                } else {
+                    heartSpan.textContent = '🤍';
+                    heartSpan.style.color = '';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function toggleHintComments(participantId) {
+            const section = document.getElementById(`hint-comments-${participantId}`);
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                section.querySelector('input')?.focus();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function toggleIdeaComments(participantId) {
+            const section = document.getElementById(`idea-comments-${participantId}`);
             if (section.style.display === 'none') {
                 section.style.display = 'block';
                 section.querySelector('input')?.focus();
