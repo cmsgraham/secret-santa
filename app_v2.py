@@ -5,6 +5,8 @@ Flask application for organizing multiple Secret Santa gift exchanges
 import os
 import secrets
 import random
+import io
+import base64
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
@@ -17,6 +19,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
+import qrcode
 
 from models import Base, User, Event, Participant, Assignment, AuthToken, EventStatus, FeedPost, FeedComment, FeedLike
 from event_names import generate_event_name, generate_event_code, get_random_event_names
@@ -164,6 +167,31 @@ def send_assignment_email(participant, receiver_name, event):
         db.session.commit()
     
     return success
+
+def generate_qr_code_base64(data):
+    """Generate a QR code and return it as base64 encoded image"""
+    try:
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=2,
+        )
+        qr.add_data(data)
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert image to base64
+        img_io = io.BytesIO()
+        img.save(img_io, 'PNG')
+        img_io.seek(0)
+        img_base64 = base64.b64encode(img_io.getvalue()).decode()
+        
+        return f"data:image/png;base64,{img_base64}"
+    except Exception as e:
+        print(f"Error generating QR code: {str(e)}")
+        return None
 
 # ============================================================================
 # Secret Santa Algorithm
@@ -437,7 +465,11 @@ def manage_event(code):
         flash('You do not have permission to manage this event', 'error')
         return redirect(url_for('dashboard'))
     
-    return render_template('manage_event.html', event=event)
+    # Generate QR code for registration link
+    registration_url = request.host_url.rstrip('/') + url_for('register', code=code)
+    qr_code = generate_qr_code_base64(registration_url)
+    
+    return render_template('manage_event.html', event=event, qr_code=qr_code, registration_url=registration_url)
 
 @app.route('/event/<code>/run-draw', methods=['POST'])
 @login_required
