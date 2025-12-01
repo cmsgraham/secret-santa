@@ -96,26 +96,17 @@
 
 <script>
     function initLanguageSelector() {
-        console.log('[Language Selector] Initializing...');
-        
         // Find all language selectors on the page
         document.querySelectorAll('.language-selector').forEach(selector => {
             // Skip if already initialized
-            if (selector.dataset.initialized) {
-                console.log('[Language Selector] Already initialized, skipping');
-                return;
-            }
+            if (selector.dataset.initialized) return;
             selector.dataset.initialized = 'true';
-            console.log('[Language Selector] Initializing selector:', selector);
 
             const currentLang = selector.querySelector('.current-language');
             const options = selector.querySelectorAll('.language-option');
-            
-            console.log('[Language Selector] Found', options.length, 'language options');
 
             // Toggle dropdown
             currentLang.addEventListener('click', function(e) {
-                console.log('[Language Selector] Dropdown clicked');
                 e.preventDefault();
                 // Close all other dropdowns
                 document.querySelectorAll('.language-selector').forEach(s => {
@@ -127,7 +118,6 @@
             // Handle language selection
             options.forEach(option => {
                 option.addEventListener('click', function(e) {
-                    console.log('[Language Selector] Language option clicked:', this.dataset.language);
                     e.preventDefault();
                     const lang = this.dataset.language;
                     
@@ -138,18 +128,10 @@
                     })
                     .then(r => r.json())
                     .then(d => {
-                        console.log('[Language Selector] API response:', d);
-                        if (d.success) {
-                            console.log('[Language Selector] Language set successfully, reloading...');
-                            window.location.reload();
-                        } else {
-                            alert('Error: ' + d.error);
-                        }
+                        if (d.success) window.location.reload();
+                        else alert('Error: ' + d.error);
                     })
-                    .catch(e => {
-                        console.error('[Language Selector] Error:', e);
-                        alert('Error changing language');
-                    });
+                    .catch(e => alert('Error changing language'));
                 });
             });
         });
@@ -166,10 +148,8 @@
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        console.log('[Language Selector] DOM still loading, waiting for DOMContentLoaded');
         document.addEventListener('DOMContentLoaded', initLanguageSelector);
     } else {
-        console.log('[Language Selector] DOM already loaded, initializing now');
         initLanguageSelector();
     }
 </script>

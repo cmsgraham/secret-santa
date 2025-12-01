@@ -92,9 +92,18 @@ def detect_language():
     # Detect from Accept-Language header
     g.locale = detect_locale_from_header(request.headers.get('Accept-Language'))
     session['language'] = g.locale
-    
-    # Update Jinja2 context with current locale
-    app.jinja_env.globals['locale'] = g.locale
+
+# ============================================================================
+# Context Processors - Make variables available in all templates
+# ============================================================================
+
+@app.context_processor
+def inject_locale():
+    """Inject locale into template context for each request"""
+    return {
+        'locale': g.get('locale', DEFAULT_LOCALE),
+        'SUPPORTED_LOCALES': ['en', 'es_MX', 'es_CR', 'es_CO', 'es_AR', 'es_ES']
+    }
 
 # SMTP Configuration
 SMTP_SERVER = os.getenv('SMTP_SERVER')
