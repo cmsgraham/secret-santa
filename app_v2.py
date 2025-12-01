@@ -1144,16 +1144,38 @@ def comment_post(post_id):
     """Add a comment to a feed post"""
     try:
         post = FeedPost.query.get_or_404(post_id)
-        participant_id = session.get('participant_id')
         
-        if not participant_id:
+        # Try to get current participant with fallbacks (like hints/ideas do)
+        current_participant_id = session.get('participant_id')
+        participant_email = session.get('participant_email')
+        user_email = session.get('user_email')
+        
+        current_participant = None
+        if current_participant_id:
+            found = Participant.query.get(current_participant_id)
+            # Only use if they're in the same event as the post
+            if found and found.event_id == post.event_id:
+                current_participant = found
+        
+        if not current_participant and participant_email:
+            current_participant = Participant.query.filter_by(email=participant_email, event_id=post.event_id).first()
+        
+        if not current_participant and user_email:
+            current_participant = Participant.query.filter_by(email=user_email, event_id=post.event_id).first()
+        
+        if not current_participant:
             flash('You must be logged in to comment', 'warning')
             return redirect(url_for('feed', code=post.event.code))
         
-        participant = Participant.query.get(participant_id)
-        if not participant or participant.event_id != post.event_id:
+        if current_participant.event_id != post.event_id:
             flash('Invalid participant', 'error')
             return redirect(url_for('feed', code=post.event.code))
+        
+        # Update session with participant info if needed
+        if 'participant_id' not in session:
+            session['participant_id'] = current_participant.id
+        if 'participant_email' not in session:
+            session['participant_email'] = current_participant.email
         
         content = request.form.get('content', '').strip()
         if not content:
@@ -1162,8 +1184,8 @@ def comment_post(post_id):
         
         comment = FeedComment(
             post_id=post_id,
-            participant_id=participant_id,
-            nickname=participant.nickname or participant.name,
+            participant_id=current_participant.id,
+            nickname=current_participant.nickname or current_participant.name,
             content=content
         )
         db.session.add(comment)
