@@ -84,6 +84,47 @@
             gap: 1rem;
             flex-wrap: wrap;
         }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .btn-dark {
+            background: #374151;
+            color: white;
+        }
+        .btn-dark:hover {
+            background: #1f2937;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .warning-box {
             background: #fef3c7;
             border: 2px solid #fbbf24;
@@ -178,7 +219,7 @@
                             <span style="color: #10b981;">✅ Email Sent</span>
                             {% endif %}
                             {% if event.status.value == 'registration_open' %}
-                            <button onclick="removeParticipant('{{ participant.id }}', '{{ participant.name }}')" class="btn" style="background: #ef4444; color: white; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            <button onclick="removeParticipant('{{ participant.id }}', '{{ participant.name }}')" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
                                 🗑️ Remove
                             </button>
                             {% endif %}
@@ -217,7 +258,7 @@
                     {% endif %}
                     
                     <div class="action-buttons" style="margin-top: 1rem;">
-                        <button class="btn btn-secondary" onclick="closeEvent()">
+                        <button class="btn btn-danger" onclick="closeEvent()">
                             🔒 Close Event
                         </button>
                     </div>
@@ -248,18 +289,33 @@
     <script>
         function copyRegistrationLink() {
             const input = document.getElementById('registrationLink');
-            navigator.clipboard.writeText(input.value).then(() => {
-                alert('✅ Link copied to clipboard!');
-            }).catch((err) => {
-                // Fallback for older browsers or permissions issues
+            const text = input.value;
+            
+            // Try modern Clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        alert('✅ Link copied to clipboard!');
+                    })
+                    .catch(() => {
+                        // Fallback to older method
+                        fallbackCopy(input);
+                    });
+            } else {
+                // Fallback for older browsers
+                fallbackCopy(input);
+            }
+        }
+
+        function fallbackCopy(input) {
+            try {
                 input.select();
-                try {
-                    document.execCommand('copy');
-                    alert('✅ Link copied to clipboard!');
-                } catch (e) {
-                    alert('❌ Failed to copy. Please copy manually.');
-                }
-            });
+                input.setSelectionRange(0, 99999); // For mobile devices
+                document.execCommand('copy');
+                alert('✅ Link copied to clipboard!');
+            } catch (e) {
+                alert('❌ Failed to copy. Please copy manually:\n\n' + input.value);
+            }
         }
 
         async function runDraw() {
