@@ -192,6 +192,46 @@ class FeedPost(Base):
     # Relationships
     event = relationship("Event", foreign_keys=[event_id])
     participant = relationship("Participant", foreign_keys=[participant_id])
+    comments = relationship("FeedComment", back_populates="post", cascade="all, delete-orphan")
+    likes = relationship("FeedLike", back_populates="post", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<FeedPost {self.nickname} on {self.event_id}>"
+
+class FeedComment(Base):
+    """Comment on a feed post"""
+    __tablename__ = 'feed_comments'
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    post_id = Column(String(36), ForeignKey('feed_posts.id'), nullable=False)
+    participant_id = Column(String(36), ForeignKey('participants.id'), nullable=False)
+    
+    # Comment content
+    nickname = Column(String(255), nullable=False)  # Anonymous nickname for display
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    # Relationships
+    post = relationship("FeedPost", back_populates="comments")
+    participant = relationship("Participant", foreign_keys=[participant_id])
+    
+    def __repr__(self):
+        return f"<FeedComment {self.nickname} on post {self.post_id}>"
+
+class FeedLike(Base):
+    """Like on a feed post"""
+    __tablename__ = 'feed_likes'
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    post_id = Column(String(36), ForeignKey('feed_posts.id'), nullable=False)
+    participant_id = Column(String(36), ForeignKey('participants.id'), nullable=False)
+    
+    # Like metadata
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    # Relationships
+    post = relationship("FeedPost", back_populates="likes")
+    participant = relationship("Participant", foreign_keys=[participant_id])
+    
+    def __repr__(self):
+        return f"<FeedLike by {self.participant_id} on {self.post_id}>"
