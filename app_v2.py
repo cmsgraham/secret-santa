@@ -1169,12 +1169,15 @@ def comment_post(post_id):
 def like_hint(participant_id):
     """Like or unlike a hint"""
     try:
+        print(f"DEBUG like_hint: participant_id={participant_id}, session={dict(session)}")
         participant = Participant.query.get_or_404(participant_id)
         
         # Try to get current participant with fallbacks
         current_participant_id = session.get('participant_id')
         participant_email = session.get('participant_email')
         user_email = session.get('user_email')
+        
+        print(f"DEBUG like_hint: current_participant_id={current_participant_id}, participant_email={participant_email}, user_email={user_email}")
         
         current_participant = None
         if current_participant_id:
@@ -1183,6 +1186,8 @@ def like_hint(participant_id):
             current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
         elif user_email:
             current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
+        
+        print(f"DEBUG like_hint: current_participant={current_participant}")
         
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
@@ -1214,18 +1219,23 @@ def like_hint(participant_id):
             return jsonify({'liked': True, 'like_count': like_count})
     except Exception as e:
         print(f"Error in like_hint: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': 'Server error'}), 500
 
 @app.route('/feed/idea/<participant_id>/like', methods=['POST'])
 def like_idea(participant_id):
     """Like or unlike a gift idea"""
     try:
+        print(f"DEBUG like_idea: participant_id={participant_id}, session={dict(session)}")
         participant = Participant.query.get_or_404(participant_id)
         
         # Try to get current participant with fallbacks
         current_participant_id = session.get('participant_id')
         participant_email = session.get('participant_email')
         user_email = session.get('user_email')
+        
+        print(f"DEBUG like_idea: current_participant_id={current_participant_id}, participant_email={participant_email}, user_email={user_email}")
         
         current_participant = None
         if current_participant_id:
@@ -1234,6 +1244,8 @@ def like_idea(participant_id):
             current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
         elif user_email:
             current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
+        
+        print(f"DEBUG like_idea: current_participant={current_participant}")
         
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
@@ -1265,6 +1277,8 @@ def like_idea(participant_id):
             return jsonify({'liked': True, 'like_count': like_count})
     except Exception as e:
         print(f"Error in like_idea: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': 'Server error'}), 500
 
 @app.route('/feed/hint/<participant_id>/comment', methods=['POST'])
