@@ -92,7 +92,7 @@ header p {
     text-decoration: underline;
 }
 
-.btn-primary {
+.btn-primary:not(.action-buttons .btn-primary) {
     width: 100%;
     padding: 15px;
     background: linear-gradient(45deg, #667eea, #764ba2);
@@ -106,7 +106,7 @@ header p {
     position: relative;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary:not(.action-buttons .btn-primary):hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
