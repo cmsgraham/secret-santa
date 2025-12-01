@@ -31,12 +31,16 @@
             align-items: center;
             margin: 0 0.5rem;
         }
-        .member-avatar img {
+        .member-avatar .avatar-emoji {
             width: 56px;
             height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
             border-radius: 50%;
-            border: 2px solid #374151;
-            background: #fff;
+            border: 2px solid #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         .member-nickname {
             margin-top: 0.5rem;
@@ -102,16 +106,43 @@
         .post-content {
             color: #374151;
         }
+        .feed-header {
+            grid-column: 1 / 4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+        .feed-header h1 {
+            margin: 0;
+            color: #667eea;
+        }
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #5568d3;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="feed-container">
+        <!-- Header -->
+        <div class="feed-header">
+            <h1>🎉 Santa's Secret Wall</h1>
+            <a href="{{ url_for('member_page', code=event.code, participant_id=session.get('participant_id')) }}" class="back-link">← Back to My Page</a>
+        </div>
         <!-- Top: Member Avatars and Nicknames -->
         <div class="feed-top">
             {% for member in members %}
             <div class="member-avatar">
-                <img src="{{ member.profile_picture_url }}" alt="Avatar">
-                <div class="member-nickname">{{ member.nickname }}</div>
+                <div class="avatar-emoji">{{ member.profile_picture or '👤' }}</div>
+                <div class="member-nickname">{{ member.nickname or member.name }}</div>
             </div>
             {% endfor %}
         </div>
@@ -120,8 +151,12 @@
             <h3>🎁 Hints</h3>
             {% for member in members %}
             <div style="margin-bottom: 1rem;">
-                <strong>{{ member.nickname }}:</strong>
-                <span>{{ member.hints or 'No hints yet.' }}</span>
+                <strong>{{ member.nickname or member.name }}:</strong>
+                {% if member.hints %}
+                    <span>{{ member.hints }}</span>
+                {% else %}
+                    <span style="color: #999;">No hints yet.</span>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
@@ -144,8 +179,12 @@
             <h3>🎈 Gift Ideas</h3>
             {% for member in members %}
             <div style="margin-bottom: 1rem;">
-                <strong>{{ member.nickname }}:</strong>
-                <span>{{ member.gift_preferences or 'No ideas yet.' }}</span>
+                <strong>{{ member.nickname or member.name }}:</strong>
+                {% if member.gift_preferences %}
+                    <span>{{ member.gift_preferences }}</span>
+                {% else %}
+                    <span style="color: #999;">No ideas yet.</span>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
