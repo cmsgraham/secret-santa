@@ -1139,7 +1139,7 @@ def like_post(post_id):
         db.session.commit()
         return {'liked': True, 'like_count': len(post.likes)}
 
-@app.route('/feed/post/<post_id>/comment', methods=['POST'])
+@app.route('/feed/post/<post_id>/comment', methods=['POST'], endpoint='comment_post')
 def comment_post(post_id):
     """Add a comment to a feed post"""
     print(f"\n{'='*60}")
