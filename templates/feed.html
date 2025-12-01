@@ -452,7 +452,7 @@
                 <!-- Comments Section -->
                 <div class="comments-section" id="comments-{{ item.post.id }}" style="display: none;">
                     <!-- Comment Form -->
-                    <form method="POST" action="/feed/post/{{ item.post.id }}/comment" class="comment-form">
+                    <form method="POST" action="/feed/post/{{ item.post.id }}/comment" class="comment-form" onsubmit="handleCommentSubmit(event)">
                         <input type="text" name="content" placeholder="Say something..." required>
                         <button type="submit">💬</button>
                     </form>
@@ -642,6 +642,19 @@
             } else {
                 section.style.display = 'none';
             }
+        }
+
+        function handleCommentSubmit(event) {
+            // Allow normal form submission, but show loading state
+            const button = event.target.querySelector('button[type="submit"]');
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.textContent = '...';
+            
+            setTimeout(() => {
+                button.disabled = false;
+                button.textContent = originalText;
+            }, 2000);
         }
     </script>
 </body>
