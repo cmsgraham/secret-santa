@@ -452,7 +452,7 @@
                 <!-- Comments Section -->
                 <div class="comments-section" id="comments-{{ item.post.id }}" style="display: none;">
                     <!-- Comment Form -->
-                    <form onsubmit="submitPostComment(event, '{{ item.post.id }}')" class="comment-form">
+                    <form method="POST" action="{{ url_for('comment_post', post_id=item.post.id) }}" class="comment-form">
                         <input type="text" name="content" placeholder="Say something..." required>
                         <button type="submit">💬</button>
                     </form>
@@ -642,56 +642,6 @@
             } else {
                 section.style.display = 'none';
             }
-        }
-
-        function submitPostComment(event, postId) {
-            event.preventDefault();
-            const form = event.target;
-            const content = form.querySelector('input[name="content"]').value;
-            
-            if (!content.trim()) {
-                alert('Please enter a comment');
-                return;
-            }
-            
-            const url = `/feed/post/${postId}/comment`;
-            console.log('Submitting to URL:', url);
-            console.log('POST data:', `content=${encodeURIComponent(content)}`);
-            
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                credentials: 'same-origin',
-                body: `content=${encodeURIComponent(content)}`
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response url:', response.url);
-                console.log('Response redirected:', response.redirected);
-                return response.text().then(text => {
-                    console.log('Response text (first 500 chars):', text.substring(0, 500));
-                    try {
-                        return JSON.parse(text);
-                    } catch (e) {
-                        throw new Error(`Failed to parse JSON: ${e.message}`);
-                    }
-                });
-            })
-            .then(data => {
-                console.log('Success data:', data);
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
-                form.querySelector('input[name="content"]').value = '';
-                location.reload();
-            })
-            .catch(error => {
-                console.error('Full error:', error);
-                alert('Failed to add comment: ' + error.message);
-            });
         }
     </script>
 </body>
