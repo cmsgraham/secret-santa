@@ -1142,20 +1142,28 @@ def like_post(post_id):
 @app.route('/feed/post/<post_id>/comment', methods=['POST'])
 def comment_post(post_id):
     """Add a comment to a feed post"""
+    print(f"\n=== COMMENT_POST CALLED ===")
+    print(f"post_id={post_id}")
+    print(f"request.form={dict(request.form)}")
+    print(f"session participant_id={session.get('participant_id')}")
+    
     post = FeedPost.query.get_or_404(post_id)
     participant_id = session.get('participant_id')
     
     if not participant_id:
+        print(f"No participant_id in session, redirecting")
         flash('You must be logged in to comment', 'warning')
         return redirect(url_for('feed', code=post.event.code))
     
     participant = Participant.query.get(participant_id)
     if not participant or participant.event_id != post.event_id:
+        print(f"Invalid participant, redirecting")
         flash('Invalid participant', 'error')
         return redirect(url_for('feed', code=post.event.code))
     
     content = request.form.get('content', '').strip()
     if not content:
+        print(f"Empty content, redirecting")
         flash('Comment cannot be empty', 'error')
         return redirect(url_for('feed', code=post.event.code))
     
@@ -1168,6 +1176,7 @@ def comment_post(post_id):
     db.session.add(comment)
     db.session.commit()
     
+    print(f"Comment saved successfully!")
     flash('Comment added! 💬', 'success')
     return redirect(url_for('feed', code=post.event.code))
 
