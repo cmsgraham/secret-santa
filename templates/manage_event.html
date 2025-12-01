@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage {{ event.name }} - Secret Santa</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=2">
     <style>
         .manage-container {
             max-width: 900px;
@@ -84,7 +84,7 @@
             gap: 1rem;
             flex-wrap: wrap;
         }
-        .btn {
+        .action-buttons .btn {
             padding: 0.75rem 1.5rem !important;
             border: none !important;
             border-radius: 8px !important;
@@ -94,38 +94,41 @@
             font-size: 1rem !important;
             width: auto !important;
             display: inline-block !important;
+            background: initial !important;
+            box-shadow: none !important;
+            transform: none !important;
         }
-        .btn-primary {
+        .action-buttons .btn-primary {
             background: #667eea !important;
             color: white !important;
         }
-        .btn-primary:hover {
+        .action-buttons .btn-primary:hover {
             background: #5568d3 !important;
             transform: none !important;
             box-shadow: none !important;
         }
-        .btn-secondary {
+        .action-buttons .btn-secondary {
             background: #6b7280 !important;
             color: white !important;
         }
-        .btn-secondary:hover {
+        .action-buttons .btn-secondary:hover {
             background: #4b5563 !important;
         }
-        .btn-dark {
+        .action-buttons .btn-dark {
             background: #374151 !important;
             color: white !important;
         }
-        .btn-dark:hover {
+        .action-buttons .btn-dark:hover {
             background: #1f2937 !important;
         }
-        .btn-danger {
+        .action-buttons .btn-danger {
             background: #ef4444 !important;
             color: white !important;
         }
-        .btn-danger:hover {
+        .action-buttons .btn-danger:hover {
             background: #dc2626 !important;
         }
-        .btn:disabled {
+        .action-buttons .btn:disabled {
             opacity: 0.6 !important;
             cursor: not-allowed !important;
         }
