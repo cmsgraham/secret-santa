@@ -11,7 +11,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, g
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -23,6 +23,16 @@ from dotenv import load_dotenv
 from urllib.parse import urlparse
 import bleach
 from markupsafe import escape
+
+# I18n imports
+from i18n import (
+    detect_locale_from_header,
+    detect_locale_from_country,
+    get_translation,
+    SUPPORTED_LOCALES,
+    DEFAULT_LOCALE,
+)
+from jinja_i18n import add_i18n_to_jinja
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -47,6 +57,44 @@ app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
 # Initialize database
 db = SQLAlchemy(app, model_class=Base)
+
+# Initialize i18n with Jinja2
+i18n_context = add_i18n_to_jinja(app, DEFAULT_LOCALE)
+
+# ============================================================================
+# Language Detection Middleware
+# ============================================================================
+
+@app.before_request
+def detect_language():
+    """Detect and set language from session, user preference, or Accept-Language header"""
+    # Check session first
+    if 'language' in session:
+        g.locale = session['language']
+        return
+    
+    # Check user preference if logged in
+    if 'user_id' in session:
+        user = db.session.get(User, session['user_id'])
+        if user and user.preferred_language:
+            g.locale = user.preferred_language
+            session['language'] = user.preferred_language
+            return
+    
+    # Check participant preference if session participant exists
+    if 'participant_id' in session:
+        participant = db.session.get(Participant, session['participant_id'])
+        if participant and participant.preferred_language:
+            g.locale = participant.preferred_language
+            session['language'] = participant.preferred_language
+            return
+    
+    # Detect from Accept-Language header
+    g.locale = detect_locale_from_header(request.headers.get('Accept-Language'))
+    session['language'] = g.locale
+    
+    # Update Jinja2 context with current locale
+    app.jinja_env.globals['locale'] = g.locale
 
 # SMTP Configuration
 SMTP_SERVER = os.getenv('SMTP_SERVER')
@@ -966,6 +1014,86 @@ def get_suggestions():
     count = int(request.args.get('count', 5))
     names = get_random_event_names(count)
     return jsonify({'names': names})
+
+# ============================================================================
+# Language API Endpoints
+# ============================================================================
+
+@app.route('/api/language/set', methods=['POST'])
+def set_language():
+    """Set user's language preference"""
+    try:
+        data = request.get_json() or {}
+        language = data.get('language', DEFAULT_LOCALE)
+        
+        if language not in SUPPORTED_LOCALES:
+            return jsonify({
+                'success': False,
+                'error': f'Unsupported language: {language}'
+            }), 400
+        
+        # Store in session
+        session['language'] = language
+        g.locale = language
+        
+        # If user is logged in, update their preference in database
+        if 'user_id' in session:
+            user = db.session.get(User, session['user_id'])
+            if user:
+                user.preferred_language = language
+                db.session.commit()
+        
+        # If participant is logged in, update their preference
+        if 'participant_id' in session:
+            participant = db.session.get(Participant, session['participant_id'])
+            if participant:
+                participant.preferred_language = language
+                db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Language preference updated',
+            'language': language
+        })
+    
+    except Exception as e:
+        logger.error(f'Language set error: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': 'Failed to set language'
+        }), 500
+
+
+@app.route('/api/languages', methods=['GET'])
+def get_languages():
+    """Get list of supported languages with metadata"""
+    try:
+        from language_selector import LANGUAGES
+        
+        languages = []
+        for code, info in LANGUAGES.items():
+            languages.append({
+                'code': code,
+                'name': info['name'],
+                'native_name': info['native_name'],
+                'flag': info['flag'],
+                'region': info['region']
+            })
+        
+        current_language = session.get('language', g.get('locale', DEFAULT_LOCALE))
+        
+        return jsonify({
+            'success': True,
+            'languages': languages,
+            'current': current_language
+        })
+    
+    except Exception as e:
+        logger.error(f'Get languages error: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': 'Failed to get languages'
+        }), 500
 
 @app.route('/event/<code>/join', methods=['POST'])
 @login_required

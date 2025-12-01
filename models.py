@@ -26,6 +26,9 @@ class User(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     last_login = Column(DateTime)
     
+    # Language preference
+    preferred_language = Column(String(10), default='en', nullable=False)
+    
     # Relationships
     events = relationship("Event", back_populates="organizer", cascade="all, delete-orphan")
     
@@ -56,6 +59,7 @@ class Event(Base):
     min_participants = Column(Integer, default=3)
     max_participants = Column(Integer, default=100)
     guessing_enabled = Column(Boolean, default=False)  # Allow participants to guess their Secret Santa
+    default_language = Column(String(10), default='en', nullable=False)  # Default language for event
     
     # Relationships
     participants = relationship("Participant", back_populates="event", cascade="all, delete-orphan")
@@ -108,6 +112,9 @@ class Participant(Base):
     # Email status
     assignment_email_sent = Column(Boolean, default=False)
     assignment_email_sent_at = Column(DateTime)
+    
+    # Language preference
+    preferred_language = Column(String(10), default='en', nullable=False)
     
     # Relationships
     event = relationship("Event", back_populates="participants")
