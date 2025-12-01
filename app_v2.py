@@ -1142,6 +1142,11 @@ def like_post(post_id):
 @app.route('/feed/post/<post_id>/comment', methods=['POST'])
 def comment_post(post_id):
     """Add a comment to a feed post"""
+    print(f"\n{'='*60}")
+    print(f"COMMENT_POST ROUTE CALLED")
+    print(f"post_id={post_id}")
+    print(f"{'='*60}\n")
+    
     try:
         post = FeedPost.query.get_or_404(post_id)
         
