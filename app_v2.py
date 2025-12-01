@@ -1143,65 +1143,58 @@ def like_post(post_id):
         db.session.commit()
         return {'liked': True, 'like_count': len(post.likes)}
 
-@app.route('/feed/post/<post_id>/comment', methods=['POST'], endpoint='comment_post')
+@app.route('/feed/wall/<post_id>/comment', methods=['POST'])
 def comment_post(post_id):
     """Add a comment to a feed post"""
-    app.logger.warning(f"DEBUG comment_post: post_id={post_id}, type={type(post_id)}")
-    try:
-        post = FeedPost.query.get_or_404(post_id)
-        
-        # Try to get current participant with fallbacks (like hints/ideas do)
-        current_participant_id = session.get('participant_id')
-        participant_email = session.get('participant_email')
-        user_email = session.get('user_email')
-        
-        current_participant = None
-        if current_participant_id:
-            found = Participant.query.get(current_participant_id)
-            # Only use if they're in the same event as the post
-            if found and found.event_id == post.event_id:
-                current_participant = found
-        
-        if not current_participant and participant_email:
-            current_participant = Participant.query.filter_by(email=participant_email, event_id=post.event_id).first()
-        
-        if not current_participant and user_email:
-            current_participant = Participant.query.filter_by(email=user_email, event_id=post.event_id).first()
-        
-        if not current_participant:
-            flash('You must be logged in to comment', 'warning')
-            return redirect(url_for('feed', code=post.event.code))
-        
-        if current_participant.event_id != post.event_id:
-            flash('Invalid participant', 'error')
-            return redirect(url_for('feed', code=post.event.code))
-        
-        # Update session with participant info if needed
-        if 'participant_id' not in session:
-            session['participant_id'] = current_participant.id
-        if 'participant_email' not in session:
-            session['participant_email'] = current_participant.email
-        
-        content = request.form.get('content', '').strip()
-        if not content:
-            flash('Comment cannot be empty', 'error')
-            return redirect(url_for('feed', code=post.event.code))
-        
-        comment = FeedComment(
-            post_id=post_id,
-            participant_id=current_participant.id,
-            nickname=current_participant.nickname or current_participant.name,
-            content=content
-        )
-        db.session.add(comment)
-        db.session.commit()
-        flash('Comment added! 💬', 'success')
-        
-    except Exception as e:
-        db.session.rollback()
-        flash('Error adding comment', 'error')
+    post = FeedPost.query.get_or_404(post_id)
+    
+    # Try to get current participant with fallbacks
+    current_participant_id = session.get('participant_id')
+    participant_email = session.get('participant_email')
+    user_email = session.get('user_email')
+    
+    current_participant = None
+    if current_participant_id:
+        found = Participant.query.get(current_participant_id)
+        # Only use if they're in the same event as the target
+        if found and found.event_id == post.event_id:
+            current_participant = found
+    
+    if not current_participant and participant_email:
+        current_participant = Participant.query.filter_by(email=participant_email, event_id=post.event_id).first()
+    
+    if not current_participant and user_email:
+        current_participant = Participant.query.filter_by(email=user_email, event_id=post.event_id).first()
+    
+    if not current_participant:
+        flash('You must be logged in to comment', 'warning')
         return redirect(url_for('feed', code=post.event.code))
     
+    if current_participant.event_id != post.event_id:
+        flash('Invalid participant', 'error')
+        return redirect(url_for('feed', code=post.event.code))
+    
+    # Update session with participant info if needed
+    if 'participant_id' not in session:
+        session['participant_id'] = current_participant.id
+    if 'participant_email' not in session:
+        session['participant_email'] = current_participant.email
+    
+    content = request.form.get('content', '').strip()
+    if not content:
+        flash('Comment cannot be empty', 'error')
+        return redirect(url_for('feed', code=post.event.code))
+    
+    comment = FeedComment(
+        post_id=post_id,
+        participant_id=current_participant.id,
+        nickname=current_participant.nickname or current_participant.name,
+        content=content
+    )
+    db.session.add(comment)
+    db.session.commit()
+    
+    flash('Comment added! 💬', 'success')
     return redirect(url_for('feed', code=post.event.code))
 
 @app.route('/feed/hint/<participant_id>/like', methods=['POST'])

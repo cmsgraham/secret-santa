@@ -452,7 +452,7 @@
                 <!-- Comments Section -->
                 <div class="comments-section" id="comments-{{ item.post.id }}" style="display: none;">
                     <!-- Comment Form -->
-                    <form method="POST" action="{{ url_for('comment_post', post_id=item.post.id) }}" class="comment-form" data-post-id="{{ item.post.id }}">
+                    <form method="POST" action="{{ url_for('comment_post', post_id=item.post.id) }}" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
                         <input type="text" name="content" placeholder="Say something..." required>
                         <button type="submit">💬</button>
                     </form>
