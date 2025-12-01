@@ -1142,11 +1142,6 @@ def like_post(post_id):
 @app.route('/feed/post/<post_id>/comment', methods=['POST'], endpoint='comment_post')
 def comment_post(post_id):
     """Add a comment to a feed post"""
-    print(f"\n{'='*60}")
-    print(f"COMMENT_POST ROUTE CALLED")
-    print(f"post_id={post_id}")
-    print(f"{'='*60}\n")
-    
     try:
         post = FeedPost.query.get_or_404(post_id)
         
@@ -1199,10 +1194,7 @@ def comment_post(post_id):
         
     except Exception as e:
         db.session.rollback()
-        print(f"Error in comment_post: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        flash(f'Error: {str(e)}', 'error')
+        flash('Error adding comment', 'error')
         return redirect(url_for('feed', code=post.event.code))
     
     return redirect(url_for('feed', code=post.event.code))
