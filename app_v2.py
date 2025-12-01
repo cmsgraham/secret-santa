@@ -79,6 +79,7 @@ def detect_language():
         if user and user.preferred_language:
             g.locale = user.preferred_language
             session['language'] = user.preferred_language
+            session.modified = True
             return
     
     # Check participant preference if session participant exists
@@ -87,11 +88,13 @@ def detect_language():
         if participant and participant.preferred_language:
             g.locale = participant.preferred_language
             session['language'] = participant.preferred_language
+            session.modified = True
             return
     
     # Detect from Accept-Language header
     g.locale = detect_locale_from_header(request.headers.get('Accept-Language'))
     session['language'] = g.locale
+    session.modified = True
 
 # ============================================================================
 # Context Processors - Make variables available in all templates
@@ -100,8 +103,10 @@ def detect_language():
 @app.context_processor
 def inject_locale():
     """Inject locale into template context for each request"""
+    locale_value = g.get('locale', DEFAULT_LOCALE)
+    logger.debug(f'[LOCALE] Injecting locale into template context: {locale_value} (g.locale={g.get("locale")})')
     return {
-        'locale': g.get('locale', DEFAULT_LOCALE),
+        'locale': locale_value,
         'SUPPORTED_LOCALES': ['en', 'es_MX', 'es_CR', 'es_CO', 'es_AR', 'es_ES']
     }
 
@@ -1043,6 +1048,7 @@ def set_language():
         
         # Store in session
         session['language'] = language
+        session.modified = True  # Explicitly mark session as modified
         g.locale = language
         
         # If user is logged in, update their preference in database
