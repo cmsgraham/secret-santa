@@ -412,6 +412,12 @@ def dashboard():
     """Unified dashboard showing all events (created and participating)"""
     user = get_current_user()
     
+    # If user not found in database (stale session), redirect to login
+    if not user:
+        session.clear()
+        flash('Your session has expired. Please log in again.', 'warning')
+        return redirect(url_for('login'))
+    
     # Get events where user is the organizer
     created_events = Event.query.filter_by(organizer_id=user.id).order_by(Event.created_at.desc()).all()
     
@@ -466,7 +472,7 @@ def manage_event(code):
         return redirect(url_for('dashboard'))
     
     # Generate QR code for registration link
-    registration_url = request.host_url.rstrip('/') + url_for('register', code=code)
+    registration_url = request.host_url.rstrip('/') + url_for('register_participant', code=code)
     qr_code = generate_qr_code_base64(registration_url)
     
     return render_template('manage_event.html', event=event, qr_code=qr_code, registration_url=registration_url)
