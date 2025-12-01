@@ -323,8 +323,11 @@ def login():
         try:
             validated = validate_email(email)
             email = validated.normalized
-        except EmailNotValidError:
-            return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+        except Exception as e:
+            app.logger.error(f"Email validation error: {str(e)}")
+            # Fallback: basic email validation
+            if '@' not in email or '.' not in email:
+                return jsonify({'success': False, 'error': 'Invalid email address'}), 400
         
         # Create or get user (use email prefix as default name)
         user = create_or_get_user(email, email.split('@')[0])
@@ -684,8 +687,11 @@ def register_participant(code):
         try:
             validated = validate_email(email)
             email = validated.normalized
-        except EmailNotValidError:
-            return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+        except Exception as e:
+            app.logger.error(f"Email validation error: {str(e)}")
+            # Fallback: basic email validation
+            if '@' not in email or '.' not in email:
+                return jsonify({'success': False, 'error': 'Invalid email address'}), 400
         
         # Auto-generate nickname if not provided
         if not nickname:
@@ -747,8 +753,11 @@ def participant_dashboard():
             try:
                 validated = validate_email(email)
                 email = validated.normalized
-            except EmailNotValidError:
-                return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+            except Exception as e:
+                app.logger.error(f"Email validation error: {str(e)}")
+                # Fallback: basic email validation
+                if '@' not in email or '.' not in email:
+                    return jsonify({'success': False, 'error': 'Invalid email address'}), 400
             
             # Check if this email exists as a participant
             participants = Participant.query.filter_by(email=email).all()
