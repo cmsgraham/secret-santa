@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage {{ event.name }} - Secret Santa</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=6">
     <style>
         .manage-container {
             max-width: 900px;
@@ -275,17 +275,17 @@
                         ✅ Draw completed! All participants have been emailed their assignments.
                     </div>
                     <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="reopenRegistration()">♻️ Reopen Registration</button>
-                        <button class="btn btn-dark" onclick="rerunDraw()">🎲 Rerun Draw</button>
-                        <button class="btn btn-secondary" onclick="toggleGuessing()">{% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}</button>
-                        <button class="btn btn-danger" onclick="closeEvent()">🔒 Close Event</button>
+                        <button class="btn btn-primary" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="reopenRegistration()">♻️ Reopen Registration</button>
+                        <button class="btn btn-dark" style="padding: 0.75rem 1.5rem; background: #374151; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="rerunDraw()">🎲 Rerun Draw</button>
+                        <button class="btn btn-secondary" style="padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="toggleGuessing()">{% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}</button>
+                        <button class="btn btn-danger" style="padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="closeEvent()">🔒 Close Event</button>
                     </div>
                 {% else %}
                     <div style="padding: 1rem; background: #f3f4f6; border-radius: 8px; text-align: center;">
                         🔒 This event is closed.
                     </div>
                     <div class="action-buttons" style="margin-top: 1rem;">
-                        <button class="btn btn-primary" onclick="reopenRegistration()">
+                        <button class="btn btn-primary" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="reopenRegistration()">
                             ♻️ Reopen Registration
                         </button>
                     </div>
