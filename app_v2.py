@@ -1031,6 +1031,13 @@ def feed(code):
     
     # Get current participant for checking if they've liked posts
     current_participant_id = session.get('participant_id')
+    current_participant_nickname = None
+    
+    # Get current participant's nickname for display
+    if current_participant_id:
+        current_participant = Participant.query.get(current_participant_id)
+        if current_participant:
+            current_participant_nickname = current_participant.nickname or current_participant.name
     
     # Prepare post data with like status
     posts_data = []
@@ -1113,7 +1120,7 @@ def feed(code):
             })
     
     # Return feed page
-    return render_template('feed.html', event=event, members=members, posts_data=posts_data, hints_data=hints_data, ideas_data=ideas_data)
+    return render_template('feed.html', event=event, members=members, posts_data=posts_data, hints_data=hints_data, ideas_data=ideas_data, current_user_nickname=current_participant_nickname)
 
 @app.route('/feed/post/<post_id>/like', methods=['POST'])
 def like_post(post_id):

@@ -1,6 +1,6 @@
 <!-- Santa's Secret Wall Feed Template -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-user-nickname="{{ current_user_nickname }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -411,10 +411,13 @@
                     
                     <!-- Existing Comments -->
                     {% if hint.comments %}
-                    <div class="comments-list" style="margin-top: 0.5rem;">
+                    <div class="comments-list" style="margin-top: 0.5rem; border-top: 1px solid #e5e7eb; padding-top: 0.5rem;">
                         {% for comment in hint.comments %}
-                        <div class="comment" style="font-size: 0.85rem;">
-                            <strong class="comment-author">{{ comment.nickname }}</strong>
+                        <div class="comment" style="font-size: 0.85rem; margin-bottom: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                                <strong class="comment-author">{{ comment.nickname }}</strong>
+                                <span style="font-size: 0.75rem; color: #9ca3af;" title="{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}">{{ comment.created_at.strftime('%b %d, %I:%M %p') }}</span>
+                            </div>
                             <div class="comment-content">{{ comment.content }}</div>
                         </div>
                         {% endfor %}
@@ -459,10 +462,13 @@
                     
                     <!-- Existing Comments -->
                     {% if item.comments %}
-                    <div class="comments-list">
+                    <div class="comments-list" style="border-top: 1px solid #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem;">
                         {% for comment in item.comments %}
-                        <div class="comment">
-                            <strong class="comment-author">{{ comment.nickname }}</strong>
+                        <div class="comment" style="margin-bottom: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                                <strong class="comment-author">{{ comment.nickname }}</strong>
+                                <span style="font-size: 0.75rem; color: #9ca3af;" title="{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}">{{ comment.created_at.strftime('%b %d, %I:%M %p') }}</span>
+                            </div>
                             <div class="comment-content">{{ comment.content }}</div>
                         </div>
                         {% endfor %}
@@ -503,10 +509,13 @@
                     
                     <!-- Existing Comments -->
                     {% if idea.comments %}
-                    <div class="comments-list" style="margin-top: 0.5rem;">
+                    <div class="comments-list" style="margin-top: 0.5rem; border-top: 1px solid #e5e7eb; padding-top: 0.5rem;">
                         {% for comment in idea.comments %}
-                        <div class="comment" style="font-size: 0.85rem;">
-                            <strong class="comment-author">{{ comment.nickname }}</strong>
+                        <div class="comment" style="font-size: 0.85rem; margin-bottom: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                                <strong class="comment-author">{{ comment.nickname }}</strong>
+                                <span style="font-size: 0.75rem; color: #9ca3af;" title="{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}">{{ comment.created_at.strftime('%b %d, %I:%M %p') }}</span>
+                            </div>
                             <div class="comment-content">{{ comment.content }}</div>
                         </div>
                         {% endfor %}
@@ -643,6 +652,98 @@
                 section.style.display = 'none';
             }
         }
+
+        // Handle comment form submission with live update
+        document.addEventListener('submit', function(e) {
+            // Only intercept comment forms
+            if (!e.target.classList.contains('comment-form')) return;
+            
+            e.preventDefault();
+            
+            const form = e.target;
+            const contentInput = form.querySelector('input[name="content"]');
+            const content = contentInput.value.trim();
+            
+            if (!content) return;
+            
+            // Disable submit button during submission
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            
+            // Submit form via fetch
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.redirected) {
+                    // Success - add new comment to the list
+                    const now = new Date();
+                    const timeStr = now.toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                    
+                    // Get the comments list container
+                    let commentsList = form.parentElement.querySelector('.comments-list');
+                    
+                    // Create it if it doesn't exist
+                    if (!commentsList) {
+                        commentsList = document.createElement('div');
+                        commentsList.className = 'comments-list';
+                        commentsList.style.cssText = 'border-top: 1px solid #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem;';
+                        form.parentElement.insertBefore(commentsList, form.nextSibling);
+                    }
+                    
+                    // Create new comment element
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment';
+                    commentDiv.style.cssText = 'margin-bottom: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 4px; font-size: 0.85rem;';
+                    
+                    const commentHeader = document.createElement('div');
+                    commentHeader.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 0.3rem;';
+                    
+                    // Extract nickname from page or use default
+                    const nickname = document.documentElement.getAttribute('data-user-nickname') || 'You';
+                    
+                    commentHeader.innerHTML = `
+                        <strong class="comment-author">${nickname}</strong>
+                        <span style="font-size: 0.75rem; color: #9ca3af;" title="${now.toLocaleString()}">${timeStr}</span>
+                    `;
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'comment-content';
+                    contentDiv.textContent = content;
+                    
+                    commentDiv.appendChild(commentHeader);
+                    commentDiv.appendChild(contentDiv);
+                    
+                    // Add to comments list
+                    commentsList.appendChild(commentDiv);
+                    
+                    // Clear input and re-enable button
+                    contentInput.value = '';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                } else {
+                    // Handle error
+                    alert('Error adding comment. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding comment. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            });
+        });
     </script>
 </body>
 </html>
