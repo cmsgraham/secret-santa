@@ -90,6 +90,15 @@ def is_safe_url(target):
     
     return True
 
+def validate_email_simple(email):
+    """Simple email validation using regex - works without DNS"""
+    import re
+    email = email.strip().lower()
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(pattern, email):
+        raise ValueError("Invalid email format")
+    return email
+
 def sanitize_html(text, allowed_tags=None):
     """Sanitize HTML to prevent XSS attacks"""
     if not text:
@@ -321,13 +330,10 @@ def login():
         
         # Validate email
         try:
-            validated = validate_email(email)
-            email = validated.normalized
+            email = validate_email_simple(email)
         except Exception as e:
             app.logger.error(f"Email validation error: {str(e)}")
-            # Fallback: basic email validation
-            if '@' not in email or '.' not in email:
-                return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+            return jsonify({'success': False, 'error': 'Invalid email address'}), 400
         
         # Create or get user (use email prefix as default name)
         user = create_or_get_user(email, email.split('@')[0])
@@ -685,13 +691,10 @@ def register_participant(code):
             return jsonify({'success': False, 'error': 'Name is required'}), 400
         
         try:
-            validated = validate_email(email)
-            email = validated.normalized
+            email = validate_email_simple(email)
         except Exception as e:
             app.logger.error(f"Email validation error: {str(e)}")
-            # Fallback: basic email validation
-            if '@' not in email or '.' not in email:
-                return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+            return jsonify({'success': False, 'error': 'Invalid email address'}), 400
         
         # Auto-generate nickname if not provided
         if not nickname:
@@ -751,13 +754,10 @@ def participant_dashboard():
             
             # Validate email
             try:
-                validated = validate_email(email)
-                email = validated.normalized
+                email = validate_email_simple(email)
             except Exception as e:
                 app.logger.error(f"Email validation error: {str(e)}")
-                # Fallback: basic email validation
-                if '@' not in email or '.' not in email:
-                    return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+                return jsonify({'success': False, 'error': 'Invalid email address'}), 400
             
             # Check if this email exists as a participant
             participants = Participant.query.filter_by(email=email).all()
