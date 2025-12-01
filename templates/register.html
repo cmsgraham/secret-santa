@@ -172,8 +172,8 @@
                         messageDiv.parentNode.insertBefore(linkDiv, messageDiv.nextSibling);
                     }
                     
-                    // Clear form
-                    e.target.reset();
+                    // Hide the form after successful registration
+                    e.target.style.display = 'none';
                 } else {
                     messageDiv.textContent = '❌ ' + data.error;
                     messageDiv.className = 'message error';
