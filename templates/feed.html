@@ -396,8 +396,8 @@
                         {% if hint.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
                         <span class="like-count">{{ hint.like_count }}</span>
                     </button>
-                    <button class="action-btn comment-btn" onclick="toggleHintComments('{{ hint.participant.id }}')" style="background: none; border: none; cursor: pointer; padding: 0;">
-                        💬 <span class="comment-count">{{ hint.comment_count }}</span>
+                    <button class="action-btn comment-btn" onclick="toggleHintComments('{{ hint.participant.id }}')" data-expanded="false" style="background: none; border: none; cursor: pointer; padding: 0;">
+                        💬 <span class="comment-count">{{ hint.comment_count }}</span> <span class="expand-indicator">▼</span>
                     </button>
                 </div>
                 
@@ -447,8 +447,8 @@
                         {% if item.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
                         <span class="like-count">{{ item.like_count }}</span>
                     </button>
-                    <button class="action-btn comment-btn" onclick="toggleCommentForm('{{ item.post.id }}')">
-                        💬 <span class="comment-count">{{ item.comment_count }}</span>
+                    <button class="action-btn comment-btn" onclick="toggleCommentForm('{{ item.post.id }}')" data-expanded="false">
+                        💬 <span class="comment-count">{{ item.comment_count }}</span> <span class="expand-indicator">▼</span>
                     </button>
                 </div>
                 
@@ -494,8 +494,8 @@
                         {% if idea.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
                         <span class="like-count">{{ idea.like_count }}</span>
                     </button>
-                    <button class="action-btn comment-btn" onclick="toggleIdeaComments('{{ idea.participant.id }}')" style="background: none; border: none; cursor: pointer; padding: 0;">
-                        💬 <span class="comment-count">{{ idea.comment_count }}</span>
+                    <button class="action-btn comment-btn" onclick="toggleIdeaComments('{{ idea.participant.id }}')" data-expanded="false" style="background: none; border: none; cursor: pointer; padding: 0;">
+                        💬 <span class="comment-count">{{ idea.comment_count }}</span> <span class="expand-indicator">▼</span>
                     </button>
                 </div>
                 
@@ -563,11 +563,24 @@
 
         function toggleCommentForm(postId) {
             const section = document.getElementById(`comments-${postId}`);
+            const button = event.target.closest('.comment-btn');
+            const indicator = button?.querySelector('.expand-indicator');
+            
             if (section.style.display === 'none') {
                 section.style.display = 'block';
                 section.querySelector('input')?.focus();
+                if (indicator) {
+                    indicator.style.transform = 'rotate(180deg)';
+                    indicator.style.transition = 'transform 0.2s';
+                    button.setAttribute('data-expanded', 'true');
+                }
             } else {
                 section.style.display = 'none';
+                if (indicator) {
+                    indicator.style.transform = 'rotate(0deg)';
+                    indicator.style.transition = 'transform 0.2s';
+                    button.setAttribute('data-expanded', 'false');
+                }
             }
         }
 
@@ -635,21 +648,47 @@
 
         function toggleHintComments(participantId) {
             const section = document.getElementById(`hint-comments-${participantId}`);
+            const button = event.target.closest('.comment-btn');
+            const indicator = button?.querySelector('.expand-indicator');
+            
             if (section.style.display === 'none') {
                 section.style.display = 'block';
                 section.querySelector('input')?.focus();
+                if (indicator) {
+                    indicator.style.transform = 'rotate(180deg)';
+                    indicator.style.transition = 'transform 0.2s';
+                    button.setAttribute('data-expanded', 'true');
+                }
             } else {
                 section.style.display = 'none';
+                if (indicator) {
+                    indicator.style.transform = 'rotate(0deg)';
+                    indicator.style.transition = 'transform 0.2s';
+                    button.setAttribute('data-expanded', 'false');
+                }
             }
         }
 
         function toggleIdeaComments(participantId) {
             const section = document.getElementById(`idea-comments-${participantId}`);
+            const button = event.target.closest('.comment-btn');
+            const indicator = button?.querySelector('.expand-indicator');
+            
             if (section.style.display === 'none') {
                 section.style.display = 'block';
                 section.querySelector('input')?.focus();
+                if (indicator) {
+                    indicator.style.transform = 'rotate(180deg)';
+                    indicator.style.transition = 'transform 0.2s';
+                    button.setAttribute('data-expanded', 'true');
+                }
             } else {
                 section.style.display = 'none';
+                if (indicator) {
+                    indicator.style.transform = 'rotate(0deg)';
+                    indicator.style.transition = 'transform 0.2s';
+                    button.setAttribute('data-expanded', 'false');
+                }
             }
         }
 
