@@ -248,9 +248,17 @@
     <script>
         function copyRegistrationLink() {
             const input = document.getElementById('registrationLink');
-            input.select();
             navigator.clipboard.writeText(input.value).then(() => {
                 alert('✅ Link copied to clipboard!');
+            }).catch((err) => {
+                // Fallback for older browsers or permissions issues
+                input.select();
+                try {
+                    document.execCommand('copy');
+                    alert('✅ Link copied to clipboard!');
+                } catch (e) {
+                    alert('❌ Failed to copy. Please copy manually.');
+                }
             });
         }
 

@@ -105,6 +105,76 @@
         }
         .post-content {
             color: #374151;
+            margin-bottom: 0.75rem;
+        }
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #667eea;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 0;
+            transition: color 0.2s;
+        }
+        .action-btn:hover {
+            color: #5568d3;
+        }
+        .like-count, .comment-count {
+            font-size: 0.9rem;
+        }
+        .comments-section {
+            margin-top: 1rem;
+            background: #fff;
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+        .comment-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .comment-form input {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .comment-form button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem 0.75rem;
+        }
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .comment {
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+        .comment-author {
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+        .comment-content {
+            color: #374151;
+            margin-top: 0.25rem;
+            font-size: 0.9rem;
         }
         .feed-header {
             grid-column: 1 / 4;
@@ -197,10 +267,42 @@
                 <textarea name="content" rows="2" placeholder="Post something fun, ask a question, or share a thought..." required></textarea>
                 <button type="submit">Post</button>
             </form>
-            {% for post in posts %}
+            {% for item in posts_data %}
             <div class="post">
-                <div class="post-nickname">{{ post.nickname }}</div>
-                <div class="post-content">{{ post.content }}</div>
+                <div class="post-nickname">{{ item.post.nickname }}</div>
+                <div class="post-content">{{ item.post.content }}</div>
+                
+                <!-- Post Actions -->
+                <div class="post-actions">
+                    <button class="action-btn like-btn" onclick="likePost('{{ item.post.id }}', this)" data-liked="{{ 'true' if item.user_has_liked else 'false' }}">
+                        {% if item.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
+                        <span class="like-count">{{ item.like_count }}</span>
+                    </button>
+                    <button class="action-btn comment-btn" onclick="toggleCommentForm('{{ item.post.id }}')">
+                        💬 <span class="comment-count">{{ item.comment_count }}</span>
+                    </button>
+                </div>
+                
+                <!-- Comments Section -->
+                <div class="comments-section" id="comments-{{ item.post.id }}" style="display: none;">
+                    <!-- Comment Form -->
+                    <form method="POST" action="{{ url_for('comment_post', post_id=item.post.id) }}" class="comment-form">
+                        <input type="text" name="content" placeholder="Say something..." required>
+                        <button type="submit">💬</button>
+                    </form>
+                    
+                    <!-- Existing Comments -->
+                    {% if item.comments %}
+                    <div class="comments-list">
+                        {% for comment in item.comments %}
+                        <div class="comment">
+                            <strong class="comment-author">{{ comment.nickname }}</strong>
+                            <div class="comment-content">{{ comment.content }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -219,5 +321,48 @@
             {% endfor %}
         </div>
     </div>
+
+    <script>
+        function likePost(postId, button) {
+            fetch(`/feed/post/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                // Update like count
+                const likeCountSpan = button.querySelector('.like-count');
+                likeCountSpan.textContent = data.like_count;
+                
+                // Toggle heart
+                const heartSpan = button.querySelector('span:first-child');
+                if (data.liked) {
+                    heartSpan.textContent = '❤️';
+                    heartSpan.style.color = '#ef4444';
+                } else {
+                    heartSpan.textContent = '🤍';
+                    heartSpan.style.color = '';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function toggleCommentForm(postId) {
+            const section = document.getElementById(`comments-${postId}`);
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                section.querySelector('input')?.focus();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

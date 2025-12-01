@@ -18,7 +18,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
-from models import Base, User, Event, Participant, Assignment, AuthToken, EventStatus
+from models import Base, User, Event, Participant, Assignment, AuthToken, EventStatus, FeedPost, FeedComment, FeedLike
 from event_names import generate_event_name, generate_event_code, get_random_event_names
 
 # Load environment variables
@@ -938,7 +938,6 @@ def feed(code):
             return redirect(url_for('feed', code=code))
         
         # Create and save the post
-        from models import FeedPost
         post = FeedPost(
             event_id=event.id,
             participant_id=participant.id,
@@ -951,12 +950,88 @@ def feed(code):
         flash('Post shared! 🎉', 'success')
         return redirect(url_for('feed', code=code))
     
-    # Retrieve all posts for this event
-    from models import FeedPost
+    # Retrieve all posts for this event with likes and comments
     posts = FeedPost.query.filter_by(event_id=event.id).order_by(FeedPost.created_at.desc()).all()
     
+    # Get current participant for checking if they've liked posts
+    current_participant_id = session.get('participant_id')
+    
+    # Prepare post data with like status
+    posts_data = []
+    for post in posts:
+        like_count = len(post.likes)
+        user_has_liked = any(like.participant_id == current_participant_id for like in post.likes) if current_participant_id else False
+        comment_count = len(post.comments)
+        posts_data.append({
+            'post': post,
+            'like_count': like_count,
+            'user_has_liked': user_has_liked,
+            'comment_count': comment_count,
+            'comments': sorted(post.comments, key=lambda c: c.created_at)
+        })
+    
     # Return feed page
-    return render_template('feed.html', event=event, members=members, posts=posts)
+    return render_template('feed.html', event=event, members=members, posts_data=posts_data)
+
+@app.route('/feed/post/<post_id>/like', methods=['POST'])
+def like_post(post_id):
+    """Like or unlike a feed post"""
+    post = FeedPost.query.get_or_404(post_id)
+    participant_id = session.get('participant_id')
+    
+    if not participant_id:
+        return {'error': 'Not logged in'}, 401
+    
+    participant = Participant.query.get(participant_id)
+    if not participant or participant.event_id != post.event_id:
+        return {'error': 'Invalid participant'}, 403
+    
+    # Check if already liked
+    existing_like = FeedLike.query.filter_by(post_id=post_id, participant_id=participant_id).first()
+    
+    if existing_like:
+        # Unlike
+        db.session.delete(existing_like)
+        db.session.commit()
+        return {'liked': False, 'like_count': len(post.likes) - 1}
+    else:
+        # Like
+        like = FeedLike(post_id=post_id, participant_id=participant_id)
+        db.session.add(like)
+        db.session.commit()
+        return {'liked': True, 'like_count': len(post.likes)}
+
+@app.route('/feed/post/<post_id>/comment', methods=['POST'])
+def comment_post(post_id):
+    """Add a comment to a feed post"""
+    post = FeedPost.query.get_or_404(post_id)
+    participant_id = session.get('participant_id')
+    
+    if not participant_id:
+        flash('You must be logged in to comment', 'warning')
+        return redirect(url_for('feed', code=post.event.code))
+    
+    participant = Participant.query.get(participant_id)
+    if not participant or participant.event_id != post.event_id:
+        flash('Invalid participant', 'error')
+        return redirect(url_for('feed', code=post.event.code))
+    
+    content = request.form.get('content', '').strip()
+    if not content:
+        flash('Comment cannot be empty', 'error')
+        return redirect(url_for('feed', code=post.event.code))
+    
+    comment = FeedComment(
+        post_id=post_id,
+        participant_id=participant_id,
+        nickname=participant.nickname or participant.name,
+        content=content
+    )
+    db.session.add(comment)
+    db.session.commit()
+    
+    flash('Comment added! 💬', 'success')
+    return redirect(url_for('feed', code=post.event.code))
 
 # ============================================================================
 # Health Check
