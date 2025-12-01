@@ -1168,15 +1168,36 @@ def comment_post(post_id):
 @app.route('/feed/hint/<participant_id>/like', methods=['POST'])
 def like_hint(participant_id):
     """Like or unlike a hint"""
-    participant = Participant.query.get_or_404(participant_id)
-    current_participant_id = session.get('participant_id')
-    
-    if not current_participant_id:
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    current_participant = Participant.query.get(current_participant_id)
-    if not current_participant or current_participant.event_id != participant.event_id:
-        return jsonify({'error': 'Invalid participant'}), 403
+    try:
+        participant = Participant.query.get_or_404(participant_id)
+        
+        # Try to get current participant with fallbacks
+        current_participant_id = session.get('participant_id')
+        participant_email = session.get('participant_email')
+        user_email = session.get('user_email')
+        
+        current_participant = None
+        if current_participant_id:
+            current_participant = Participant.query.get(current_participant_id)
+        elif participant_email:
+            current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
+        elif user_email:
+            current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
+        
+        if not current_participant:
+            return jsonify({'error': 'Not logged in'}), 401
+        
+        # Update session with participant info if needed
+        if 'participant_id' not in session:
+            session['participant_id'] = current_participant.id
+        if 'participant_email' not in session:
+            session['participant_email'] = current_participant.email
+        
+        if current_participant.event_id != participant.event_id:
+            return jsonify({'error': 'Invalid participant'}), 403
+    except Exception as e:
+        print(f"Error in like_hint: {str(e)}")
+        return jsonify({'error': 'Server error'}), 500
     
     pseudo_post_id = f"hint_{participant_id}"
     
@@ -1198,15 +1219,36 @@ def like_hint(participant_id):
 @app.route('/feed/idea/<participant_id>/like', methods=['POST'])
 def like_idea(participant_id):
     """Like or unlike a gift idea"""
-    participant = Participant.query.get_or_404(participant_id)
-    current_participant_id = session.get('participant_id')
-    
-    if not current_participant_id:
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    current_participant = Participant.query.get(current_participant_id)
-    if not current_participant or current_participant.event_id != participant.event_id:
-        return jsonify({'error': 'Invalid participant'}), 403
+    try:
+        participant = Participant.query.get_or_404(participant_id)
+        
+        # Try to get current participant with fallbacks
+        current_participant_id = session.get('participant_id')
+        participant_email = session.get('participant_email')
+        user_email = session.get('user_email')
+        
+        current_participant = None
+        if current_participant_id:
+            current_participant = Participant.query.get(current_participant_id)
+        elif participant_email:
+            current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
+        elif user_email:
+            current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
+        
+        if not current_participant:
+            return jsonify({'error': 'Not logged in'}), 401
+        
+        # Update session with participant info if needed
+        if 'participant_id' not in session:
+            session['participant_id'] = current_participant.id
+        if 'participant_email' not in session:
+            session['participant_email'] = current_participant.email
+        
+        if current_participant.event_id != participant.event_id:
+            return jsonify({'error': 'Invalid participant'}), 403
+    except Exception as e:
+        print(f"Error in like_idea: {str(e)}")
+        return jsonify({'error': 'Server error'}), 500
     
     pseudo_post_id = f"idea_{participant_id}"
     
@@ -1228,15 +1270,36 @@ def like_idea(participant_id):
 @app.route('/feed/hint/<participant_id>/comment', methods=['POST'])
 def comment_hint(participant_id):
     """Add a comment to a hint"""
-    participant = Participant.query.get_or_404(participant_id)
-    current_participant_id = session.get('participant_id')
-    
-    if not current_participant_id:
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    current_participant = Participant.query.get(current_participant_id)
-    if not current_participant or current_participant.event_id != participant.event_id:
-        return jsonify({'error': 'Invalid participant'}), 403
+    try:
+        participant = Participant.query.get_or_404(participant_id)
+        
+        # Try to get current participant with fallbacks
+        current_participant_id = session.get('participant_id')
+        participant_email = session.get('participant_email')
+        user_email = session.get('user_email')
+        
+        current_participant = None
+        if current_participant_id:
+            current_participant = Participant.query.get(current_participant_id)
+        elif participant_email:
+            current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
+        elif user_email:
+            current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
+        
+        if not current_participant:
+            return jsonify({'error': 'Not logged in'}), 401
+        
+        # Update session with participant info if needed
+        if 'participant_id' not in session:
+            session['participant_id'] = current_participant.id
+        if 'participant_email' not in session:
+            session['participant_email'] = current_participant.email
+        
+        if current_participant.event_id != participant.event_id:
+            return jsonify({'error': 'Invalid participant'}), 403
+    except Exception as e:
+        print(f"Error in comment_hint: {str(e)}")
+        return jsonify({'error': 'Server error'}), 500
     
     content = request.form.get('content', '').strip()
     if not content:
@@ -1258,15 +1321,36 @@ def comment_hint(participant_id):
 @app.route('/feed/idea/<participant_id>/comment', methods=['POST'])
 def comment_idea(participant_id):
     """Add a comment to a gift idea"""
-    participant = Participant.query.get_or_404(participant_id)
-    current_participant_id = session.get('participant_id')
-    
-    if not current_participant_id:
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    current_participant = Participant.query.get(current_participant_id)
-    if not current_participant or current_participant.event_id != participant.event_id:
-        return jsonify({'error': 'Invalid participant'}), 403
+    try:
+        participant = Participant.query.get_or_404(participant_id)
+        
+        # Try to get current participant with fallbacks
+        current_participant_id = session.get('participant_id')
+        participant_email = session.get('participant_email')
+        user_email = session.get('user_email')
+        
+        current_participant = None
+        if current_participant_id:
+            current_participant = Participant.query.get(current_participant_id)
+        elif participant_email:
+            current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
+        elif user_email:
+            current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
+        
+        if not current_participant:
+            return jsonify({'error': 'Not logged in'}), 401
+        
+        # Update session with participant info if needed
+        if 'participant_id' not in session:
+            session['participant_id'] = current_participant.id
+        if 'participant_email' not in session:
+            session['participant_email'] = current_participant.email
+        
+        if current_participant.event_id != participant.event_id:
+            return jsonify({'error': 'Invalid participant'}), 403
+    except Exception as e:
+        print(f"Error in comment_idea: {str(e)}")
+        return jsonify({'error': 'Server error'}), 500
     
     content = request.form.get('content', '').strip()
     if not content:
