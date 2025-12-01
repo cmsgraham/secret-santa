@@ -1036,8 +1036,74 @@ def feed(code):
             'comments': sorted(post.comments, key=lambda c: c.created_at)
         })
     
+    # Prepare hints data with engagement stats
+    hints_data = []
+    for member in members:
+        if member.hints:
+            # Count likes for this hint (we'll use a pseudo-id based on participant)
+            hint_likes = db.session.query(FeedLike).filter(
+                FeedLike.post_id == f"hint_{member.id}"
+            ).count()
+            hint_comments = db.session.query(FeedComment).filter(
+                FeedComment.post_id == f"hint_{member.id}"
+            ).count()
+            
+            user_has_liked_hint = False
+            if current_participant_id:
+                user_has_liked_hint = db.session.query(FeedLike).filter_by(
+                    post_id=f"hint_{member.id}",
+                    participant_id=current_participant_id
+                ).first() is not None
+            
+            hint_comments_list = db.session.query(FeedComment).filter(
+                FeedComment.post_id == f"hint_{member.id}"
+            ).order_by(FeedComment.created_at).all()
+            
+            hints_data.append({
+                'participant': member,
+                'content': member.hints,
+                'like_count': hint_likes,
+                'user_has_liked': user_has_liked_hint,
+                'comment_count': hint_comments,
+                'comments': hint_comments_list,
+                'type': 'hint'
+            })
+    
+    # Prepare gift ideas data with engagement stats
+    ideas_data = []
+    for member in members:
+        if member.gift_preferences:
+            # Count likes for this gift idea
+            idea_likes = db.session.query(FeedLike).filter(
+                FeedLike.post_id == f"idea_{member.id}"
+            ).count()
+            idea_comments = db.session.query(FeedComment).filter(
+                FeedComment.post_id == f"idea_{member.id}"
+            ).count()
+            
+            user_has_liked_idea = False
+            if current_participant_id:
+                user_has_liked_idea = db.session.query(FeedLike).filter_by(
+                    post_id=f"idea_{member.id}",
+                    participant_id=current_participant_id
+                ).first() is not None
+            
+            idea_comments_list = db.session.query(FeedComment).filter(
+                FeedComment.post_id == f"idea_{member.id}"
+            ).order_by(FeedComment.created_at).all()
+            
+            ideas_data.append({
+                'participant': member,
+                'content': member.gift_preferences,
+                'like_count': idea_likes,
+                'user_has_liked': user_has_liked_idea,
+                'comment_count': idea_comments,
+                'comments': idea_comments_list,
+                'type': 'idea'
+            })
+    
     # Return feed page
-    return render_template('feed.html', event=event, members=members, posts_data=posts_data)
+    return render_template('feed.html', event=event, members=members, posts_data=posts_data, hints_data=hints_data, ideas_data=ideas_data)
 
 @app.route('/feed/post/<post_id>/like', methods=['POST'])
 def like_post(post_id):
@@ -1098,6 +1164,126 @@ def comment_post(post_id):
     
     flash('Comment added! 💬', 'success')
     return redirect(url_for('feed', code=post.event.code))
+
+@app.route('/feed/hint/<participant_id>/like', methods=['POST'])
+def like_hint(participant_id):
+    """Like or unlike a hint"""
+    participant = Participant.query.get_or_404(participant_id)
+    current_participant_id = session.get('participant_id')
+    
+    if not current_participant_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    current_participant = Participant.query.get(current_participant_id)
+    if not current_participant or current_participant.event_id != participant.event_id:
+        return jsonify({'error': 'Invalid participant'}), 403
+    
+    pseudo_post_id = f"hint_{participant_id}"
+    
+    # Check if already liked
+    existing_like = FeedLike.query.filter_by(post_id=pseudo_post_id, participant_id=current_participant_id).first()
+    
+    if existing_like:
+        db.session.delete(existing_like)
+        db.session.commit()
+        like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
+        return jsonify({'liked': False, 'like_count': like_count})
+    else:
+        like = FeedLike(post_id=pseudo_post_id, participant_id=current_participant_id)
+        db.session.add(like)
+        db.session.commit()
+        like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
+        return jsonify({'liked': True, 'like_count': like_count})
+
+@app.route('/feed/idea/<participant_id>/like', methods=['POST'])
+def like_idea(participant_id):
+    """Like or unlike a gift idea"""
+    participant = Participant.query.get_or_404(participant_id)
+    current_participant_id = session.get('participant_id')
+    
+    if not current_participant_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    current_participant = Participant.query.get(current_participant_id)
+    if not current_participant or current_participant.event_id != participant.event_id:
+        return jsonify({'error': 'Invalid participant'}), 403
+    
+    pseudo_post_id = f"idea_{participant_id}"
+    
+    # Check if already liked
+    existing_like = FeedLike.query.filter_by(post_id=pseudo_post_id, participant_id=current_participant_id).first()
+    
+    if existing_like:
+        db.session.delete(existing_like)
+        db.session.commit()
+        like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
+        return jsonify({'liked': False, 'like_count': like_count})
+    else:
+        like = FeedLike(post_id=pseudo_post_id, participant_id=current_participant_id)
+        db.session.add(like)
+        db.session.commit()
+        like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
+        return jsonify({'liked': True, 'like_count': like_count})
+
+@app.route('/feed/hint/<participant_id>/comment', methods=['POST'])
+def comment_hint(participant_id):
+    """Add a comment to a hint"""
+    participant = Participant.query.get_or_404(participant_id)
+    current_participant_id = session.get('participant_id')
+    
+    if not current_participant_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    current_participant = Participant.query.get(current_participant_id)
+    if not current_participant or current_participant.event_id != participant.event_id:
+        return jsonify({'error': 'Invalid participant'}), 403
+    
+    content = request.form.get('content', '').strip()
+    if not content:
+        return jsonify({'error': 'Comment cannot be empty'}), 400
+    
+    pseudo_post_id = f"hint_{participant_id}"
+    
+    comment = FeedComment(
+        post_id=pseudo_post_id,
+        participant_id=current_participant_id,
+        nickname=current_participant.nickname or current_participant.name,
+        content=content
+    )
+    db.session.add(comment)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Comment added!'})
+
+@app.route('/feed/idea/<participant_id>/comment', methods=['POST'])
+def comment_idea(participant_id):
+    """Add a comment to a gift idea"""
+    participant = Participant.query.get_or_404(participant_id)
+    current_participant_id = session.get('participant_id')
+    
+    if not current_participant_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    current_participant = Participant.query.get(current_participant_id)
+    if not current_participant or current_participant.event_id != participant.event_id:
+        return jsonify({'error': 'Invalid participant'}), 403
+    
+    content = request.form.get('content', '').strip()
+    if not content:
+        return jsonify({'error': 'Comment cannot be empty'}), 400
+    
+    pseudo_post_id = f"idea_{participant_id}"
+    
+    comment = FeedComment(
+        post_id=pseudo_post_id,
+        participant_id=current_participant_id,
+        nickname=current_participant.nickname or current_participant.name,
+        content=content
+    )
+    db.session.add(comment)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Comment added!'})
 
 # ============================================================================
 # Health Check
