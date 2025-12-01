@@ -1187,34 +1187,34 @@ def like_hint(participant_id):
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
         
+        if current_participant.event_id != participant.event_id:
+            return jsonify({'error': 'Invalid participant'}), 403
+        
         # Update session with participant info if needed
         if 'participant_id' not in session:
             session['participant_id'] = current_participant.id
         if 'participant_email' not in session:
             session['participant_email'] = current_participant.email
         
-        if current_participant.event_id != participant.event_id:
-            return jsonify({'error': 'Invalid participant'}), 403
+        pseudo_post_id = f"hint_{participant_id}"
+        
+        # Check if already liked
+        existing_like = FeedLike.query.filter_by(post_id=pseudo_post_id, participant_id=current_participant.id).first()
+        
+        if existing_like:
+            db.session.delete(existing_like)
+            db.session.commit()
+            like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
+            return jsonify({'liked': False, 'like_count': like_count})
+        else:
+            like = FeedLike(post_id=pseudo_post_id, participant_id=current_participant.id)
+            db.session.add(like)
+            db.session.commit()
+            like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
+            return jsonify({'liked': True, 'like_count': like_count})
     except Exception as e:
         print(f"Error in like_hint: {str(e)}")
         return jsonify({'error': 'Server error'}), 500
-    
-    pseudo_post_id = f"hint_{participant_id}"
-    
-    # Check if already liked
-    existing_like = FeedLike.query.filter_by(post_id=pseudo_post_id, participant_id=current_participant_id).first()
-    
-    if existing_like:
-        db.session.delete(existing_like)
-        db.session.commit()
-        like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
-        return jsonify({'liked': False, 'like_count': like_count})
-    else:
-        like = FeedLike(post_id=pseudo_post_id, participant_id=current_participant_id)
-        db.session.add(like)
-        db.session.commit()
-        like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
-        return jsonify({'liked': True, 'like_count': like_count})
 
 @app.route('/feed/idea/<participant_id>/like', methods=['POST'])
 def like_idea(participant_id):
@@ -1238,34 +1238,34 @@ def like_idea(participant_id):
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
         
+        if current_participant.event_id != participant.event_id:
+            return jsonify({'error': 'Invalid participant'}), 403
+        
         # Update session with participant info if needed
         if 'participant_id' not in session:
             session['participant_id'] = current_participant.id
         if 'participant_email' not in session:
             session['participant_email'] = current_participant.email
         
-        if current_participant.event_id != participant.event_id:
-            return jsonify({'error': 'Invalid participant'}), 403
+        pseudo_post_id = f"idea_{participant_id}"
+        
+        # Check if already liked
+        existing_like = FeedLike.query.filter_by(post_id=pseudo_post_id, participant_id=current_participant.id).first()
+        
+        if existing_like:
+            db.session.delete(existing_like)
+            db.session.commit()
+            like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
+            return jsonify({'liked': False, 'like_count': like_count})
+        else:
+            like = FeedLike(post_id=pseudo_post_id, participant_id=current_participant.id)
+            db.session.add(like)
+            db.session.commit()
+            like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
+            return jsonify({'liked': True, 'like_count': like_count})
     except Exception as e:
         print(f"Error in like_idea: {str(e)}")
         return jsonify({'error': 'Server error'}), 500
-    
-    pseudo_post_id = f"idea_{participant_id}"
-    
-    # Check if already liked
-    existing_like = FeedLike.query.filter_by(post_id=pseudo_post_id, participant_id=current_participant_id).first()
-    
-    if existing_like:
-        db.session.delete(existing_like)
-        db.session.commit()
-        like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
-        return jsonify({'liked': False, 'like_count': like_count})
-    else:
-        like = FeedLike(post_id=pseudo_post_id, participant_id=current_participant_id)
-        db.session.add(like)
-        db.session.commit()
-        like_count = FeedLike.query.filter_by(post_id=pseudo_post_id).count()
-        return jsonify({'liked': True, 'like_count': like_count})
 
 @app.route('/feed/hint/<participant_id>/comment', methods=['POST'])
 def comment_hint(participant_id):
@@ -1289,34 +1289,34 @@ def comment_hint(participant_id):
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
         
+        if current_participant.event_id != participant.event_id:
+            return jsonify({'error': 'Invalid participant'}), 403
+        
         # Update session with participant info if needed
         if 'participant_id' not in session:
             session['participant_id'] = current_participant.id
         if 'participant_email' not in session:
             session['participant_email'] = current_participant.email
         
-        if current_participant.event_id != participant.event_id:
-            return jsonify({'error': 'Invalid participant'}), 403
+        content = request.form.get('content', '').strip()
+        if not content:
+            return jsonify({'error': 'Comment cannot be empty'}), 400
+        
+        pseudo_post_id = f"hint_{participant_id}"
+        
+        comment = FeedComment(
+            post_id=pseudo_post_id,
+            participant_id=current_participant.id,
+            nickname=current_participant.nickname or current_participant.name,
+            content=content
+        )
+        db.session.add(comment)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Comment added!'})
     except Exception as e:
         print(f"Error in comment_hint: {str(e)}")
         return jsonify({'error': 'Server error'}), 500
-    
-    content = request.form.get('content', '').strip()
-    if not content:
-        return jsonify({'error': 'Comment cannot be empty'}), 400
-    
-    pseudo_post_id = f"hint_{participant_id}"
-    
-    comment = FeedComment(
-        post_id=pseudo_post_id,
-        participant_id=current_participant_id,
-        nickname=current_participant.nickname or current_participant.name,
-        content=content
-    )
-    db.session.add(comment)
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'Comment added!'})
 
 @app.route('/feed/idea/<participant_id>/comment', methods=['POST'])
 def comment_idea(participant_id):
@@ -1340,34 +1340,34 @@ def comment_idea(participant_id):
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
         
+        if current_participant.event_id != participant.event_id:
+            return jsonify({'error': 'Invalid participant'}), 403
+        
         # Update session with participant info if needed
         if 'participant_id' not in session:
             session['participant_id'] = current_participant.id
         if 'participant_email' not in session:
             session['participant_email'] = current_participant.email
         
-        if current_participant.event_id != participant.event_id:
-            return jsonify({'error': 'Invalid participant'}), 403
+        content = request.form.get('content', '').strip()
+        if not content:
+            return jsonify({'error': 'Comment cannot be empty'}), 400
+        
+        pseudo_post_id = f"idea_{participant_id}"
+        
+        comment = FeedComment(
+            post_id=pseudo_post_id,
+            participant_id=current_participant.id,
+            nickname=current_participant.nickname or current_participant.name,
+            content=content
+        )
+        db.session.add(comment)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Comment added!'})
     except Exception as e:
         print(f"Error in comment_idea: {str(e)}")
         return jsonify({'error': 'Server error'}), 500
-    
-    content = request.form.get('content', '').strip()
-    if not content:
-        return jsonify({'error': 'Comment cannot be empty'}), 400
-    
-    pseudo_post_id = f"idea_{participant_id}"
-    
-    comment = FeedComment(
-        post_id=pseudo_post_id,
-        participant_id=current_participant_id,
-        nickname=current_participant.nickname or current_participant.name,
-        content=content
-    )
-    db.session.add(comment)
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'Comment added!'})
 
 # ============================================================================
 # Health Check
