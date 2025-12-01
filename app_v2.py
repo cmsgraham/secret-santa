@@ -1142,18 +1142,29 @@ def like_post(post_id):
 @app.route('/feed/post/<post_id>/comment', methods=['POST'])
 def comment_post(post_id):
     """Add a comment to a feed post"""
+    print(f"DEBUG comment_post: Received request for post_id={post_id}")
+    print(f"DEBUG comment_post: Content-Type={request.content_type}")
+    print(f"DEBUG comment_post: method={request.method}")
+    print(f"DEBUG comment_post: form data={request.form}")
+    
     post = FeedPost.query.get_or_404(post_id)
+    print(f"DEBUG comment_post: Found post: {post.id}")
+    
     participant_id = session.get('participant_id')
+    print(f"DEBUG comment_post: participant_id from session={participant_id}")
     
     if not participant_id:
+        print(f"DEBUG comment_post: No participant_id, returning 401")
         return jsonify({'error': 'You must be logged in to comment'}), 401
     
     participant = Participant.query.get(participant_id)
     if not participant or participant.event_id != post.event_id:
+        print(f"DEBUG comment_post: Invalid participant, returning 403")
         return jsonify({'error': 'Invalid participant'}), 403
     
     content = request.form.get('content', '').strip()
     if not content:
+        print(f"DEBUG comment_post: Empty content, returning 400")
         return jsonify({'error': 'Comment cannot be empty'}), 400
     
     comment = FeedComment(
@@ -1165,6 +1176,7 @@ def comment_post(post_id):
     db.session.add(comment)
     db.session.commit()
     
+    print(f"DEBUG comment_post: Comment created successfully, returning JSON")
     return jsonify({'success': True, 'message': 'Comment added! 💬'})
 
 @app.route('/feed/hint/<participant_id>/like', methods=['POST'])
