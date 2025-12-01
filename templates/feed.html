@@ -452,7 +452,7 @@
                 <!-- Comments Section -->
                 <div class="comments-section" id="comments-{{ item.post.id }}" style="display: none;">
                     <!-- Comment Form -->
-                    <form method="POST" action="{{ url_for('comment_post', post_id=item.post.id) }}" class="comment-form">
+                    <form onsubmit="submitPostComment(event, '{{ item.post.id }}')" class="comment-form">
                         <input type="text" name="content" placeholder="Say something..." required>
                         <button type="submit">💬</button>
                     </form>
@@ -642,6 +642,38 @@
             } else {
                 section.style.display = 'none';
             }
+        }
+
+        function submitPostComment(event, postId) {
+            event.preventDefault();
+            const form = event.target;
+            const content = form.querySelector('input[name="content"]').value;
+            
+            if (!content.trim()) {
+                alert('Please enter a comment');
+                return;
+            }
+            
+            fetch(`/feed/post/${postId}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `content=${encodeURIComponent(content)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                form.querySelector('input[name="content"]').value = '';
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add comment');
+            });
         }
     </script>
 </body>
