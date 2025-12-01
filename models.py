@@ -175,3 +175,23 @@ class AuthToken(Base):
             expires = expires.replace(tzinfo=timezone.utc)
         
         return now < expires
+
+class FeedPost(Base):
+    """Feed post on Santa's Secret Wall"""
+    __tablename__ = 'feed_posts'
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    event_id = Column(String(36), ForeignKey('events.id'), nullable=False)
+    participant_id = Column(String(36), ForeignKey('participants.id'), nullable=False)
+    
+    # Post content
+    nickname = Column(String(255), nullable=False)  # Anonymous nickname for display
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    # Relationships
+    event = relationship("Event", foreign_keys=[event_id])
+    participant = relationship("Participant", foreign_keys=[participant_id])
+    
+    def __repr__(self):
+        return f"<FeedPost {self.nickname} on {self.event_id}>"
