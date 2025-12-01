@@ -20,6 +20,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
+from urllib.parse import urlparse
+import bleach
+from markupsafe import escape
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -71,6 +74,47 @@ def get_current_user():
     if 'user_id' in session:
         return db.session.get(User, session['user_id'])
     return None
+
+def is_safe_url(target):
+    """Validate that a URL is safe for redirects (same-origin only)"""
+    if not target:
+        return False
+    
+    # Only allow relative URLs (starting with /)
+    if not target.startswith('/'):
+        return False
+    
+    # Prevent protocol-relative URLs (//)
+    if target.startswith('//'):
+        return False
+    
+    return True
+
+def sanitize_html(text, allowed_tags=None):
+    """Sanitize HTML to prevent XSS attacks"""
+    if not text:
+        return text
+    
+    # Default safe tags for rich text
+    if allowed_tags is None:
+        allowed_tags = ['a', 'b', 'i', 'em', 'strong', 'u', 'p', 'br']
+    
+    # Allowed attributes - only href for links
+    allowed_attrs = {'a': ['href', 'title']}
+    
+    # Use bleach to clean HTML
+    return bleach.clean(text, tags=allowed_tags, attributes=allowed_attrs, strip=True)
+
+def sanitize_text(text, max_length=1000):
+    """Sanitize plain text to prevent XSS (escapes HTML)"""
+    if not text:
+        return text
+    
+    # Truncate if needed
+    text = text[:max_length]
+    
+    # Escape HTML entities
+    return escape(text)
 
 def create_or_get_user(email, name):
     """Create a new user or get existing one"""
@@ -328,9 +372,11 @@ def verify_magic_link(token):
     
     flash(f'Welcome back, {user.name}!', 'success')
     
-    # Redirect to next URL or dashboard
-    next_url = request.args.get('next') or url_for('dashboard')
-    return redirect(next_url)
+    # Redirect to next URL or dashboard (validate URL first to prevent open redirect)
+    next_url = request.args.get('next')
+    if next_url and is_safe_url(next_url):
+        return redirect(next_url)
+    return redirect(url_for('dashboard'))
 
 @app.route('/logout')
 def logout():
@@ -373,6 +419,10 @@ def create_event():
         
         event_name = data.get('event_name', '').strip()
         description = data.get('description', '').strip()
+        
+        # Sanitize inputs to prevent XSS
+        event_name = sanitize_text(event_name, max_length=255)
+        description = sanitize_text(description, max_length=2000)
         
         # Generate event code
         code = generate_event_code()
@@ -623,6 +673,10 @@ def register_participant(code):
         nickname = data.get('nickname', '').strip()
         email = data.get('email', '').strip().lower()
         
+        # Sanitize inputs to prevent XSS
+        name = sanitize_text(name, max_length=255)
+        nickname = sanitize_text(nickname, max_length=255)
+        
         # Validate
         if not name:
             return jsonify({'success': False, 'error': 'Name is required'}), 400
@@ -795,12 +849,18 @@ def member_page(code, participant_id):
         action = data.get('action')
         
         if action == 'save_hints':
-            participant.hints = data.get('hints', '').strip()[:1000]  # Limit to 1000 chars
+            hints = data.get('hints', '').strip()[:1000]
+            # Sanitize to prevent XSS
+            hints = sanitize_text(hints, max_length=1000)
+            participant.hints = hints
             db.session.commit()
             return jsonify({'success': True, 'message': 'Hints saved successfully'})
         
         elif action == 'save_preferences':
-            participant.gift_preferences = data.get('gift_preferences', '').strip()[:2000]  # Limit to 2000 chars
+            preferences = data.get('gift_preferences', '').strip()[:2000]
+            # Sanitize to prevent XSS
+            preferences = sanitize_text(preferences, max_length=2000)
+            participant.gift_preferences = preferences
             db.session.commit()
             return jsonify({'success': True, 'message': 'Preferences saved successfully'})
         
@@ -822,7 +882,9 @@ def member_page(code, participant_id):
         
         elif action == 'update_profile_picture':
             profile_picture = data.get('profile_picture', '').strip()
-            if profile_picture and len(profile_picture) <= 500:  # Validate length
+            if profile_picture and len(profile_picture) <= 500:
+                # Sanitize to prevent XSS (emoji/icon format)
+                profile_picture = sanitize_text(profile_picture, max_length=500)
                 participant.profile_picture = profile_picture
                 db.session.commit()
                 return jsonify({'success': True, 'message': 'Profile picture updated successfully'})
@@ -830,7 +892,9 @@ def member_page(code, participant_id):
         
         elif action == 'update_nickname':
             nickname = data.get('nickname', '').strip()
-            if nickname and len(nickname) <= 100:  # Validate length
+            if nickname and len(nickname) <= 100:
+                # Sanitize to prevent XSS
+                nickname = sanitize_text(nickname, max_length=100)
                 participant.nickname = nickname
                 db.session.commit()
                 return jsonify({'success': True, 'message': 'Nickname updated successfully'})
@@ -979,6 +1043,9 @@ def feed(code):
         if not content:
             flash('Post cannot be empty', 'error')
             return redirect(url_for('feed', code=code))
+        
+        # Sanitize content to prevent XSS
+        content = sanitize_text(content, max_length=5000)
         
         # Get the current participant from session - try multiple sources
         participant_id = session.get('participant_id')
@@ -1192,6 +1259,9 @@ def comment_post(post_id):
         flash('Comment cannot be empty', 'error')
         return redirect(url_for('feed', code=post.event.code))
     
+    # Sanitize content to prevent XSS
+    content = sanitize_text(content, max_length=2000)
+    
     comment = FeedComment(
         post_id=post_id,
         participant_id=current_participant.id,
@@ -1378,6 +1448,8 @@ def comment_hint(participant_id):
         flash('Comment cannot be empty', 'error')
         return redirect(url_for('feed', code=participant.event.code))
     
+    # Sanitize content to prevent XSS
+    content = sanitize_text(content, max_length=2000)
     pseudo_post_id = f"hint_{participant_id}"
     
     comment = FeedComment(
@@ -1434,6 +1506,8 @@ def comment_idea(participant_id):
         flash('Comment cannot be empty', 'error')
         return redirect(url_for('feed', code=participant.event.code))
     
+    # Sanitize content to prevent XSS
+    content = sanitize_text(content, max_length=2000)
     pseudo_post_id = f"idea_{participant_id}"
     
     comment = FeedComment(

@@ -602,12 +602,12 @@
                         <ol class="preference-list">
                         {% for pref in preferences %}
                             {% if pref.strip() %}
-                            <li>{{ pref.strip()|urlize|safe }}</li>
+                            <li>{{ pref.strip()|urlize }}</li>
                             {% endif %}
                         {% endfor %}
                         </ol>
                     {% else %}
-                        <div class="info-section">{{ assignment.receiver.gift_preferences|urlize|safe }}</div>
+                        <div class="info-section">{{ assignment.receiver.gift_preferences|urlize }}</div>
                     {% endif %}
                 </div>
                 {% endif %}
