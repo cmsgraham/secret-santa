@@ -95,44 +95,61 @@
 </style>
 
 <script>
-    (function() {
-        const selector = document.querySelector('.language-selector');
-        if (!selector) return;
+    function initLanguageSelector() {
+        // Find all language selectors on the page
+        document.querySelectorAll('.language-selector').forEach(selector => {
+            // Skip if already initialized
+            if (selector.dataset.initialized) return;
+            selector.dataset.initialized = 'true';
 
-        const currentLang = selector.querySelector('.current-language');
-        const options = selector.querySelectorAll('.language-option');
+            const currentLang = selector.querySelector('.current-language');
+            const options = selector.querySelectorAll('.language-option');
 
-        // Toggle dropdown
-        currentLang.addEventListener('click', function(e) {
-            e.preventDefault();
-            selector.classList.toggle('active');
-        });
-
-        // Handle language selection
-        options.forEach(option => {
-            option.addEventListener('click', function(e) {
+            // Toggle dropdown
+            currentLang.addEventListener('click', function(e) {
                 e.preventDefault();
-                const lang = this.dataset.language;
-                
-                fetch('/api/language/set', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ language: lang })
-                })
-                .then(r => r.json())
-                .then(d => {
-                    if (d.success) window.location.reload();
-                    else alert('Error: ' + d.error);
-                })
-                .catch(e => alert('Error changing language'));
+                // Close all other dropdowns
+                document.querySelectorAll('.language-selector').forEach(s => {
+                    if (s !== selector) s.classList.remove('active');
+                });
+                selector.classList.toggle('active');
+            });
+
+            // Handle language selection
+            options.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.dataset.language;
+                    
+                    fetch('/api/language/set', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ language: lang })
+                    })
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.success) window.location.reload();
+                        else alert('Error: ' + d.error);
+                    })
+                    .catch(e => alert('Error changing language'));
+                });
             });
         });
 
         // Close on outside click
         document.addEventListener('click', function(e) {
-            if (!selector.contains(e.target)) {
-                selector.classList.remove('active');
-            }
+            document.querySelectorAll('.language-selector').forEach(selector => {
+                if (!selector.contains(e.target)) {
+                    selector.classList.remove('active');
+                }
+            });
         });
-    })();
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLanguageSelector);
+    } else {
+        initLanguageSelector();
+    }
 </script>
