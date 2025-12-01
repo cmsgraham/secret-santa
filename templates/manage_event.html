@@ -227,6 +227,9 @@
                     </div>
                     <div class="action-buttons">
                         <button onclick="reopenRegistration()" style="all: revert; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">♻️ Reopen Registration</button>
+                        <button onclick="rerunDraw()" style="all: revert; padding: 0.75rem 1.5rem; background: #374151; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">🎲 Rerun Draw</button>
+                        <button onclick="toggleGuessing()" style="all: revert; padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}</button>
+                        <button onclick="closeEvent()" style="all: revert; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">🔒 Close Event</button>
                     </div>
                 {% else %}
                     <div style="padding: 1rem; background: #f3f4f6; border-radius: 8px; text-align: center;">
