@@ -165,6 +165,7 @@
                     placeholder="Enter your registered email"
                     required 
                     autofocus
+                    autocomplete="email"
                 >
             </div>
             
@@ -197,19 +198,31 @@
     </div>
     
     <script>
+        // Load saved email on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedEmail = localStorage.getItem('lastLoginEmail');
+            if (savedEmail) {
+                document.getElementById('email').value = savedEmail;
+            }
+        });
+        
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const emailInput = document.getElementById('email');
             const submitBtn = e.target.querySelector('button[type="submit"]');
             const messageDiv = document.getElementById('message');
             const originalBtnText = submitBtn.textContent;
+            
+            // Save email to localStorage
+            localStorage.setItem('lastLoginEmail', emailInput.value);
             
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
             messageDiv.style.display = 'none';
             
             const formData = {
-                email: document.getElementById('email').value
+                email: emailInput.value
             };
             
             try {
