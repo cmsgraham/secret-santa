@@ -93,10 +93,12 @@ def is_safe_url(target):
 def validate_email_simple(email):
     """Simple email validation using regex - works without DNS"""
     import re
+    if not email:
+        raise ValueError("Email is empty")
     email = email.strip().lower()
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(pattern, email):
-        raise ValueError("Invalid email format")
+        raise ValueError(f"Invalid email format: {email}")
     return email
 
 def sanitize_html(text, allowed_tags=None):
@@ -693,8 +695,8 @@ def register_participant(code):
         try:
             email = validate_email_simple(email)
         except Exception as e:
-            app.logger.error(f"Email validation error: {str(e)}")
-            return jsonify({'success': False, 'error': 'Invalid email address'}), 400
+            app.logger.error(f"Email validation error for '{email}': {str(e)}")
+            return jsonify({'success': False, 'error': f'Invalid email address: {str(e)}'}), 400
         
         # Auto-generate nickname if not provided
         if not nickname:
