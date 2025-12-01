@@ -940,14 +940,26 @@ def feed(code):
         
         # Get the current participant from session
         participant_id = session.get('participant_id')
-        if not participant_id:
+        participant_email = session.get('participant_email')
+        
+        # Try to find participant by ID first, then by email
+        participant = None
+        if participant_id:
+            participant = Participant.query.get(participant_id)
+        elif participant_email:
+            participant = Participant.query.filter_by(email=participant_email, event_id=event.id).first()
+        
+        if not participant:
             flash('You must be logged in to post', 'warning')
             return redirect(url_for('feed', code=code))
         
-        participant = Participant.query.get(participant_id)
-        if not participant or participant.event_id != event.id:
+        if participant.event_id != event.id:
             flash('Invalid participant', 'error')
             return redirect(url_for('feed', code=code))
+        
+        # Update session with participant_id if it wasn't there
+        if 'participant_id' not in session:
+            session['participant_id'] = participant.id
         
         # Create and save the post
         post = FeedPost(
