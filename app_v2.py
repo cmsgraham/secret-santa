@@ -11,7 +11,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -736,7 +736,10 @@ def register_participant(code):
             'participant_id': participant.id
         })
     
-    return render_template('register.html', event=event)
+    response = make_response(render_template('register.html', event=event))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    return response
 
 @app.route('/participant/dashboard', methods=['GET', 'POST'])
 def participant_dashboard():
