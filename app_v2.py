@@ -911,7 +911,7 @@ def remove_participant(code, participant_id):
 # Feed (Santa's Secret Wall)
 # ============================================================================
 
-@app.route('/event/<code>/feed')
+@app.route('/event/<code>/feed', methods=['GET', 'POST'])
 def feed(code):
     """Santa's Secret Wall - Anonymous feed for event participants"""
     event = Event.query.filter_by(code=code).first_or_404()
@@ -919,8 +919,44 @@ def feed(code):
     # Get all participants in the event
     members = event.participants
     
+    # Handle POST - create new feed post
+    if request.method == 'POST':
+        content = request.form.get('content', '').strip()
+        if not content:
+            flash('Post cannot be empty', 'error')
+            return redirect(url_for('feed', code=code))
+        
+        # Get the current participant from session
+        participant_id = session.get('participant_id')
+        if not participant_id:
+            flash('You must be logged in to post', 'warning')
+            return redirect(url_for('feed', code=code))
+        
+        participant = Participant.query.get(participant_id)
+        if not participant or participant.event_id != event.id:
+            flash('Invalid participant', 'error')
+            return redirect(url_for('feed', code=code))
+        
+        # Create and save the post
+        from models import FeedPost
+        post = FeedPost(
+            event_id=event.id,
+            participant_id=participant.id,
+            nickname=participant.nickname or participant.name,
+            content=content
+        )
+        db.session.add(post)
+        db.session.commit()
+        
+        flash('Post shared! 🎉', 'success')
+        return redirect(url_for('feed', code=code))
+    
+    # Retrieve all posts for this event
+    from models import FeedPost
+    posts = FeedPost.query.filter_by(event_id=event.id).order_by(FeedPost.created_at.desc()).all()
+    
     # Return feed page
-    return render_template('feed.html', event=event, members=members, posts=[])
+    return render_template('feed.html', event=event, members=members, posts=posts)
 
 # ============================================================================
 # Health Check

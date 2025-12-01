@@ -128,10 +128,40 @@
             color: #5568d3;
             text-decoration: underline;
         }
+        .flash-message {
+            grid-column: 1 / 4;
+            padding: 12px 15px;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .flash-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+        .flash-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #10b981;
+        }
+        .flash-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #f59e0b;
+        }
     </style>
 </head>
 <body>
     <div class="feed-container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <!-- Header -->
         <div class="feed-header">
             <h1>🎉 Santa's Secret Wall</h1>
