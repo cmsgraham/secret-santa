@@ -1142,24 +1142,24 @@ def like_post(post_id):
 @app.route('/feed/post/<post_id>/comment', methods=['POST'])
 def comment_post(post_id):
     """Add a comment to a feed post"""
-    post = FeedPost.query.get_or_404(post_id)
-    participant_id = session.get('participant_id')
-    
-    if not participant_id:
-        flash('You must be logged in to comment', 'warning')
-        return redirect(url_for('feed', code=post.event.code))
-    
-    participant = Participant.query.get(participant_id)
-    if not participant or participant.event_id != post.event_id:
-        flash('Invalid participant', 'error')
-        return redirect(url_for('feed', code=post.event.code))
-    
-    content = request.form.get('content', '').strip()
-    if not content:
-        flash('Comment cannot be empty', 'error')
-        return redirect(url_for('feed', code=post.event.code))
-    
     try:
+        post = FeedPost.query.get_or_404(post_id)
+        participant_id = session.get('participant_id')
+        
+        if not participant_id:
+            flash('You must be logged in to comment', 'warning')
+            return redirect(url_for('feed', code=post.event.code))
+        
+        participant = Participant.query.get(participant_id)
+        if not participant or participant.event_id != post.event_id:
+            flash('Invalid participant', 'error')
+            return redirect(url_for('feed', code=post.event.code))
+        
+        content = request.form.get('content', '').strip()
+        if not content:
+            flash('Comment cannot be empty', 'error')
+            return redirect(url_for('feed', code=post.event.code))
+        
         comment = FeedComment(
             post_id=post_id,
             participant_id=participant_id,
@@ -1169,9 +1169,14 @@ def comment_post(post_id):
         db.session.add(comment)
         db.session.commit()
         flash('Comment added! 💬', 'success')
+        
     except Exception as e:
         db.session.rollback()
-        flash('Error adding comment', 'error')
+        print(f"Error in comment_post: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('feed', code=post.event.code))
     
     return redirect(url_for('feed', code=post.event.code))
 
