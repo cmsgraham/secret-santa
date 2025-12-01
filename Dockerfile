@@ -36,8 +36,12 @@ COPY models.py .
 COPY event_names.py .
 COPY nickname_generator.py .
 COPY init_db.py .
+COPY i18n.py .
+COPY jinja_i18n.py .
+COPY language_selector.py .
 COPY templates/ templates/
 COPY static/ static/
+COPY translations/ translations/
 
 # Create logs directory
 RUN mkdir -p /app/logs
