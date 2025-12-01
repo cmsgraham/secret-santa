@@ -7,6 +7,7 @@ import secrets
 import random
 import io
 import base64
+import logging
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
@@ -19,6 +20,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
+
+# Configure logging
+logger = logging.getLogger(__name__)
 import qrcode
 
 from models import Base, User, Event, Participant, Assignment, AuthToken, EventStatus, FeedPost, FeedComment, FeedLike
@@ -1142,7 +1146,7 @@ def like_post(post_id):
 @app.route('/feed/post/<post_id>/comment', methods=['POST'], endpoint='comment_post')
 def comment_post(post_id):
     """Add a comment to a feed post"""
-    print(f"DEBUG comment_post: post_id={post_id}, type={type(post_id)}")
+    app.logger.warning(f"DEBUG comment_post: post_id={post_id}, type={type(post_id)}")
     try:
         post = FeedPost.query.get_or_404(post_id)
         
