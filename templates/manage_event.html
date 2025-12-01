@@ -275,7 +275,10 @@
                         ✅ Draw completed! All participants have been emailed their assignments.
                     </div>
                     <div class="action-buttons">
-                        <button class="btn btn-primary" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="reopenRegistration()">♻️ Reopen Registration</button>
+                        <button onclick="reopenRegistration()" style="padding: 0.75rem 1.5rem !important; background: #667eea !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important;">♻️ Reopen Registration</button>
+                        <button onclick="rerunDraw()" style="padding: 0.75rem 1.5rem !important; background: #374151 !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important;">🎲 Rerun Draw</button>
+                        <button onclick="toggleGuessing()" style="padding: 0.75rem 1.5rem !important; background: #6b7280 !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important;">{% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}</button>
+                        <button onclick="closeEvent()" style="padding: 0.75rem 1.5rem !important; background: #ef4444 !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; cursor: pointer !important; font-size: 1rem !important; margin: 0 !important;">🔒 Close Event</button>
                     </div>
                 {% else %}
                     <div style="padding: 1rem; background: #f3f4f6; border-radius: 8px; text-align: center;">
