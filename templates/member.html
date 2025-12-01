@@ -889,8 +889,7 @@
             <div id="iconCategories"></div>
             
             <div style="margin-top: 20px; text-align: right;">
-                <button class="btn btn-secondary" onclick="closeProfileModal()" style="margin-right: 10px;">Cancel</button>
-                <button class="btn" onclick="saveProfilePicture()">Save Picture</button>
+                <button class="btn btn-secondary" onclick="closeProfileModal()">Close</button>
             </div>
             <div class="save-message" id="profileSaved">✓ Profile picture saved!</div>
         </div>
@@ -960,6 +959,9 @@
             // Add selected class to clicked icon
             element.classList.add('selected');
             selectedIcon = icon;
+            
+            // Auto-save immediately
+            saveProfilePicture();
         }
         
         async function saveProfilePicture() {
@@ -985,7 +987,7 @@
                     setTimeout(() => {
                         savedMsg.classList.remove('show');
                         closeProfileModal();
-                    }, 1500);
+                    }, 1000);
                 } else {
                     alert('Failed to save profile picture. Please try again.');
                 }
