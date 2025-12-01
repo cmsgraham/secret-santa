@@ -1,0 +1,161 @@
+<!-- Navigation with Language Selector -->
+<!-- Include this in your base template or header -->
+
+<nav style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: white; border-bottom: 1px solid #e5e7eb;">
+    <div>
+        <a href="/" style="color: #374151; text-decoration: none; font-weight: bold; font-size: 1.25rem;">
+            🎁 Secret Santa
+        </a>
+    </div>
+    
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+        {% if 'user_id' in session %}
+            <span style="color: #6b7280;">{{ user.name }}</span>
+            <a href="/logout" style="color: #667eea; text-decoration: none; font-weight: 600;">Logout</a>
+        {% endif %}
+        
+        {% if 'participant_id' in session %}
+            <a href="/dashboard" style="color: #667eea; text-decoration: none; font-weight: 600;">← Back to Event</a>
+        {% endif %}
+        
+        <!-- Language Selector -->
+        {% include 'components/language_selector.html' %}
+    </div>
+</nav>
+
+<style>
+    /* Language Selector Styles */
+    
+    .language-selector {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .current-language {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+    
+    .current-language:hover {
+        background: #e5e7eb;
+        border-color: #9ca3af;
+    }
+    
+    .language-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 200px;
+        z-index: 1000;
+        margin-top: 0.5rem;
+    }
+    
+    .language-selector.active .language-dropdown {
+        display: block;
+    }
+    
+    .language-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 1rem;
+        color: #374151;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .language-option:last-child {
+        border-bottom: none;
+    }
+    
+    .language-option:hover {
+        background: #f3f4f6;
+        padding-left: 1.15rem;
+    }
+    
+    .language-option.active {
+        background: #dbeafe;
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .language-option .flag {
+        font-size: 1.2rem;
+    }
+</style>
+
+<script>
+(function() {
+    const selector = document.querySelector('.language-selector');
+    if (!selector) return;
+
+    const currentLang = selector.querySelector('.current-language');
+    const options = selector.querySelectorAll('.language-option');
+
+    // Toggle dropdown
+    if (currentLang) {
+        currentLang.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            selector.classList.toggle('active');
+        });
+    }
+
+    // Handle language selection
+    options.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const lang = this.dataset.language;
+            
+            selector.style.opacity = '0.6';
+            selector.style.pointerEvents = 'none';
+            
+            fetch('/api/language/set', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ language: lang })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + d.error);
+                    selector.style.opacity = '1';
+                    selector.style.pointerEvents = 'auto';
+                }
+            })
+            .catch(e => {
+                console.error('Language switch error:', e);
+                alert('Error changing language');
+                selector.style.opacity = '1';
+                selector.style.pointerEvents = 'auto';
+            });
+        });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!selector.contains(e.target)) {
+            selector.classList.remove('active');
+        }
+    });
+})();
+</script>
