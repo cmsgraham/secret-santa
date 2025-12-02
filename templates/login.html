@@ -67,7 +67,22 @@
             font-size: 0.9rem;
             color: #6b7280;
         }
-    </style>
+        
+        /* Mobile responsive styles */
+        @media (max-width: 640px) {
+            .login-container {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch !important;
+            }
+            nav a {
+                text-align: center;
+            }
+        }
 </head>
 <body>
     <div class="container">
