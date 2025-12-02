@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage {{ event.name }} - Secret Santa</title>
+    <title>{{ t('manage_event_title', event_name=event.name) }} - {{ t('app_name') }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=7">
     <style>
         .manage-container {
@@ -103,7 +103,7 @@
 <body>
     <div class="container">
         <nav style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
-            <a href="{{ url_for('dashboard') }}" style="color: #374151; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            <a href="{{ url_for('dashboard') }}" style="color: #374151; text-decoration: none; font-weight: bold;">{{ t('manage_event_back') }}</a>
             {% include 'components/language_selector.html' %}
         </nav>
 
@@ -113,11 +113,11 @@
                 
                 <span class="status-badge {% if event.status.value == 'registration_open' %}status-registration_open{% elif event.status.value == 'draw_completed' %}status-draw_completed{% else %}status-event_closed{% endif %}">
                     {% if event.status.value == 'registration_open' %}
-                        🟢 Registration Open
+                        {{ t('event_status_registration_open') }}
                     {% elif event.status.value == 'draw_completed' %}
-                        🎲 Draw Completed
+                        {{ t('event_status_draw_completed') }}
                     {% else %}
-                        🔒 Event Closed
+                        {{ t('event_status_closed') }}
                     {% endif %}
                 </span>
 
@@ -126,23 +126,23 @@
                 {% endif %}
 
                 <div style="display: flex; gap: 2rem; margin-top: 1rem; color: #6b7280; font-size: 0.9rem;">
-                    <div><strong>Event Code:</strong> {{ event.code }}</div>
-                    <div><strong>Created:</strong> {{ event.created_at.strftime('%b %d, %Y') }}</div>
+                    <div><strong>{{ t('manage_event_event_code') }}</strong> {{ event.code }}</div>
+                    <div><strong>{{ t('manage_event_created') }}</strong> {{ event.created_at.strftime('%b %d, %Y') }}</div>
                     {% if event.draw_date %}
-                    <div><strong>Draw Run:</strong> {{ event.draw_date.strftime('%b %d, %Y') }}</div>
+                    <div><strong>{{ t('manage_event_draw_run') }}</strong> {{ event.draw_date.strftime('%b %d, %Y') }}</div>
                     {% endif %}
                 </div>
 
                 {% if event.status.value == 'registration_open' %}
                 <div class="share-box">
-                    <strong>📤 Share this link with participants:</strong>
+                    <strong>{{ t('manage_event_share') }}</strong>
                     <div class="share-link">
                         <input type="text" id="registrationLink" value="{{ request.url_root }}{{ event.registration_url[1:] }}" readonly>
-                        <button style="all: revert; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="copyRegistrationLink()">📋 Copy</button>
+                        <button style="all: revert; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="copyRegistrationLink()">{{ t('manage_event_copy') }}</button>
                     </div>
                     {% if qr_code %}
                     <div style="margin-top: 1rem; text-align: center;">
-                        <strong>📱 Or scan this QR code:</strong>
+                        <strong>{{ t('manage_event_qr') }}</strong>
                         <div style="margin-top: 0.5rem; display: flex; justify-content: center;">
                             <img src="{{ qr_code }}" alt="Registration QR Code" style="width: 200px; height: 200px; border: 2px solid #e5e7eb; border-radius: 8px; padding: 0.5rem; background: white;">
                         </div>
@@ -156,11 +156,11 @@
 
             <!-- Participants Section -->
             <div class="section">
-                <h2>👥 Participants ({{ event.participant_count }})</h2>
+                <h2>{{ t('manage_event_participants_title') }} ({{ event.participant_count }})</h2>
                 
                 {% if event.participant_count == 0 %}
                 <div style="text-align: center; padding: 2rem; color: #6b7280;">
-                    <p>No participants yet. Share the registration link above!</p>
+                    <p>{{ t('manage_event_no_participants') }}</p>
                 </div>
                 {% else %}
                 <ul class="participant-list">
@@ -178,17 +178,17 @@
                                 </span>
                                 {% endif %}
                                 <div style="font-size: 0.85rem; color: #6b7280;">
-                                    Registered {{ participant.registered_at.strftime('%b %d at %I:%M %p') }}
+                                    {{ t('manage_event_registered', date=participant.registered_at.strftime('%b %d at %I:%M %p')) }}
                                 </div>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             {% if participant.assignment_email_sent %}
-                            <span style="color: #10b981;">✅ Email Sent</span>
+                            <span style="color: #10b981;">{{ t('manage_event_email_sent') }}</span>
                             {% endif %}
                             {% if event.status.value == 'registration_open' %}
                             <button onclick="removeParticipant('{{ participant.id }}', '{{ participant.name }}')" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
-                                🗑️ Remove
+                                {{ t('manage_event_remove') }}
                             </button>
                             {% endif %}
                         </div>
@@ -199,54 +199,53 @@
 
                 {% if event.participant_count < event.min_participants and event.status.value == 'registration_open' %}
                 <div class="warning-box">
-                    ⚠️ Need at least {{ event.min_participants }} participants to run the draw. 
-                    ({{ event.min_participants - event.participant_count }} more needed)
+                    {{ t('manage_event_warn_need_participants', min_count=event.min_participants, remaining=event.min_participants - event.participant_count) }}
                 </div>
                 {% endif %}
             </div>
 
             <!-- Actions Section -->
             <div class="section">
-                <h2>⚙️ Event Actions</h2>
+                <h2>{{ t('manage_event_actions_title') }}</h2>
                 
                 {% if event.status.value == 'registration_open' %}
                     {% if event.can_run_draw %}
                     <div class="success-box">
-                        ✅ Ready to run the draw! Everyone will receive their Secret Santa assignment via email.
+                        {{ t('manage_event_ready') }}
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="runDraw()" style="all: revert; padding: 1rem 2rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1.1rem;">
-                            🎲 Run the Draw!
+                            {{ t('manage_event_draw_button') }}
                         </button>
                     </div>
                     {% else %}
                     <div class="warning-box">
-                        ⚠️ Not ready yet. Need at least {{ event.min_participants }} participants to run the draw.
+                        {{ t('manage_event_not_ready', min_count=event.min_participants) }}
                     </div>
                     {% endif %}
                     
                     <div class="action-buttons" style="margin-top: 1rem;">
                         <button class="btn btn-danger" onclick="closeEvent()" style="all: revert; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
-                            🔒 Close Event
+                            {{ t('manage_event_close_button') }}
                         </button>
                     </div>
                 {% elif event.status.value == 'draw_completed' %}
                     <div class="success-box">
-                        ✅ Draw completed! All participants have been emailed their assignments.
+                        {{ t('manage_event_draw_complete') }}
                     </div>
                     <div class="action-buttons">
-                        <button onclick="reopenRegistration()" style="all: revert; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">♻️ Reopen Registration</button>
-                        <button onclick="rerunDraw()" style="all: revert; padding: 0.75rem 1.5rem; background: #374151; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">🎲 Rerun Draw</button>
-                        <button onclick="toggleGuessing()" style="all: revert; padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{% if event.guessing_enabled %}🔍 Guessing Enabled{% else %}🔒 Enable Guessing{% endif %}</button>
-                        <button onclick="closeEvent()" style="all: revert; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">🔒 Close Event</button>
+                        <button onclick="reopenRegistration()" style="all: revert; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{{ t('manage_event_reopen_button') }}</button>
+                        <button onclick="rerunDraw()" style="all: revert; padding: 0.75rem 1.5rem; background: #374151; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{{ t('manage_event_rerun_button') }}</button>
+                        <button onclick="toggleGuessing()" style="all: revert; padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{% if event.guessing_enabled %}🔍 {{ t('event_actions_guessing_enabled') }}{% else %}🔒 {{ t('event_actions_enable_guessing') }}{% endif %}</button>
+                        <button onclick="closeEvent()" style="all: revert; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{{ t('manage_event_close_button') }}</button>
                     </div>
                 {% else %}
                     <div style="padding: 1rem; background: #f3f4f6; border-radius: 8px; text-align: center;">
-                        🔒 This event is closed.
+                        {{ t('manage_event_closed_message') }}
                     </div>
                     <div class="action-buttons" style="margin-top: 1rem;">
                         <button class="btn btn-primary" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="reopenRegistration()">
-                            ♻️ Reopen Registration
+                            {{ t('manage_event_reopen_button') }}
                         </button>
                     </div>
                 {% endif %}
@@ -263,7 +262,7 @@
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text)
                     .then(() => {
-                        alert('✅ Link copied to clipboard!');
+                        alert('{{ t("manage_event_copy_success") }}');
                     })
                     .catch(() => {
                         // Fallback to older method
@@ -280,20 +279,20 @@
                 input.select();
                 input.setSelectionRange(0, 99999); // For mobile devices
                 document.execCommand('copy');
-                alert('✅ Link copied to clipboard!');
+                alert('{{ t("manage_event_copy_success") }}');
             } catch (e) {
-                alert('❌ Failed to copy. Please copy manually:\n\n' + input.value);
+                alert('{{ t("manage_event_copy_error") }}\n\n' + input.value);
             }
         }
 
         async function runDraw() {
-            if (!confirm('Ready to run the draw? All participants will be emailed their assignments.')) {
+            if (!confirm('{{ t("manage_event_draw_confirm") }}')) {
                 return;
             }
 
             const btn = event.target;
             btn.disabled = true;
-            btn.textContent = 'Running draw...';
+            btn.textContent = '{{ t("manage_event_draw_running") }}';
 
             try {
                 const response = await fetch('{{ url_for("run_draw", code=event.code) }}', {
@@ -304,22 +303,22 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '🎉 ' + data.message);
+                    showMessage('success', '{{ t("manage_event_draw_success", message='') }}' + data.message);
                     setTimeout(() => window.location.reload(), 2000);
                 } else {
-                    showMessage('error', '❌ ' + data.error);
+                    showMessage('error', data.error || '{{ t("manage_event_error_draw") }}');
                     btn.disabled = false;
-                    btn.textContent = '🎲 Run the Draw!';
+                    btn.textContent = '{{ t("manage_event_draw_button") }}';
                 }
             } catch (error) {
-                showMessage('error', '❌ Failed to run draw. Please try again.');
+                showMessage('error', '{{ t("manage_event_error_draw") }}');
                 btn.disabled = false;
-                btn.textContent = '🎲 Run the Draw!';
+                btn.textContent = '{{ t("manage_event_draw_button") }}';
             }
         }
 
         async function reopenRegistration() {
-            if (!confirm('Reopen registration? This will allow new participants to join.')) {
+            if (!confirm('{{ t("manage_event_reopen_confirm") }}')) {
                 return;
             }
 
@@ -332,26 +331,27 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '✅ ' + data.message);
+                    showMessage('success', '{{ t("manage_event_reopen_success", message='') }}' + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    showMessage('error', '❌ ' + data.error);
+                    showMessage('error', data.error || '{{ t("manage_event_error_reopen") }}');
                 }
             } catch (error) {
-                showMessage('error', '❌ Failed to reopen registration.');
+                showMessage('error', '{{ t("manage_event_error_reopen") }}');
             }
         }
 
         async function rerunDraw() {
-            if (!confirm('Rerun the draw? Everyone will receive NEW assignments.')) {
+            if (!confirm('{{ t("manage_event_rerun_confirm") }}')) {
                 return;
             }
 
             await runDraw();
         }
+        }
 
         async function closeEvent() {
-            if (!confirm('Close this event? You can reopen it later if needed.')) {
+            if (!confirm('{{ t("manage_event_close_confirm") }}')) {
                 return;
             }
 
@@ -364,20 +364,19 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '✅ ' + data.message);
+                    showMessage('success', '{{ t("manage_event_close_success", message='') }}' + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    showMessage('error', '❌ ' + data.error);
+                    showMessage('error', data.error || '{{ t("manage_event_error_close") }}');
                 }
             } catch (error) {
-                showMessage('error', '❌ Failed to close event.');
+                showMessage('error', '{{ t("manage_event_error_close") }}');
             }
         }
 
         async function toggleGuessing() {
             const currentState = {{ 'true' if event.guessing_enabled else 'false' }};
-            const action = currentState ? 'disable' : 'enable';
-            const message = currentState ? 'Disable guessing phase?' : 'Enable guessing? Participants will be able to guess who their Secret Santa is.';
+            const message = currentState ? '{{ t("manage_event_guessing_disable_confirm") }}' : '{{ t("manage_event_guessing_enable_confirm") }}';
             
             if (!confirm(message)) {
                 return;
@@ -392,18 +391,19 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '✅ ' + data.message);
+                    showMessage('success', '{{ t("manage_event_guessing_success", message='') }}' + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    showMessage('error', '❌ ' + data.error);
+                    showMessage('error', data.error || '{{ t("manage_event_error_guessing") }}');
                 }
             } catch (error) {
-                showMessage('error', '❌ Failed to toggle guessing.');
+                showMessage('error', '{{ t("manage_event_error_guessing") }}');
             }
         }
 
         async function removeParticipant(participantId, participantName) {
-            if (!confirm(`Remove ${participantName} from this event?\n\nThis action cannot be undone.`)) {
+            const msg = '{{ t("manage_event_remove_confirm", name='') }}'.replace('{{ name }}', participantName);
+            if (!confirm(msg)) {
                 return;
             }
 
@@ -416,13 +416,13 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '✅ ' + data.message);
+                    showMessage('success', '{{ t("manage_event_remove_success", message='') }}' + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    showMessage('error', '❌ ' + data.error);
+                    showMessage('error', data.error || '{{ t("manage_event_error_remove") }}');
                 }
             } catch (error) {
-                showMessage('error', '❌ Failed to remove participant.');
+                showMessage('error', '{{ t("manage_event_error_remove") }}');
             }
         }
 
