@@ -9,6 +9,7 @@ if (typeof NotificationSystem === 'undefined') {
         constructor() {
             this.container = null;
             this.toasts = [];
+                this.pending = [];
             this.init();
         }
 
@@ -26,6 +27,8 @@ if (typeof NotificationSystem === 'undefined') {
             this.container = document.createElement('div');
             this.container.className = 'toast-container';
             document.body.appendChild(this.container);
+                this.flushPending();
+                return true;
         }
 
         /**
@@ -36,6 +39,12 @@ if (typeof NotificationSystem === 'undefined') {
          * @param {number} duration - Auto-dismiss time in ms (0 = manual)
          */
         show(type, title, message = '', duration = 5000) {
+                if (!this.container) {
+                    // Container isn't ready yet; enqueue the toast and wait for DOMContentLoaded
+                    this.pending.push({ type, title, message, duration });
+                    this.init();
+                    return null;
+                }
             const toastId = `toast-${Date.now()}-${Math.random()}`;
         
         const toast = document.createElement('div');
@@ -82,6 +91,15 @@ if (typeof NotificationSystem === 'undefined') {
 
         return toastId;
     }
+
+            flushPending() {
+                if (!this.container) return;
+
+                while (this.pending.length) {
+                    const next = this.pending.shift();
+                    this.show(next.type, next.title, next.message, next.duration);
+                }
+            }
 
     /**
      * Show success notification
@@ -182,13 +200,14 @@ if (typeof ConfirmationDialog === 'undefined') {
 
                 const modal = document.createElement('div');
                 modal.className = 'modal';
+                const messageHtml = this.escapeHtml(message).replace(/\n/g, '<br>');
 
                 modal.innerHTML = `
                     <div class="modal-header">
                         <h3>${this.escapeHtml(title)}</h3>
                     </div>
                     <div class="modal-body">
-                        ${this.escapeHtml(message)}
+                        ${messageHtml}
                     </div>
                     <div class="modal-footer">
                         <button class="btn-cancel">${this.escapeHtml(cancelText)}</button>

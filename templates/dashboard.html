@@ -175,7 +175,7 @@
             // Try modern clipboard API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(fullUrl).then(() => {
-                    notify.success('{{ t("dashboard_copied") }}');
+                    notify.success({{ t("dashboard_copied")|tojson }});
                 }).catch(err => {
                     console.error('Clipboard API failed:', err);
                     fallbackCopy(fullUrl);
@@ -198,26 +198,27 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    notify.success('{{ t("dashboard_copied") }}');
+                    notify.success({{ t("dashboard_copied")|tojson }});
                 } else {
                     // If copy fails, show prompt
-                    prompt('{{ t("dashboard_copy_prompt") }}', text);
+                    prompt({{ t("dashboard_copy_prompt")|tojson }}, text);
                 }
             } catch (err) {
                 console.error('Fallback copy failed:', err);
-                prompt('{{ t("dashboard_copy_prompt") }}', text);
+                prompt({{ t("dashboard_copy_prompt")|tojson }}, text);
             }
             
             document.body.removeChild(textarea);
         }
 
-        async function deleteEvent(code, name) {
-            const msg = '{{ t("dashboard_delete_confirm") }}'.replace('{{ name }}', name);
+        async function deleteEvent(code, name, confirmMessage) {
+            const fallback = {{ t("dashboard_delete_confirm")|tojson }};
+            const msg = typeof confirmMessage === 'string' && confirmMessage.length ? confirmMessage : fallback;
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_delete_title") or "Delete Event" }}',
+                title: {{ (t("dialog_delete_title") or "Delete Event")|tojson }},
                 message: msg,
-                confirmText: '{{ t("button_delete") }}',
-                cancelText: '{{ t("button_cancel") }}',
+                confirmText: {{ t("button_delete")|tojson }},
+                cancelText: {{ t("button_cancel")|tojson }},
                 isDangerous: true
             });
             
@@ -234,24 +235,23 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    notify.success('{{ t("dashboard_deleted") }}');
+                    notify.success({{ t("dashboard_deleted")|tojson }});
                     window.location.reload();
                 } else {
-                    notify.error('{{ t("dashboard_delete_failed") }}', data.error);
+                    notify.error({{ t("dashboard_delete_failed")|tojson }}, data.error);
                 }
             } catch (error) {
-                notify.error('{{ t("dashboard_delete_failed") }}');
+                notify.error({{ t("dashboard_delete_failed")|tojson }});
                 console.error(error);
             }
         }
 
-        async function joinEvent(code, name) {
-            const confirmMsg = '{{ t("dashboard_join_confirm") }}'.replace('{{ name }}', name);
+        async function joinEvent(code, confirmMsg) {
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_join_title") or "Join Event" }}',
+                title: {{ (t("dialog_join_title") or "Join Event")|tojson }},
                 message: confirmMsg,
-                confirmText: '{{ t("button_join") or "Join" }}',
-                cancelText: '{{ t("button_cancel") or "Cancel" }}'
+                confirmText: {{ (t("button_join") or "Join")|tojson }},
+                cancelText: {{ (t("button_cancel") or "Cancel")|tojson }}
             });
             
             if (!confirmed) return;
@@ -267,16 +267,16 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    notify.success('{{ t("success") or "Success" }}', data.message);
+                    notify.success({{ (t("success") or "Success")|tojson }}, data.message);
                     // Redirect to member page
                     setTimeout(() => {
                         window.location.href = data.member_url;
                     }, 1000);
                 } else {
-                    notify.error('{{ t("dashboard_join_failed") }}', data.error);
+                    notify.error({{ t("dashboard_join_failed")|tojson }}, data.error);
                 }
             } catch (error) {
-                notify.error('{{ t("dashboard_join_failed") }}');
+                notify.error({{ t("dashboard_join_failed")|tojson }});
                 console.error(error);
             }
         }
@@ -291,7 +291,7 @@
         <div class="dashboard-header">
             <div>
                 <h1>🎅 {{ t('dashboard_title') }}</h1>
-                <p>{{ t('dashboard_welcome', user_name=user.name) }}</p>
+                <p>{{ t('dashboard_welcome', user_name=user_display_name) }}</p>
             </div>
             <div style="display: flex; gap: 1rem; align-items: center;">
                 {% include 'components/language_selector.html' %}
@@ -350,7 +350,11 @@
                         {{ t('dashboard_my_page') }}
                     </a>
                     {% elif item.event.status.value == 'registration_open' %}
-                    <button onclick="joinEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-dark">
+                    <button
+                        class="btn btn-dark"
+                        data-join-message="{{ t('dashboard_join_confirm', name=item.event.name) | e }}"
+                        onclick="joinEvent('{{ item.event.code }}', this.dataset.joinMessage)"
+                    >
                         {{ t('dashboard_join_event') }}
                     </button>
                     {% endif %}
@@ -358,7 +362,7 @@
                         {{ t('dashboard_copy_link') }}
                     </button>
                     {% if item.event.status.value == 'event_closed' %}
-                    <button onclick="deleteEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-danger btn-icon">
+                    <button onclick='deleteEvent({{ item.event.code|tojson }}, {{ item.event.name|tojson }}, {{ t('dashboard_delete_confirm', name=item.event.name)|tojson }})' class="btn btn-danger btn-icon">
                         🗑️
                     </button>
                     {% endif %}

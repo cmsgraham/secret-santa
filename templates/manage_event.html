@@ -7,6 +7,44 @@
     <script src="{{ url_for('static', filename='notifications.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=7">
     <script>
+        const manageTranslations = {
+            copySuccess: {{ t("manage_event_copy_success")|tojson }},
+            copyErrorPrefix: {{ (t("manage_event_copy_error") ~ "\\n\\n")|tojson }},
+            dialogRunTitle: {{ t("dialog_run_draw_title")|tojson }},
+            manageDrawConfirm: {{ t("manage_event_draw_confirm")|tojson }},
+            buttonDraw: {{ t("button_draw")|tojson }},
+            buttonCancel: {{ t("button_cancel")|tojson }},
+            drawRunning: {{ t("manage_event_draw_running")|tojson }},
+            drawSuccessTemplate: {{ t("manage_event_draw_success", message="PLACEHOLDER")|tojson }},
+            drawButtonLabel: {{ t("manage_event_draw_button")|tojson }},
+            manageDrawError: {{ t("manage_event_error_draw")|tojson }},
+            dialogReopenTitle: {{ t("dialog_reopen_title")|tojson }},
+            manageReopenConfirm: {{ t("manage_event_reopen_confirm")|tojson }},
+            buttonReopen: {{ t("button_reopen")|tojson }},
+            manageReopenSuccessTemplate: {{ t("manage_event_reopen_success", message="PLACEHOLDER")|tojson }},
+            manageReopenError: {{ t("manage_event_error_reopen")|tojson }},
+            dialogRerunTitle: {{ t("dialog_rerun_title")|tojson }},
+            manageRerunConfirm: {{ t("manage_event_rerun_confirm")|tojson }},
+            buttonRerun: {{ t("button_rerun")|tojson }},
+            dialogCloseTitle: {{ t("dialog_close_title")|tojson }},
+            manageCloseConfirm: {{ t("manage_event_close_confirm")|tojson }},
+            buttonClose: {{ t("button_close")|tojson }},
+            manageCloseSuccessTemplate: {{ t("manage_event_close_success", message="PLACEHOLDER")|tojson }},
+            manageCloseError: {{ t("manage_event_error_close")|tojson }},
+            dialogToggleGuessingTitle: {{ t("dialog_toggle_guessing_title")|tojson }},
+            manageGuessingDisableConfirm: {{ t("manage_event_guessing_disable_confirm")|tojson }},
+            manageGuessingEnableConfirm: {{ t("manage_event_guessing_enable_confirm")|tojson }},
+            buttonDisable: {{ t("button_disable")|tojson }},
+            buttonEnable: {{ t("button_enable")|tojson }},
+            manageGuessingSuccessTemplate: {{ t("manage_event_guessing_success", message="PLACEHOLDER")|tojson }},
+            manageGuessingError: {{ t("manage_event_error_guessing")|tojson }},
+            dialogRemoveTitle: {{ t("dialog_remove_participant_title")|tojson }},
+            manageRemoveConfirmTemplate: {{ t("manage_event_remove_confirm", name="PLACEHOLDER")|tojson }},
+            buttonRemove: {{ t("button_remove")|tojson }},
+            manageRemoveSuccessTemplate: {{ t("manage_event_remove_success", message="PLACEHOLDER")|tojson }},
+            manageRemoveError: {{ t("manage_event_error_remove")|tojson }}
+        };
+
         function copyRegistrationLink() {
             const input = document.getElementById('registrationLink');
             const text = input.value;
@@ -15,7 +53,7 @@
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text)
                     .then(() => {
-                        notify.success('{{ t("manage_event_copy_success") }}');
+                        notify.success(manageTranslations.copySuccess);
                     })
                     .catch(() => {
                         // Fallback to older method
@@ -32,18 +70,18 @@
                 input.select();
                 input.setSelectionRange(0, 99999); // For mobile devices
                 document.execCommand('copy');
-                notify.success('{{ t("manage_event_copy_success") }}');
+                notify.success(manageTranslations.copySuccess);
             } catch (e) {
-                notify.error('Error', '{{ t("manage_event_copy_error") }}\n\n' + input.value);
+                notify.error('Error', manageTranslations.copyErrorPrefix + input.value);
             }
         }
 
         async function runDraw() {
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_run_draw_title") }}',
-                message: '{{ t("manage_event_draw_confirm") }}',
-                confirmText: '{{ t("button_draw") }}',
-                cancelText: '{{ t("button_cancel") }}'
+                title: manageTranslations.dialogRunTitle,
+                message: manageTranslations.manageDrawConfirm,
+                confirmText: manageTranslations.buttonDraw,
+                cancelText: manageTranslations.buttonCancel
             });
             if (!confirmed) {
                 return;
@@ -51,7 +89,7 @@
 
             const btn = event.target;
             btn.disabled = true;
-            btn.textContent = '{{ t("manage_event_draw_running") }}';
+            btn.textContent = manageTranslations.drawRunning;
 
             try {
                 const response = await fetch('{{ url_for("run_draw", code=event.code) }}', {
@@ -63,26 +101,26 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_draw_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', manageTranslations.drawSuccessTemplate.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 2000);
                 } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_draw") }}');
+                    showMessage('error', data.error || manageTranslations.manageDrawError);
                     btn.disabled = false;
-                    btn.textContent = '{{ t("manage_event_draw_button") }}';
+                    btn.textContent = manageTranslations.drawButtonLabel;
                 }
             } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_draw") }}');
+                showMessage('error', manageTranslations.manageDrawError);
                 btn.disabled = false;
-                btn.textContent = '{{ t("manage_event_draw_button") }}';
+                btn.textContent = manageTranslations.drawButtonLabel;
             }
         }
 
         async function reopenRegistration() {
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_reopen_title") }}',
-                message: '{{ t("manage_event_reopen_confirm") }}',
-                confirmText: '{{ t("button_reopen") }}',
-                cancelText: '{{ t("button_cancel") }}',
+                title: manageTranslations.dialogReopenTitle,
+                message: manageTranslations.manageReopenConfirm,
+                confirmText: manageTranslations.buttonReopen,
+                cancelText: manageTranslations.buttonCancel,
                 isDangerous: true
             });
             if (!confirmed) {
@@ -99,22 +137,22 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_reopen_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', manageTranslations.manageReopenSuccessTemplate.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_reopen") }}');
+                    showMessage('error', data.error || manageTranslations.manageReopenError);
                 }
             } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_reopen") }}');
+                showMessage('error', manageTranslations.manageReopenError);
             }
         }
 
         async function rerunDraw() {
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_rerun_title") }}',
-                message: '{{ t("manage_event_rerun_confirm") }}',
-                confirmText: '{{ t("button_rerun") }}',
-                cancelText: '{{ t("button_cancel") }}',
+                title: manageTranslations.dialogRerunTitle,
+                message: manageTranslations.manageRerunConfirm,
+                confirmText: manageTranslations.buttonRerun,
+                cancelText: manageTranslations.buttonCancel,
                 isDangerous: true
             });
             if (!confirmed) {
@@ -126,10 +164,10 @@
 
         async function closeEvent() {
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_close_title") }}',
-                message: '{{ t("manage_event_close_confirm") }}',
-                confirmText: '{{ t("button_close") }}',
-                cancelText: '{{ t("button_cancel") }}',
+                title: manageTranslations.dialogCloseTitle,
+                message: manageTranslations.manageCloseConfirm,
+                confirmText: manageTranslations.buttonClose,
+                cancelText: manageTranslations.buttonCancel,
                 isDangerous: true
             });
             if (!confirmed) {
@@ -146,25 +184,25 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_close_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', manageTranslations.manageCloseSuccessTemplate.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_close") }}');
+                    showMessage('error', data.error || manageTranslations.manageCloseError);
                 }
             } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_close") }}');
+                showMessage('error', manageTranslations.manageCloseError);
             }
         }
 
         async function toggleGuessing() {
             const currentState = {% if event.guessing_enabled %}true{% else %}false{% endif %};
-            const message = currentState ? '{{ t("manage_event_guessing_disable_confirm") }}' : '{{ t("manage_event_guessing_enable_confirm") }}';
+            const message = currentState ? manageTranslations.manageGuessingDisableConfirm : manageTranslations.manageGuessingEnableConfirm;
             
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_toggle_guessing_title") }}',
+                title: manageTranslations.dialogToggleGuessingTitle,
                 message: message,
-                confirmText: currentState ? '{{ t("button_disable") }}' : '{{ t("button_enable") }}',
-                cancelText: '{{ t("button_cancel") }}'
+                confirmText: currentState ? manageTranslations.buttonDisable : manageTranslations.buttonEnable,
+                cancelText: manageTranslations.buttonCancel
             });
             if (!confirmed) {
                 return;
@@ -180,23 +218,23 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_guessing_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', manageTranslations.manageGuessingSuccessTemplate.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_guessing") }}');
+                    showMessage('error', data.error || manageTranslations.manageGuessingError);
                 }
             } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_guessing") }}');
+                showMessage('error', manageTranslations.manageGuessingError);
             }
         }
 
         async function removeParticipant(participantId, participantName) {
-            const msg = '{{ t("manage_event_remove_confirm", name="PLACEHOLDER") }}'.replace('PLACEHOLDER', participantName);
+            const msg = manageTranslations.manageRemoveConfirmTemplate.replace('PLACEHOLDER', participantName);
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_remove_participant_title") }}',
+                title: manageTranslations.dialogRemoveTitle,
                 message: msg,
-                confirmText: '{{ t("button_remove") }}',
-                cancelText: '{{ t("button_cancel") }}',
+                confirmText: manageTranslations.buttonRemove,
+                cancelText: manageTranslations.buttonCancel,
                 isDangerous: true
             });
             if (!confirmed) {
@@ -213,13 +251,13 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_remove_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', manageTranslations.manageRemoveSuccessTemplate.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_remove") }}');
+                    showMessage('error', data.error || manageTranslations.manageRemoveError);
                 }
             } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_remove") }}');
+                showMessage('error', manageTranslations.manageRemoveError);
             }
         }
 
@@ -353,6 +391,7 @@
                 gap: 1rem;
             }
         }
+    </style>
     {% include 'components/language_selector_assets.html' %}
 </head>
 <body>
@@ -361,6 +400,11 @@
             <a href="{{ url_for('dashboard') }}" style="color: #374151; text-decoration: none; font-weight: bold;">{{ t('manage_event_back') }}</a>
             {% include 'components/language_selector.html' %}
         </nav>
+        <script>
+            if (typeof initLanguageSelector === 'function') {
+                initLanguageSelector();
+            }
+        </script>
 
         <div class="manage-container">
             <div class="event-header">

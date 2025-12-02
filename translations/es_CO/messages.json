@@ -115,7 +115,7 @@
   "dashboard_registered": "Registrado {{ date }}",
   "dashboard_your_nickname": "Tu apodo",
   "dashboard_join_confirm": "¿Unirte a \"{{ name }}\" como participante?\n\n¡Podrás añadir pistas, preferencias de regalo y obtener tu asignación de Secret Santa!",
-  "dashboard_delete_confirm": "¿Estás seguro de que deseas eliminar \"{{ name }}\"?\n\nEsta acción no se puede deshacer y eliminará:\n- Todos los participantes\n- Todas las asignaciones\n- Todos los datos del evento",
+  "dashboard_delete_confirm": "{{ name }}\n\n¿Estás seguro de que deseas eliminar \"{{ name }}\"?\n\nEsta acción no se puede deshacer y eliminará:\n- Todos los participantes\n- Todas las asignaciones\n- Todos los datos del evento",
   "dashboard_deleted": "✅ ¡Evento eliminado exitosamente!",
   "dashboard_join_failed": "❌ Error al unirse al evento",
   "dashboard_delete_failed": "❌ Error al eliminar el evento",

@@ -8,6 +8,7 @@ import random
 import io
 import base64
 import logging
+import re
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
@@ -193,6 +194,19 @@ def sanitize_text(text, max_length=1000):
     
     # Escape HTML entities
     return escape(text)
+
+
+def format_display_name(raw_name: str) -> str:
+    """Build a friendly display name for the dashboard greeting"""
+    if not raw_name:
+        return ''
+    candidate = raw_name
+    if '@' in candidate:
+        candidate = candidate.split('@')[0]
+    candidate = re.sub(r'[._\-]+', ' ', candidate).strip()
+    if not candidate:
+        candidate = raw_name
+    return ' '.join(part.capitalize() for part in candidate.split())
 
 def create_or_get_user(email, name):
     """Create a new user or get existing one"""
@@ -625,10 +639,12 @@ def dashboard():
                 'member_url': url_for('member_page', code=event.code, participant_id=p.id)
             })
     
+    display_name = format_display_name(user.name or user.email)
     return render_template('dashboard.html', 
                          created_events=created_events_data,
                          participating_events=participating_events,
-                         user=user)
+                         user=user,
+                         user_display_name=display_name)
 
 @app.route('/event/<code>/manage')
 @login_required
@@ -1232,6 +1248,45 @@ def remove_participant(code, participant_id):
 # Feed (Santa's Secret Wall)
 # ============================================================================
 
+def resolve_participant_for_event(event):
+    """Return a participant object matching the session data for an event."""
+    participant_id = session.get('participant_id')
+    participant_email = session.get('participant_email')
+    user_email = session.get('user_email')
+    fallback_email = None
+    participant = None
+
+    if participant_id:
+        candidate = Participant.query.get(participant_id)
+        if candidate and candidate.event_id == event.id:
+            participant = candidate
+        elif candidate:
+            fallback_email = candidate.email
+
+    if not participant and participant_email:
+        participant = Participant.query.filter_by(email=participant_email, event_id=event.id).first()
+
+    if not participant and user_email:
+        participant = Participant.query.filter_by(email=user_email, event_id=event.id).first()
+
+    if not participant and fallback_email:
+        participant = Participant.query.filter_by(email=fallback_email, event_id=event.id).first()
+
+    if participant:
+        session['participant_id'] = participant.id
+        session['participant_email'] = participant.email
+
+    return participant
+
+
+def extract_topics(text: str) -> list[str]:
+    """Split multi-line hints/ideas into topic list"""
+    if not text:
+        return []
+    lines = re.split(r'[\r\n]+', text)
+    return [line.strip() for line in lines if line.strip()]
+
+
 @app.route('/event/<code>/feed', methods=['GET', 'POST'])
 def feed(code):
     """Santa's Secret Wall - Anonymous feed for event participants"""
@@ -1261,20 +1316,22 @@ def feed(code):
         
         # Try to find participant by ID first, then by email (participant_email), then by user_email
         participant = None
+        fallback_email = None
         if participant_id:
-            participant = Participant.query.get(participant_id)
-        elif participant_email:
+            candidate = Participant.query.get(participant_id)
+            if candidate and candidate.event_id == event.id:
+                participant = candidate
+            elif candidate:
+                fallback_email = candidate.email
+        if not participant and participant_email:
             participant = Participant.query.filter_by(email=participant_email, event_id=event.id).first()
-        elif user_email:
-            # Check if the organizer is also a participant in this event
+        if not participant and user_email:
             participant = Participant.query.filter_by(email=user_email, event_id=event.id).first()
+        if not participant and fallback_email:
+            participant = Participant.query.filter_by(email=fallback_email, event_id=event.id).first()
         
         if not participant:
             flash('You must be logged in to post', 'warning')
-            return redirect(url_for('feed', code=code))
-        
-        if participant.event_id != event.id:
-            flash('Invalid participant', 'error')
             return redirect(url_for('feed', code=code))
         
         # Update session with participant_id if it wasn't there
@@ -1300,14 +1357,12 @@ def feed(code):
     posts = FeedPost.query.filter_by(event_id=event.id).order_by(FeedPost.created_at.desc()).all()
     
     # Get current participant for checking if they've liked posts
-    current_participant_id = session.get('participant_id')
+    current_participant = resolve_participant_for_event(event)
+    current_participant_id = current_participant.id if current_participant else None
     current_participant_nickname = None
-    
-    # Get current participant's nickname for display
-    if current_participant_id:
-        current_participant = Participant.query.get(current_participant_id)
-        if current_participant:
-            current_participant_nickname = current_participant.nickname or current_participant.name
+
+    if current_participant:
+        current_participant_nickname = current_participant.nickname or current_participant.name
     
     # Prepare post data with like status
     posts_data = []
@@ -1345,15 +1400,17 @@ def feed(code):
             hint_comments_list = db.session.query(FeedComment).filter(
                 FeedComment.post_id == f"hint_{member.id}"
             ).order_by(FeedComment.created_at).all()
+            hint_topics = extract_topics(member.hints)
             
             hints_data.append({
                 'participant': member,
-                'content': member.hints,
+                'content': member.hints if not hint_topics else '',
                 'like_count': hint_likes,
                 'user_has_liked': user_has_liked_hint,
                 'comment_count': hint_comments,
                 'comments': hint_comments_list,
-                'type': 'hint'
+                'type': 'hint',
+                'topics': hint_topics,
             })
     
     # Prepare gift ideas data with engagement stats
@@ -1378,15 +1435,17 @@ def feed(code):
             idea_comments_list = db.session.query(FeedComment).filter(
                 FeedComment.post_id == f"idea_{member.id}"
             ).order_by(FeedComment.created_at).all()
+            idea_topics = extract_topics(member.gift_preferences)
             
             ideas_data.append({
                 'participant': member,
-                'content': member.gift_preferences,
+                'content': member.gift_preferences if not idea_topics else '',
                 'like_count': idea_likes,
                 'user_has_liked': user_has_liked_idea,
                 'comment_count': idea_comments,
                 'comments': idea_comments_list,
-                'type': 'idea'
+                'type': 'idea',
+                'topics': idea_topics
             })
     
     # Return feed page
@@ -1396,66 +1455,37 @@ def feed(code):
 def like_post(post_id):
     """Like or unlike a feed post"""
     post = FeedPost.query.get_or_404(post_id)
-    participant_id = session.get('participant_id')
-    
-    if not participant_id:
-        return {'error': 'Not logged in'}, 401
-    
-    participant = Participant.query.get(participant_id)
-    if not participant or participant.event_id != post.event_id:
+    participant = resolve_participant_for_event(post.event)
+
+    if not participant:
         return {'error': 'Invalid participant'}, 403
-    
-    # Check if already liked
-    existing_like = FeedLike.query.filter_by(post_id=post_id, participant_id=participant_id).first()
+
+    active_participant_id = participant.id
+    existing_like = FeedLike.query.filter_by(post_id=post_id, participant_id=active_participant_id).first()
     
     if existing_like:
         # Unlike
         db.session.delete(existing_like)
         db.session.commit()
-        return {'liked': False, 'like_count': len(post.likes) - 1}
+        like_count = FeedLike.query.filter_by(post_id=post_id).count()
+        return {'liked': False, 'like_count': like_count}
     else:
         # Like
-        like = FeedLike(post_id=post_id, participant_id=participant_id)
+        like = FeedLike(post_id=post_id, participant_id=active_participant_id)
         db.session.add(like)
         db.session.commit()
-        return {'liked': True, 'like_count': len(post.likes)}
+        like_count = FeedLike.query.filter_by(post_id=post_id).count()
+        return {'liked': True, 'like_count': like_count}
 
 @app.route('/feed/wall/<post_id>/comment', methods=['POST'])
 def comment_post(post_id):
     """Add a comment to a feed post"""
     post = FeedPost.query.get_or_404(post_id)
-    
-    # Try to get current participant with fallbacks
-    current_participant_id = session.get('participant_id')
-    participant_email = session.get('participant_email')
-    user_email = session.get('user_email')
-    
-    current_participant = None
-    if current_participant_id:
-        found = Participant.query.get(current_participant_id)
-        # Only use if they're in the same event as the target
-        if found and found.event_id == post.event_id:
-            current_participant = found
-    
-    if not current_participant and participant_email:
-        current_participant = Participant.query.filter_by(email=participant_email, event_id=post.event_id).first()
-    
-    if not current_participant and user_email:
-        current_participant = Participant.query.filter_by(email=user_email, event_id=post.event_id).first()
-    
+
+    current_participant = resolve_participant_for_event(post.event)
     if not current_participant:
         flash('You must be logged in to comment', 'warning')
         return redirect(url_for('feed', code=post.event.code))
-    
-    if current_participant.event_id != post.event_id:
-        flash('Invalid participant', 'error')
-        return redirect(url_for('feed', code=post.event.code))
-    
-    # Update session with participant info if needed
-    if 'participant_id' not in session:
-        session['participant_id'] = current_participant.id
-    if 'participant_email' not in session:
-        session['participant_email'] = current_participant.email
     
     content = request.form.get('content', '').strip()
     if not content:
@@ -1485,41 +1515,9 @@ def like_hint(participant_id):
         participant = Participant.query.get_or_404(participant_id)
         print(f"DEBUG like_hint: Target participant found: {participant.id}, event_id={participant.event_id}")
         
-        # Try to get current participant with fallbacks
-        current_participant_id = session.get('participant_id')
-        participant_email = session.get('participant_email')
-        user_email = session.get('user_email')
-        
-        print(f"DEBUG like_hint: current_participant_id={current_participant_id}, participant_email={participant_email}, user_email={user_email}")
-        
-        current_participant = None
-        if current_participant_id:
-            found = Participant.query.get(current_participant_id)
-            # Only use if they're in the same event as the target
-            if found and found.event_id == participant.event_id:
-                current_participant = found
-                print(f"DEBUG like_hint: Looked up by participant_id in correct event, found={current_participant is not None}")
-            else:
-                print(f"DEBUG like_hint: participant_id found but wrong event or not found")
-        
-        if not current_participant and participant_email:
-            current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
-            print(f"DEBUG like_hint: Looked up by participant_email in event {participant.event_id}, found={current_participant is not None}")
-        
-        if not current_participant and user_email:
-            current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
-            print(f"DEBUG like_hint: Looked up by user_email in event {participant.event_id}, found={current_participant is not None}")
-        
-        print(f"DEBUG like_hint: current_participant={current_participant}")
-        
+        current_participant = resolve_participant_for_event(participant.event)
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
-        
-        # Update session with participant info if needed
-        if 'participant_id' not in session:
-            session['participant_id'] = current_participant.id
-        if 'participant_email' not in session:
-            session['participant_email'] = current_participant.email
         
         pseudo_post_id = f"hint_{participant_id}"
         
@@ -1547,46 +1545,11 @@ def like_hint(participant_id):
 def like_idea(participant_id):
     """Like or unlike a gift idea"""
     try:
-        print(f"DEBUG like_idea: participant_id={participant_id}, session={dict(session)}")
         participant = Participant.query.get_or_404(participant_id)
-        print(f"DEBUG like_idea: Target participant found: {participant.id}, event_id={participant.event_id}")
-        
-        # Try to get current participant with fallbacks
-        current_participant_id = session.get('participant_id')
-        participant_email = session.get('participant_email')
-        user_email = session.get('user_email')
-        
-        print(f"DEBUG like_idea: current_participant_id={current_participant_id}, participant_email={participant_email}, user_email={user_email}")
-        
-        current_participant = None
-        if current_participant_id:
-            found = Participant.query.get(current_participant_id)
-            # Only use if they're in the same event as the target
-            if found and found.event_id == participant.event_id:
-                current_participant = found
-                print(f"DEBUG like_idea: Looked up by participant_id in correct event, found={current_participant is not None}")
-            else:
-                print(f"DEBUG like_idea: participant_id found but wrong event or not found")
-        
-        if not current_participant and participant_email:
-            current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
-            print(f"DEBUG like_idea: Looked up by participant_email in event {participant.event_id}, found={current_participant is not None}")
-        
-        if not current_participant and user_email:
-            current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
-            print(f"DEBUG like_idea: Looked up by user_email in event {participant.event_id}, found={current_participant is not None}")
-        
-        print(f"DEBUG like_idea: current_participant={current_participant}")
-        
+        current_participant = resolve_participant_for_event(participant.event)
         if not current_participant:
             return jsonify({'error': 'Not logged in'}), 401
-        
-        # Update session with participant info if needed
-        if 'participant_id' not in session:
-            session['participant_id'] = current_participant.id
-        if 'participant_email' not in session:
-            session['participant_email'] = current_participant.email
-        
+
         pseudo_post_id = f"idea_{participant_id}"
         
         # Check if already liked
@@ -1613,38 +1576,10 @@ def like_idea(participant_id):
 def comment_hint(participant_id):
     """Add a comment to a hint"""
     participant = Participant.query.get_or_404(participant_id)
-    
-    # Try to get current participant with fallbacks
-    current_participant_id = session.get('participant_id')
-    participant_email = session.get('participant_email')
-    user_email = session.get('user_email')
-    
-    current_participant = None
-    if current_participant_id:
-        found = Participant.query.get(current_participant_id)
-        # Only use if they're in the same event as the target
-        if found and found.event_id == participant.event_id:
-            current_participant = found
-    
-    if not current_participant and participant_email:
-        current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
-    
-    if not current_participant and user_email:
-        current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
-    
+    current_participant = resolve_participant_for_event(participant.event)
     if not current_participant:
         flash('You must be logged in to comment', 'warning')
         return redirect(url_for('feed', code=participant.event.code))
-    
-    if current_participant.event_id != participant.event_id:
-        flash('Invalid participant', 'error')
-        return redirect(url_for('feed', code=participant.event.code))
-    
-    # Update session with participant info if needed
-    if 'participant_id' not in session:
-        session['participant_id'] = current_participant.id
-    if 'participant_email' not in session:
-        session['participant_email'] = current_participant.email
     
     content = request.form.get('content', '').strip()
     if not content:
@@ -1671,38 +1606,11 @@ def comment_hint(participant_id):
 def comment_idea(participant_id):
     """Add a comment to a gift idea"""
     participant = Participant.query.get_or_404(participant_id)
-    
-    # Try to get current participant with fallbacks
-    current_participant_id = session.get('participant_id')
-    participant_email = session.get('participant_email')
-    user_email = session.get('user_email')
-    
-    current_participant = None
-    if current_participant_id:
-        found = Participant.query.get(current_participant_id)
-        # Only use if they're in the same event as the target
-        if found and found.event_id == participant.event_id:
-            current_participant = found
-    
-    if not current_participant and participant_email:
-        current_participant = Participant.query.filter_by(email=participant_email, event_id=participant.event_id).first()
-    
-    if not current_participant and user_email:
-        current_participant = Participant.query.filter_by(email=user_email, event_id=participant.event_id).first()
-    
+    current_participant = resolve_participant_for_event(participant.event)
+
     if not current_participant:
         flash('You must be logged in to comment', 'warning')
         return redirect(url_for('feed', code=participant.event.code))
-    
-    if current_participant.event_id != participant.event_id:
-        flash('Invalid participant', 'error')
-        return redirect(url_for('feed', code=participant.event.code))
-    
-    # Update session with participant info if needed
-    if 'participant_id' not in session:
-        session['participant_id'] = current_participant.id
-    if 'participant_email' not in session:
-        session['participant_email'] = current_participant.email
     
     content = request.form.get('content', '').strip()
     if not content:

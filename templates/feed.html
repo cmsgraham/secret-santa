@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ t('feed_title') }}</title>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
@@ -66,21 +67,23 @@
             padding: 1.5rem;
             min-height: 400px;
         }
-        .feed-main h2 {
-            color: #374151;
-            margin-bottom: 1rem;
+        .back-link:hover {
+            color: #5568d3;
+            text-decoration: underline;
         }
         .post-form {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            flex-direction: column;
+            gap: 0.75rem;
         }
+
         .post-form textarea {
             flex: 1;
             border-radius: 8px;
             border: 1px solid #d1d5db;
             padding: 0.75rem;
             font-size: 1rem;
+            width: 100%;
             resize: vertical;
         }
         .post-form button {
@@ -132,6 +135,19 @@
         .like-count, .comment-count {
             font-size: 0.9rem;
         }
+        .heart-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+        .action-btn.like-btn .heart-icon {
+            color: #667eea;
+            transition: color 0.2s;
+        }
+        .action-btn.like-btn[data-liked="true"] .heart-icon {
+            color: #ef4444;
+        }
         .comments-section {
             margin-top: 1rem;
             background: #fff;
@@ -175,6 +191,22 @@
             color: #374151;
             margin-top: 0.25rem;
             font-size: 0.9rem;
+        }
+        .topic-list {
+            margin-top: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .topic-item {
+            display: inline-flex;
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            background: #eef2ff;
+            border: 1px solid #dbeafe;
+            font-size: 0.85rem;
+            color: #1e3a8a;
+            font-weight: 600;
         }
         .feed-header {
             grid-column: 1 / 4;
@@ -356,14 +388,12 @@
 </head>
 <body>
     <div class="feed-container">
-        <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="flash-message flash-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        <div id="feed-flash-data" data-messages='{{ messages|tojson }}' style="display: none;"></div>
+        {% endif %}
         {% endwith %}
+        <!-- Flash Messages (handled via toast popups now) -->
         <!-- Header -->
         <div class="feed-header">
             <h1>🎉 {{ t('feed_title') }}</h1>
@@ -389,16 +419,27 @@
             <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
                 <div style="margin-bottom: 0.5rem;">
                     <strong>{{ hint.participant.nickname or hint.participant.name }}:</strong>
+                    {% if not hint.topics %}
                     <div style="margin-top: 0.3rem; color: #374151;">{{ hint.content }}</div>
+                    {% endif %}
                 </div>
+                {% if hint.topics %}
+                <div class="topic-list">
+                    {% for topic in hint.topics %}
+                    <div class="topic-item">{{ topic }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 
                 <!-- Hint Actions -->
                 <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.85rem;">
-                    <button class="action-btn like-btn" onclick="likeHint('{{ hint.participant.id }}', this)" data-liked="{{ 'true' if hint.user_has_liked else 'false' }}" style="background: none; border: none; cursor: pointer; padding: 0;">
-                        {% if hint.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
+                    <button class="action-btn like-btn hint-like-btn" data-participant-id="{{ hint.participant.id }}" data-liked="{{ 'true' if hint.user_has_liked else 'false' }}" style="background: none; border: none; cursor: pointer; padding: 0;">
+                        <span class="heart-icon" role="img" aria-label="{{ t('feed_like_tooltip') }}">
+                            {% if hint.user_has_liked %}❤️{% else %}🤍{% endif %}
+                        </span>
                         <span class="like-count">{{ hint.like_count }}</span>
                     </button>
-                    <button class="action-btn comment-btn" onclick="toggleHintComments('{{ hint.participant.id }}')" data-expanded="false" style="background: none; border: none; cursor: pointer; padding: 0;">
+                    <button class="action-btn comment-btn hint-comment-btn" data-participant-id="{{ hint.participant.id }}" data-expanded="false" style="background: none; border: none; cursor: pointer; padding: 0;">
                         💬 <span class="comment-count">{{ hint.comment_count }}</span> <span class="expand-indicator">▼</span>
                     </button>
                 </div>
@@ -446,7 +487,9 @@
                 <!-- Post Actions -->
                 <div class="post-actions">
                     <button class="action-btn like-btn" onclick="likePost('{{ item.post.id }}', this)" data-liked="{{ 'true' if item.user_has_liked else 'false' }}">
-                        {% if item.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
+                        <span class="heart-icon" role="img" aria-label="{{ t('feed_like_tooltip') }}">
+                            {% if item.user_has_liked %}❤️{% else %}🤍{% endif %}
+                        </span>
                         <span class="like-count">{{ item.like_count }}</span>
                     </button>
                     <button class="action-btn comment-btn" onclick="toggleCommentForm('{{ item.post.id }}')" data-expanded="false">
@@ -487,16 +530,27 @@
             <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
                 <div style="margin-bottom: 0.5rem;">
                     <strong>{{ idea.participant.nickname or idea.participant.name }}:</strong>
+                    {% if not idea.topics %}
                     <div style="margin-top: 0.3rem; color: #374151;">{{ idea.content }}</div>
+                    {% endif %}
                 </div>
+                {% if idea.topics %}
+                <div class="topic-list">
+                    {% for topic in idea.topics %}
+                    <div class="topic-item">{{ topic }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 
                 <!-- Idea Actions -->
                 <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.85rem;">
-                    <button class="action-btn like-btn" onclick="likeIdea('{{ idea.participant.id }}', this)" data-liked="{{ 'true' if idea.user_has_liked else 'false' }}" style="background: none; border: none; cursor: pointer; padding: 0;">
-                        {% if idea.user_has_liked %}<span style="color: #ef4444;">❤️</span>{% else %}<span>🤍</span>{% endif %} 
+                    <button class="action-btn like-btn idea-like-btn" data-participant-id="{{ idea.participant.id }}" data-liked="{{ 'true' if idea.user_has_liked else 'false' }}" style="background: none; border: none; cursor: pointer; padding: 0;">
+                        <span class="heart-icon" role="img" aria-label="{{ t('feed_like_tooltip') }}">
+                            {% if idea.user_has_liked %}❤️{% else %}🤍{% endif %}
+                        </span>
                         <span class="like-count">{{ idea.like_count }}</span>
                     </button>
-                    <button class="action-btn comment-btn" onclick="toggleIdeaComments('{{ idea.participant.id }}')" data-expanded="false" style="background: none; border: none; cursor: pointer; padding: 0;">
+                    <button class="action-btn comment-btn idea-comment-btn" data-participant-id="{{ idea.participant.id }}" data-expanded="false" style="background: none; border: none; cursor: pointer; padding: 0;">
                         💬 <span class="comment-count">{{ idea.comment_count }}</span> <span class="expand-indicator">▼</span>
                     </button>
                 </div>
@@ -532,6 +586,21 @@
     </div>
 
     <script>
+        function refreshLikeButton(button, liked, count) {
+            if (!button) return;
+            button.dataset.liked = liked ? 'true' : 'false';
+            const heartSpan = button.querySelector('.heart-icon');
+            if (heartSpan) {
+                heartSpan.textContent = liked ? '❤️' : '🤍';
+            }
+            if (count !== undefined && count !== null) {
+                const likeCountSpan = button.querySelector('.like-count');
+                if (likeCountSpan) {
+                    likeCountSpan.textContent = count;
+                }
+            }
+        }
+
         function likePost(postId, button) {
             fetch(`/feed/post/${postId}/like`, {
                 method: 'POST',
@@ -547,18 +616,45 @@
                 }
                 
                 // Update like count
-                const likeCountSpan = button.querySelector('.like-count');
-                likeCountSpan.textContent = data.like_count;
-                
-                // Toggle heart
-                const heartSpan = button.querySelector('span:first-child');
-                if (data.liked) {
-                    heartSpan.textContent = '❤️';
-                    heartSpan.style.color = '#ef4444';
-                } else {
-                    heartSpan.textContent = '🤍';
-                    heartSpan.style.color = '';
+                refreshLikeButton(button, data.liked, data.like_count);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function likeHint(participantId, button) {
+            fetch(`/feed/hint/${participantId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    notify.error('Error', data.error);
+                    return;
+                }
+                
+                refreshLikeButton(button, data.liked, data.like_count);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function likeIdea(participantId, button) {
+            fetch(`/feed/idea/${participantId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    notify.error('Error', data.error);
+                    return;
+                }
+                
+                refreshLikeButton(button, data.liked, data.like_count);
             })
             .catch(error => console.error('Error:', error));
         }
@@ -694,6 +790,11 @@
             }
         }
 
+        document.querySelectorAll('.action-btn.like-btn').forEach(btn => {
+            const liked = btn.dataset.liked === 'true';
+            refreshLikeButton(btn, liked);
+        });
+
         // Handle comment form submission with live update
         document.addEventListener('submit', function(e) {
             // Only intercept comment forms
@@ -785,6 +886,61 @@
                 submitBtn.textContent = originalText;
             });
         });
+
+        // Event delegation for hint and idea like buttons
+        document.addEventListener('click', function(e) {
+            const hintLikeBtn = e.target.closest('.hint-like-btn');
+            const ideaLikeBtn = e.target.closest('.idea-like-btn');
+            const hintCommentBtn = e.target.closest('.hint-comment-btn');
+            const ideaCommentBtn = e.target.closest('.idea-comment-btn');
+
+            if (hintLikeBtn) {
+                const participantId = hintLikeBtn.dataset.participantId;
+                likeHint(participantId, hintLikeBtn);
+            }
+
+            if (ideaLikeBtn) {
+                const participantId = ideaLikeBtn.dataset.participantId;
+                likeIdea(participantId, ideaLikeBtn);
+            }
+
+            if (hintCommentBtn) {
+                const participantId = hintCommentBtn.dataset.participantId;
+                toggleHintComments(participantId);
+            }
+
+            if (ideaCommentBtn) {
+                const participantId = ideaCommentBtn.dataset.participantId;
+                toggleIdeaComments(participantId);
+            }
+        });
+    </script>
+    <script>
+        (function() {
+            const flashHolder = document.getElementById('feed-flash-data');
+            if (!flashHolder) return;
+
+            const notifyLevel = {
+                success: 'success',
+                error: 'error',
+                warning: 'warning',
+                info: 'info'
+            };
+
+            let feedFlashMessages = [];
+            try {
+                feedFlashMessages = JSON.parse(flashHolder.dataset.messages || '[]');
+            } catch (error) {
+                console.error('Failed to parse flash messages', error);
+            }
+
+            feedFlashMessages.forEach(([category, message]) => {
+                const method = notifyLevel[category] || 'info';
+                if (notify && typeof notify[method] === 'function') {
+                    notify[method](message);
+                }
+            });
+        })();
     </script>
 </body>
 </html>

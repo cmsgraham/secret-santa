@@ -115,7 +115,7 @@
   "dashboard_registered": "Registered {{ date }}",
   "dashboard_your_nickname": "Your nickname",
   "dashboard_join_confirm": "Join \"{{ name }}\" as a participant?\n\nYou'll be able to add hints, gift preferences, and get a Secret Santa assignment!",
-  "dashboard_delete_confirm": "Are you sure you want to delete \"{{ name }}\"?\n\nThis action cannot be undone and will delete:\n- All participants\n- All assignments\n- All event data",
+  "dashboard_delete_confirm": "{{ name }}\n\nAre you sure you want to delete \"{{ name }}\"?\n\nThis action cannot be undone and will delete:\n- All participants\n- All assignments\n- All event data",
   "dashboard_deleted": "✅ Event deleted successfully!",
   "dashboard_join_failed": "❌ Failed to join event",
   "dashboard_delete_failed": "❌ Failed to delete event",
