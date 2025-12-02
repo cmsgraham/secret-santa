@@ -5,73 +5,154 @@ Supports English and Spanish (multiple regions)
 import random
 import string
 
-# English word lists
+# English word lists - Cultural events and celebrations
 ADJECTIVES_EN = [
-    "Jolly", "Merry", "Festive", "Magical", "Snowy", "Frosty", "Sparkly",
-    "Cozy", "Cheery", "Joyful", "Bright", "Glittery", "Twinkling", "Dazzling",
-    "Enchanted", "Delightful", "Whimsical", "Gleeful", "Radiant", "Blissful",
-    "Epic", "Legendary", "Spectacular", "Magnificent", "Wonderful", "Fantastic",
-    "Incredible", "Amazing", "Awesome", "Splendid", "Groovy", "Funky"
+    "Merry", "Festive", "Magical", "Cozy", "Cheery", "Joyful", "Bright",
+    "Wonderful", "Fantastic", "Amazing", "Awesome", "Splendid", "Legendary"
 ]
 
 NOUNS_EN = [
-    "Elves", "Reindeer", "Snowflakes", "Candy Canes", "Gingerbread", "Mittens",
-    "Stockings", "Ornaments", "Presents", "Sleigh Bells", "Snowmen", "Angels",
-    "Stars", "Carolers", "Nutcrackers", "Wreaths", "Tinsel", "Holly",
-    "Mistletoe", "Penguins", "Polar Bears", "Hot Chocolate", "Cookies",
-    "Fruitcake", "Eggnog", "Jingle Bells", "Santa's Helpers", "Toy Makers",
-    "Gift Givers", "Snow Angels", "Ice Skaters", "Sledders", "Carolers"
+    "Christmas Party", "Holiday Celebration", "Winter Festival", "Gift Exchange",
+    "Tree Trimming", "Caroling Night", "Ugly Sweater Party", "Cookie Exchange",
+    "Gingerbread Decorating", "Ornament Swap", "White Elephant", "Secret Santa",
+    "Holiday Potluck", "Eggnog Tasting", "Lights Tour", "Movie Marathon"
 ]
 
 ACTIVITIES_EN = [
-    "Exchange", "Swap", "Party", "Celebration", "Gathering", "Fiesta",
-    "Bash", "Shindig", "Soiree", "Jamboree", "Extravaganza", "Festival",
-    "Bonanza", "Spectacular", "Gala", "Get-Together", "Meetup", "Reunion"
+    "2025", "Celebration", "Party", "Gathering", "Exchange", "Bash"
 ]
 
 YEARS_EN = [
-    "2025", "Twenty Twenty-Five", "MMXXV"
+    "2025"
 ]
 
 THEMES_EN = [
-    "Winter Wonderland", "North Pole", "Santa's Workshop", "Candy Land",
-    "Ice Palace", "Cozy Cabin", "Festive Forest", "Holiday Haven",
-    "Jingle Junction", "Merry Manor", "Yuletide Yard", "Christmas Corner",
-    "Snowy Summit", "Frosty Fields", "Twinkling Town", "Gift Grove"
+    "Winter Wonderland Secret Santa",
+    "North Pole Gift Exchange",
+    "Festive Holiday Celebration",
+    "Cozy Christmas Gathering",
+    "Magical Winter Party",
+    "Joyful Holiday Exchange",
+    "Merry Christmas Bash",
+    "Bright Holiday Festival"
 ]
 
-# Spanish word lists (universal for all Spanish variants)
-ADJECTIVES_ES = [
-    "Alegre", "Festivo", "Mágico", "Nevado", "Helado", "Brillante",
-    "Acogedor", "Jovial", "Radiante", "Reluciente", "Encantado", "Delicioso",
-    "Épico", "Legendario", "Espectacular", "Magnífico", "Maravilloso", "Fantástico",
-    "Increíble", "Sorprendente", "Fantástico", "Espléndido", "Groovy", "Funky"
+# Spanish word lists - Cultural events and celebrations
+# Using names that make sense: festivals, TV shows, parties, cultural events
+
+# Mexico: Día de Muertos, Posadas, Carnaval, Las Mañanitas
+ADJECTIVES_ES_MX = [
+    "Festivo", "Navideño", "Colorido", "Alegre", "Tradicional", "Mágico", "Especial"
 ]
 
-NOUNS_ES = [
-    "Elfos", "Renos", "Copos de Nieve", "Bastones de Caramelo", "Jengibre", "Mitones",
-    "Calcetines", "Adornos", "Regalos", "Campanas", "Muñecos de Nieve", "Ángeles",
-    "Estrellas", "Villancicos", "Cascanueces", "Coronas", "Oropel", "Acebo",
-    "Muérdago", "Pingüinos", "Osos Polares", "Chocolate Caliente", "Galletas",
-    "Turrón", "Ponche", "Campanillas", "Ayudantes de Papá Noel", "Hacedores de Juguetes",
-    "Repartidores de Regalos", "Ángeles de Nieve", "Patinadores", "Trineos", "Cantores"
+NOUNS_ES_MX = [
+    "Posadas", "Navidad", "Intercambio Navideño", "Fiesta Familiar",
+    "Cena Navideña", "Reunión Festiva", "Celebración Decembrina",
+    "Piñata Party", "Convivio", "Festejo Navideño", "Compartir Regalos"
 ]
 
-ACTIVITIES_ES = [
-    "Intercambio", "Canje", "Fiesta", "Celebración", "Reunión", "Fiesta",
-    "Juerga", "Sarao", "Velada", "Juerguecilla", "Extravagancia", "Festival",
-    "Bonanza", "Espectáculo", "Gala", "Tertulia", "Encuentro", "Reencuentro"
+ACTIVITIES_ES_MX = [
+    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Festejo"
 ]
 
-YEARS_ES = [
-    "2025", "Veinticinco", "MMXXV"
+THEMES_ES_MX = [
+    "Posadas Navideñas",
+    "Navidad Mexicana",
+    "Fiesta de Intercambio",
+    "Celebración Decembrina",
+    "Reunión Festiva"
 ]
 
-THEMES_ES = [
-    "País de las Maravillas Invernal", "Polo Norte", "Taller de Papá Noel", "País de Dulces",
-    "Palacio de Hielo", "Cabaña Acogedora", "Bosque Festivo", "Refugio Navideño",
-    "Cruce de Campanillas", "Mansión Alegre", "Patio Yuletide", "Rincón Navideño",
-    "Cumbre Nevada", "Campos Helados", "Pueblo Reluciente", "Bosque de Regalos"
+# Costa Rica: Luces de Navidad, Las Festividades, Típicos
+ADJECTIVES_ES_CR = [
+    "Festivo", "Navideño", "Tico", "Alegre", "Especial", "Mágico", "Cálido"
+]
+
+NOUNS_ES_CR = [
+    "Luces de Navidad", "Navidad Tica", "Intercambio Festivo",
+    "Cena Navideña", "Fiesta Familiar", "Convivio Navideño",
+    "Típicos Navideños", "Posada Tica", "Reunión Decembrina", "Celebración Costarricense"
+]
+
+ACTIVITIES_ES_CR = [
+    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Convivio"
+]
+
+THEMES_ES_CR = [
+    "Luces de Navidad Costa Rica",
+    "Navidad Tica",
+    "Fiesta Costarricense",
+    "Celebración Tica",
+    "Reunión Festiva"
+]
+
+# Colombia: Festival de Luces, Navidad, Cumbia
+ADJECTIVES_ES_CO = [
+    "Festivo", "Navideño", "Colorido", "Alegre", "Tradicional", "Mágico", "Caluroso"
+]
+
+NOUNS_ES_CO = [
+    "Festival de Luces", "Navidad Colombiana", "Intercambio Navideño",
+    "Fiesta Familiar", "Cena Navideña", "Celebración Decembrina",
+    "Convivio Navideño", "Reunión Festiva", "Cumbia Navideña", "Compartir Regalos"
+]
+
+ACTIVITIES_ES_CO = [
+    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Festival"
+]
+
+THEMES_ES_CO = [
+    "Festival de Luces",
+    "Navidad Colombiana",
+    "Fiesta de Intercambio",
+    "Celebración Navideña",
+    "Reunión Festiva"
+]
+
+# Argentina: Asado Navideño, Tango, Fiesta
+ADJECTIVES_ES_AR = [
+    "Festivo", "Navideño", "Argentino", "Alegre", "Especial", "Mágico", "Caluroso"
+]
+
+NOUNS_ES_AR = [
+    "Asado Navideño", "Navidad Argentina", "Intercambio de Regalos",
+    "Fiesta Familiar", "Cena Navideña", "Reunión Festiva",
+    "Convivio Navideño", "Abrazo Navideño", "Celebración Decembrina", "Compartir en Familia"
+]
+
+ACTIVITIES_ES_AR = [
+    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Abrazo"
+]
+
+THEMES_ES_AR = [
+    "Asado Navideño",
+    "Navidad Argentina",
+    "Fiesta de Intercambio",
+    "Celebración Navideña",
+    "Reunión Familiar"
+]
+
+# Spain: Nochebuena, Roscón de Reyes, Cena Navideña
+ADJECTIVES_ES_ES = [
+    "Festivo", "Navideño", "Español", "Alegre", "Tradicional", "Mágico", "Especial"
+]
+
+NOUNS_ES_ES = [
+    "Nochebuena", "Roscón de Reyes", "Cena Navideña",
+    "Intercambio Navideño", "Fiesta Familiar", "Reunión Festiva",
+    "Celebración Española", "Convivio Navideño", "Turrón Party", "Champagne y Uvas"
+]
+
+ACTIVITIES_ES_ES = [
+    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Cena"
+]
+
+THEMES_ES_ES = [
+    "Nochebuena Española",
+    "Navidad Española",
+    "Roscón de Reyes",
+    "Celebración Navideña",
+    "Reunión Festiva"
 ]
 
 # Legacy naming for backward compatibility
@@ -83,30 +164,56 @@ THEMES = THEMES_EN
 
 def generate_event_name(style="default", locale="en"):
     """
-    Generate a funny/festive Secret Santa event name
+    Generate a meaningful Secret Santa event name based on cultural references
     
     Args:
         style: Type of name to generate
             - "default": Adjective + Noun + Activity
             - "theme": Theme-based name
             - "year": Name with year
-            - "funny": Extra silly combination
+            - "funny": Extra adjective + noun combination
         locale: Language code
             - "en": English (default)
-            - "es_*": Spanish (all variants: es_MX, es_CR, es_CO, es_AR, es_ES)
+            - "es_MX": Spanish (Mexico)
+            - "es_CR": Spanish (Costa Rica)
+            - "es_CO": Spanish (Colombia)
+            - "es_AR": Spanish (Argentina)
+            - "es_ES": Spanish (Spain)
     
     Returns:
         str: Generated event name
     """
     # Select word lists based on locale
-    if locale and locale.startswith('es'):
-        # Spanish for all variants (es_MX, es_CR, es_CO, es_AR, es_ES)
-        adjectives = ADJECTIVES_ES
-        nouns = NOUNS_ES
-        activities = ACTIVITIES_ES
-        years = YEARS_ES
-        themes = THEMES_ES
-        connector = "Secret Santa" if locale == "es_AR" else "Secret Santa"  # Same for all variants
+    if locale == 'es_MX':
+        adjectives = ADJECTIVES_ES_MX
+        nouns = NOUNS_ES_MX
+        activities = ACTIVITIES_ES_MX
+        years = ACTIVITIES_ES_MX  # Just year format
+        themes = THEMES_ES_MX
+    elif locale == 'es_CR':
+        adjectives = ADJECTIVES_ES_CR
+        nouns = NOUNS_ES_CR
+        activities = ACTIVITIES_ES_CR
+        years = ACTIVITIES_ES_CR
+        themes = THEMES_ES_CR
+    elif locale == 'es_CO':
+        adjectives = ADJECTIVES_ES_CO
+        nouns = NOUNS_ES_CO
+        activities = ACTIVITIES_ES_CO
+        years = ACTIVITIES_ES_CO
+        themes = THEMES_ES_CO
+    elif locale == 'es_AR':
+        adjectives = ADJECTIVES_ES_AR
+        nouns = NOUNS_ES_AR
+        activities = ACTIVITIES_ES_AR
+        years = ACTIVITIES_ES_AR
+        themes = THEMES_ES_AR
+    elif locale == 'es_ES':
+        adjectives = ADJECTIVES_ES_ES
+        nouns = NOUNS_ES_ES
+        activities = ACTIVITIES_ES_ES
+        years = ACTIVITIES_ES_ES
+        themes = THEMES_ES_ES
     else:
         # English (default)
         adjectives = ADJECTIVES_EN
@@ -117,30 +224,27 @@ def generate_event_name(style="default", locale="en"):
     
     if style == "theme":
         theme = random.choice(themes)
-        activity = random.choice(activities)
-        return f"{theme} Secret Santa {activity}"
+        return f"{theme} 2025"
     
     elif style == "year":
         adjective = random.choice(adjectives)
         noun = random.choice(nouns)
-        year = random.choice(years)
-        return f"{adjective} {noun} {year}"
+        return f"{adjective} {noun} 2025"
     
     elif style == "funny":
         adj1 = random.choice(adjectives)
-        adj2 = random.choice(adjectives)
-        noun = random.choice(nouns)
-        activity = random.choice(activities)
-        if locale and locale.startswith('es'):
-            return f"El/La {adj1} {adj2} {noun} {activity}"
-        else:
-            return f"The {adj1} {adj2} {noun} {activity}"
+        noun1 = random.choice(nouns)
+        noun2 = random.choice(nouns)
+        return f"{adj1} {noun1} y {noun2}" if locale and locale.startswith('es') else f"{adj1} {noun1} & {noun2}"
     
     else:  # default
         adjective = random.choice(adjectives)
         noun = random.choice(nouns)
         activity = random.choice(activities)
-        return f"{adjective} {noun} {activity}"
+        if locale and locale.startswith('es'):
+            return f"{adjective} {noun} de {activity}"
+        else:
+            return f"{adjective} {noun} {activity}"
 
 def generate_event_code(length=8):
     """
