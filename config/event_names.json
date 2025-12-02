@@ -1,127 +1,82 @@
 {
-  "en": {
-    "adjectives": [
-      "Merry", "Festive", "Magical", "Cozy", "Cheery", "Joyful", "Bright",
-      "Wonderful", "Fantastic", "Amazing", "Awesome", "Splendid", "Legendary"
-    ],
-    "nouns": [
-      "Christmas Party", "Holiday Celebration", "Winter Festival", "Gift Exchange",
-      "Tree Trimming", "Caroling Night", "Ugly Sweater Party", "Cookie Exchange",
-      "Gingerbread Decorating", "Ornament Swap", "White Elephant", "Secret Santa",
-      "Holiday Potluck", "Eggnog Tasting", "Lights Tour", "Movie Marathon"
-    ],
-    "activities": [
-      "2025", "Celebration", "Party", "Gathering", "Exchange", "Bash"
-    ],
-    "themes": [
-      "Winter Wonderland Secret Santa",
-      "North Pole Gift Exchange",
-      "Festive Holiday Celebration",
-      "Cozy Christmas Gathering",
-      "Magical Winter Party",
-      "Joyful Holiday Exchange",
-      "Merry Christmas Bash",
-      "Bright Holiday Festival"
-    ]
-  },
-  "es_MX": {
-    "adjectives": [
-      "Festivo", "Navideño", "Colorido", "Alegre", "Tradicional", "Mágico", "Especial"
-    ],
-    "nouns": [
-      "Posadas", "Navidad", "Intercambio Navideño", "Fiesta Familiar",
-      "Cena Navideña", "Reunión Festiva", "Celebración Decembrina",
-      "Piñata Party", "Convivio", "Festejo Navideño", "Compartir Regalos"
-    ],
-    "activities": [
-      "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Festejo"
-    ],
-    "themes": [
-      "Posadas Navideñas",
-      "Navidad Mexicana",
-      "Fiesta de Intercambio",
-      "Celebración Decembrina",
-      "Reunión Festiva"
-    ]
-  },
-  "es_CR": {
-    "adjectives": [
-      "Festivo", "Navideño", "Tico", "Alegre", "Especial", "Mágico", "Cálido"
-    ],
-    "nouns": [
-      "Luces de Navidad", "Navidad Tica", "Intercambio Festivo",
-      "Cena Navideña", "Fiesta Familiar", "Convivio Navideño",
-      "Típicos Navideños", "Posada Tica", "Reunión Decembrina", "Celebración Costarricense"
-    ],
-    "activities": [
-      "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Convivio"
-    ],
-    "themes": [
-      "Luces de Navidad Costa Rica",
-      "Navidad Tica",
-      "Fiesta Costarricense",
-      "Celebración Tica",
-      "Reunión Festiva"
-    ]
-  },
-  "es_CO": {
-    "adjectives": [
-      "Festivo", "Navideño", "Colorido", "Alegre", "Tradicional", "Mágico", "Caluroso"
-    ],
-    "nouns": [
-      "Festival de Luces", "Navidad Colombiana", "Intercambio Navideño",
-      "Fiesta Familiar", "Cena Navideña", "Celebración Decembrina",
-      "Convivio Navideño", "Reunión Festiva", "Cumbia Navideña", "Compartir Regalos"
-    ],
-    "activities": [
-      "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Festival"
-    ],
-    "themes": [
-      "Festival de Luces",
-      "Navidad Colombiana",
-      "Fiesta de Intercambio",
-      "Celebración Navideña",
-      "Reunión Festiva"
-    ]
-  },
-  "es_AR": {
-    "adjectives": [
-      "Festivo", "Navideño", "Argentino", "Alegre", "Especial", "Mágico", "Caluroso"
-    ],
-    "nouns": [
-      "Asado Navideño", "Navidad Argentina", "Intercambio de Regalos",
-      "Fiesta Familiar", "Cena Navideña", "Reunión Festiva",
-      "Convivio Navideño", "Abrazo Navideño", "Celebración Decembrina", "Compartir en Familia"
-    ],
-    "activities": [
-      "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Abrazo"
-    ],
-    "themes": [
-      "Asado Navideño",
-      "Navidad Argentina",
-      "Fiesta de Intercambio",
-      "Celebración Navideña",
-      "Reunión Familiar"
-    ]
-  },
-  "es_ES": {
-    "adjectives": [
-      "Festivo", "Navideño", "Español", "Alegre", "Tradicional", "Mágico", "Especial"
-    ],
-    "nouns": [
-      "Nochebuena", "Roscón de Reyes", "Cena Navideña",
-      "Intercambio Navideño", "Fiesta Familiar", "Reunión Festiva",
-      "Celebración Española", "Convivio Navideño", "Turrón Party", "Champagne y Uvas"
-    ],
-    "activities": [
-      "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Cena"
-    ],
-    "themes": [
-      "Nochebuena Española",
-      "Navidad Española",
-      "Roscón de Reyes",
-      "Celebración Navideña",
-      "Reunión Festiva"
-    ]
-  }
+  "en": [
+    "Winter Wonderland Secret Santa",
+    "North Pole Gift Exchange",
+    "Festive Holiday Celebration",
+    "Cozy Christmas Gathering",
+    "Magical Winter Party",
+    "Joyful Holiday Exchange",
+    "Merry Christmas Bash",
+    "Bright Holiday Festival",
+    "Christmas Party 2025",
+    "Holiday Celebration",
+    "Winter Festival",
+    "Gift Exchange",
+    "Tree Trimming",
+    "Caroling Night",
+    "Ugly Sweater Party",
+    "Cookie Exchange"
+  ],
+  "es_MX": [
+    "Posadas Navideñas",
+    "Navidad Mexicana",
+    "Fiesta de Intercambio",
+    "Celebración Decembrina",
+    "Reunión Festiva",
+    "Intercambio Navideño",
+    "Fiesta Familiar",
+    "Cena Navideña",
+    "Piñata Party",
+    "Convivio Navideño",
+    "Compartir Regalos",
+    "Festejo Navideño"
+  ],
+  "es_CR": [
+    "Luces de Navidad Costa Rica",
+    "Navidad Tica",
+    "Fiesta Costarricense",
+    "Celebración Tica",
+    "Reunión Festiva",
+    "Intercambio Festivo",
+    "Cena Navideña",
+    "Fiesta Familiar",
+    "Convivio Navideño",
+    "Típicos Navideños"
+  ],
+  "es_CO": [
+    "Festival de Luces",
+    "Navidad Colombiana",
+    "Fiesta de Intercambio",
+    "Celebración Navideña",
+    "Reunión Festiva",
+    "Intercambio Navideño",
+    "Fiesta Familiar",
+    "Cena Navideña",
+    "Cumbia Navideña",
+    "Compartir Regalos"
+  ],
+  "es_AR": [
+    "Asado Navideño",
+    "Navidad Argentina",
+    "Fiesta de Intercambio",
+    "Celebración Navideña",
+    "Reunión Familiar",
+    "Intercambio de Regalos",
+    "Fiesta Familiar",
+    "Cena Navideña",
+    "Reunión Festiva",
+    "Abrazo Navideño"
+  ],
+  "es_ES": [
+    "Nochebuena Española",
+    "Navidad Española",
+    "Roscón de Reyes",
+    "Celebración Navideña",
+    "Reunión Festiva",
+    "Intercambio Navideño",
+    "Fiesta Familiar",
+    "Cena Navideña",
+    "Convivio Navideño",
+    "Turrón Party"
+  ]
 }

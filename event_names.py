@@ -46,73 +46,36 @@ def _load_event_names_config():
     }
 
 
-def _get_config_for_locale(locale="en"):
-    """Get configuration for a specific locale"""
+def _get_event_names_for_locale(locale="en"):
+    """Get event name list for a specific locale"""
     config = _load_event_names_config()
     
-    if locale in config:
+    if locale in config and isinstance(config[locale], list):
         return config[locale]
     
     # Fallback to English
-    if 'en' in config:
+    if 'en' in config and isinstance(config['en'], list):
         return config['en']
     
     # Last resort: use hardcoded defaults
-    return {
-        'adjectives': ADJECTIVES_EN,
-        'nouns': NOUNS_EN,
-        'activities': ACTIVITIES_EN,
-        'themes': THEMES_EN
-    }
+    return ["Holiday Celebration", "Christmas Party", "Gift Exchange"]
 
-def generate_event_name(style="default", locale="en"):
+def generate_event_name(locale="en"):
     """
-    Generate a meaningful Secret Santa event name based on language configuration
+    Generate a random event name from the configured list for the given locale
     
     Args:
-        style: Type of name to generate
-            - "default": Adjective + Noun + Activity
-            - "theme": Theme-based name
-            - "year": Name with year
-            - "funny": Extra adjective + noun combination
         locale: Language code (e.g., "en", "es_MX", "es_CR", "es_CO", "es_AR", "es_ES")
     
     Returns:
-        str: Generated event name loaded from config
+        str: Random event name from the configured list
     """
-    config = _get_config_for_locale(locale)
+    names = _get_event_names_for_locale(locale)
     
-    adjectives = config.get('adjectives', [])
-    nouns = config.get('nouns', [])
-    activities = config.get('activities', [])
-    themes = config.get('themes', [])
+    if names:
+        return random.choice(names)
     
-    if not adjectives or not nouns:
-        return "Secret Santa 2025"  # Fallback
-    
-    if style == "theme" and themes:
-        theme = random.choice(themes)
-        return f"{theme} 2025"
-    
-    elif style == "year":
-        adjective = random.choice(adjectives)
-        noun = random.choice(nouns)
-        return f"{adjective} {noun} 2025"
-    
-    elif style == "funny":
-        adj1 = random.choice(adjectives)
-        noun1 = random.choice(nouns)
-        noun2 = random.choice(nouns)
-        return f"{adj1} {noun1} y {noun2}" if locale and locale.startswith('es') else f"{adj1} {noun1} & {noun2}"
-    
-    else:  # default
-        adjective = random.choice(adjectives)
-        noun = random.choice(nouns)
-        activity = random.choice(activities)
-        if locale and locale.startswith('es'):
-            return f"{adjective} {noun} de {activity}"
-        else:
-            return f"{adjective} {noun} {activity}"
+    return "Holiday Celebration"  # Fallback
 
 def generate_event_code(length=8):
     """
@@ -133,26 +96,26 @@ def generate_event_code(length=8):
 
 def get_random_event_names(count=5, locale="en"):
     """
-    Generate multiple event name suggestions
+    Get multiple random event name suggestions
     
     Args:
         count: Number of names to generate
         locale: Language code (default "en")
     
     Returns:
-        list: List of event names
+        list: List of unique random event names
     """
-    styles = ["default", "theme", "year", "funny"]
-    names = []
+    names_pool = _get_event_names_for_locale(locale)
     
-    for _ in range(count):
-        style = random.choice(styles)
-        name = generate_event_name(style=style, locale=locale)
-        while name in names:
-            name = generate_event_name(style=style, locale=locale)
-        names.append(name)
+    if not names_pool:
+        return ["Holiday Celebration"] * count
     
-    return names
+    # Return unique names if possible
+    if len(names_pool) >= count:
+        return random.sample(names_pool, count)
+    else:
+        # If pool is smaller than count, use all names and fill with duplicates
+        return names_pool + [random.choice(names_pool) for _ in range(count - len(names_pool))]
 
 # Predefined funny names for quick selection
 PREDEFINED_NAMES = [
