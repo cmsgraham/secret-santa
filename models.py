@@ -121,6 +121,9 @@ class Participant(Base):
     giving_to = relationship("Assignment", foreign_keys="Assignment.giver_id", back_populates="giver")
     receiving_from = relationship("Assignment", foreign_keys="Assignment.receiver_id", back_populates="receiver")
     guessed_secret_santa = relationship("Participant", remote_side=[id], foreign_keys=[guessed_secret_santa_id])
+    feed_posts = relationship("FeedPost", back_populates="participant", cascade="all, delete-orphan")
+    feed_comments = relationship("FeedComment", back_populates="participant", cascade="all, delete-orphan")
+    feed_likes = relationship("FeedLike", back_populates="participant", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Participant {self.name} ({self.email})>"
@@ -198,7 +201,7 @@ class FeedPost(Base):
     
     # Relationships
     event = relationship("Event", foreign_keys=[event_id])
-    participant = relationship("Participant", foreign_keys=[participant_id])
+    participant = relationship("Participant", foreign_keys=[participant_id], back_populates="feed_posts")
     comments = relationship("FeedComment", back_populates="post", cascade="all, delete-orphan", primaryjoin="FeedPost.id==FeedComment.post_id", foreign_keys="[FeedComment.post_id]")
     likes = relationship("FeedLike", back_populates="post", cascade="all, delete-orphan", primaryjoin="FeedPost.id==FeedLike.post_id", foreign_keys="[FeedLike.post_id]")
     
@@ -220,7 +223,7 @@ class FeedComment(Base):
     
     # Relationships
     post = relationship("FeedPost", back_populates="comments", primaryjoin="FeedPost.id==FeedComment.post_id", foreign_keys=[post_id])
-    participant = relationship("Participant", foreign_keys=[participant_id])
+    participant = relationship("Participant", foreign_keys=[participant_id], back_populates="feed_comments")
     
     def __repr__(self):
         return f"<FeedComment {self.nickname} on post {self.post_id}>"
@@ -238,7 +241,7 @@ class FeedLike(Base):
     
     # Relationships
     post = relationship("FeedPost", back_populates="likes", primaryjoin="FeedPost.id==FeedLike.post_id", foreign_keys=[post_id])
-    participant = relationship("Participant", foreign_keys=[participant_id])
+    participant = relationship("Participant", foreign_keys=[participant_id], back_populates="feed_likes")
     
     def __repr__(self):
         return f"<FeedLike by {self.participant_id} on {self.post_id}>"

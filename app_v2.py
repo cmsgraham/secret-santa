@@ -1236,6 +1236,16 @@ def remove_participant(code, participant_id):
         return jsonify({'success': False, 'error': 'Cannot remove participants after draw is completed'}), 400
     
     participant_name = participant.name
+    
+    # Delete pseudo-feed entries for this participant (hints, ideas, etc)
+    # These use post_id format like "hint_<participant_id>" and "idea_<participant_id>"
+    pseudo_post_ids = [f"hint_{participant_id}", f"idea_{participant_id}"]
+    for pseudo_id in pseudo_post_ids:
+        db.session.query(FeedComment).filter_by(post_id=pseudo_id).delete()
+        db.session.query(FeedLike).filter_by(post_id=pseudo_id).delete()
+    db.session.commit()
+    
+    # Now delete the participant (cascade will delete feed_posts, feed_comments, feed_likes)
     db.session.delete(participant)
     db.session.commit()
     

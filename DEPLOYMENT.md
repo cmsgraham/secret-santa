@@ -155,7 +155,7 @@ ssh root@172.233.171.101 "docker-compose -f /root/secret-santa/docker-compose.ym
 
 **Update Code (after git push):**
 ```bash
-ssh root@172.233.171.101 "cd /root/secret-santa && git pull && docker-compose up -d --build"
+ssh root@172.233.171.101 "cd /root/secret-santa && git pull origin main && docker-compose down && docker-compose up -d --build && sleep 3"
 ```
 
 ### 📈 Next Steps (Optional Improvements)
