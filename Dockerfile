@@ -43,6 +43,7 @@ COPY language_selector.py .
 COPY templates/ templates/
 COPY static/ static/
 COPY translations/ translations/
+COPY config/ config/
 
 # Create logs directory
 RUN mkdir -p /app/logs
