@@ -307,5 +307,18 @@
   "email_assignment_event_details": "Event Details:",
   "email_assignment_event_name_label": "Event:",
   "email_assignment_organizer_label": "Organized by:",
-  "email_assignment_closing": "Happy gifting! 🎄"
+  "email_assignment_closing": "Happy gifting! 🎄",
+  "feed_title": "Santa's Secret Wall",
+  "feed_hints_title": "Hints",
+  "feed_gift_ideas_title": "Gift Ideas",
+  "feed_no_hints": "No hints shared yet.",
+  "feed_no_ideas": "No gift ideas shared yet.",
+  "feed_placeholder": "Post something fun, ask a question, or share a thought...",
+  "feed_post_button": "Post",
+  "feed_placeholder_comment": "Say something...",
+  "feed_comment_button": "💬",
+  "feed_back_to_dashboard": "← Dashboard",
+  "feed_back": "← Back",
+  "feed_like_tooltip": "Like",
+  "feed_comment_tooltip": "Comment"
 }

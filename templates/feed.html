@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Santa's Secret Wall</title>
+    <title>{{ t('feed_title') }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
@@ -365,11 +365,11 @@
         {% endwith %}
         <!-- Header -->
         <div class="feed-header">
-            <h1>🎉 Santa's Secret Wall</h1>
+            <h1>🎉 {{ t('feed_title') }}</h1>
             <div style="display: flex; gap: 1rem; align-items: center;">
                 {% include 'components/language_selector.html' %}
-                <a href="{{ url_for('dashboard') }}" class="back-link">← Dashboard</a>
-                <a href="javascript:history.back()" class="back-link">← Back</a>
+                <a href="{{ url_for('dashboard') }}" class="back-link">{{ t('feed_back_to_dashboard') }}</a>
+                <a href="javascript:history.back()" class="back-link">{{ t('feed_back') }}</a>
             </div>
         </div>
         <!-- Top: Member Avatars and Nicknames -->
@@ -383,7 +383,7 @@
         </div>
         <!-- Left: Hints -->
         <div class="feed-left">
-            <h3>🎁 Hints</h3>
+            <h3>🎁 {{ t('feed_hints_title') }}</h3>
             {% for hint in hints_data %}
             <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
                 <div style="margin-bottom: 0.5rem;">
@@ -406,8 +406,8 @@
                 <div class="comments-section" id="hint-comments-{{ hint.participant.id }}" style="display: none; margin-top: 0.5rem;">
                     <!-- Comment Form -->
                     <form method="POST" action="{{ url_for('comment_hint', participant_id=hint.participant.id) }}" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
-                        <input type="text" name="content" placeholder="Say something..." required style="font-size: 0.85rem; padding: 0.4rem;">
-                        <button type="submit" style="background: #667eea; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer;">💬</button>
+                        <input type="text" name="content" placeholder="{{ t('feed_placeholder_comment') }}" required style="font-size: 0.85rem; padding: 0.4rem;">
+                        <button type="submit" style="background: #667eea; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer;">{{ t('feed_comment_button') }}</button>
                     </form>
                     
                     <!-- Existing Comments -->
@@ -427,15 +427,15 @@
                 </div>
             </div>
             {% else %}
-            <div style="color: #999;">No hints shared yet.</div>
+            <div style="color: #999;">{{ t('feed_no_hints') }}</div>
             {% endfor %}
         </div>
         <!-- Main: Santa's Secret Wall -->
         <div class="feed-main">
-            <h2>Santa's Secret Wall</h2>
+            <h2>{{ t('feed_title') }}</h2>
             <form class="post-form" method="POST" action="{{ url_for('feed', code=event.code) }}">
-                <textarea name="content" rows="2" placeholder="Post something fun, ask a question, or share a thought..." required></textarea>
-                <button type="submit">Post</button>
+                <textarea name="content" rows="2" placeholder="{{ t('feed_placeholder') }}" required></textarea>
+                <button type="submit">{{ t('feed_post_button') }}</button>
             </form>
             {% for item in posts_data %}
             <div class="post">
@@ -457,8 +457,8 @@
                 <div class="comments-section" id="comments-{{ item.post.id }}" style="display: none;">
                     <!-- Comment Form -->
                     <form method="POST" action="{{ url_for('comment_post', post_id=item.post.id) }}" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
-                        <input type="text" name="content" placeholder="Say something..." required>
-                        <button type="submit">💬</button>
+                        <input type="text" name="content" placeholder="{{ t('feed_placeholder_comment') }}" required>
+                        <button type="submit">{{ t('feed_comment_button') }}</button>
                     </form>
                     
                     <!-- Existing Comments -->
@@ -481,7 +481,7 @@
         </div>
         <!-- Right: Gift Ideas -->
         <div class="feed-right">
-            <h3>🎈 Gift Ideas</h3>
+            <h3>🎈 {{ t('feed_gift_ideas_title') }}</h3>
             {% for idea in ideas_data %}
             <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
                 <div style="margin-bottom: 0.5rem;">
@@ -504,8 +504,8 @@
                 <div class="comments-section" id="idea-comments-{{ idea.participant.id }}" style="display: none; margin-top: 0.5rem;">
                     <!-- Comment Form -->
                     <form method="POST" action="{{ url_for('comment_idea', participant_id=idea.participant.id) }}" class="comment-form" style="flex-direction: column; gap: 0.3rem;">
-                        <input type="text" name="content" placeholder="Say something..." required style="font-size: 0.85rem; padding: 0.4rem;">
-                        <button type="submit" style="background: #667eea; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer;">💬</button>
+                        <input type="text" name="content" placeholder="{{ t('feed_placeholder_comment') }}" required style="font-size: 0.85rem; padding: 0.4rem;">
+                        <button type="submit" style="background: #667eea; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer;">{{ t('feed_comment_button') }}</button>
                     </form>
                     
                     <!-- Existing Comments -->
@@ -525,7 +525,7 @@
                 </div>
             </div>
             {% else %}
-            <div style="color: #999;">No gift ideas shared yet.</div>
+            <div style="color: #999;">{{ t('feed_no_ideas') }}</div>
             {% endfor %}
         </div>
     </div>

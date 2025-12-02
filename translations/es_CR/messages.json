@@ -307,5 +307,18 @@
   "email_assignment_event_details": "Detalles del Evento:",
   "email_assignment_event_name_label": "Evento:",
   "email_assignment_organizer_label": "Organizado por:",
-  "email_assignment_closing": "¡Feliz regalo! 🎄"
+  "email_assignment_closing": "¡Feliz regalo! 🎄",
+  "feed_title": "Muro Secreto de Papá Noel",
+  "feed_hints_title": "Pistas",
+  "feed_gift_ideas_title": "Ideas de Regalos",
+  "feed_no_hints": "Aún no hay pistas compartidas.",
+  "feed_no_ideas": "Aún no hay ideas de regalos compartidas.",
+  "feed_placeholder": "Publica algo divertido, haz una pregunta o comparte un pensamiento...",
+  "feed_post_button": "Publicar",
+  "feed_placeholder_comment": "Di algo...",
+  "feed_comment_button": "💬",
+  "feed_back_to_dashboard": "← Panel",
+  "feed_back": "← Atrás",
+  "feed_like_tooltip": "Me gusta",
+  "feed_comment_tooltip": "Comentario"
 }
