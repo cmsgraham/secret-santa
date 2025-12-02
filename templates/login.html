@@ -145,7 +145,8 @@
             messageDiv.style.display = 'none';
             
             const formData = {
-                email: emailInput.value
+                email: emailInput.value,
+                language: sessionStorage.getItem('currentLanguage') || 'en'
             };
             
             try {

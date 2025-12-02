@@ -415,6 +415,7 @@ def login():
     if request.method == 'POST':
         data = request.get_json() if request.is_json else request.form
         email = data.get('email', '').strip().lower()
+        language = data.get('language', 'en').strip()
         
         # Validate email
         try:
@@ -425,6 +426,12 @@ def login():
         
         # Create or get user (use email prefix as default name)
         user = create_or_get_user(email, email.split('@')[0])
+        
+        # Update user's preferred language if provided
+        if language and language in SUPPORTED_LOCALES:
+            user.preferred_language = language
+        
+        db.session.commit()
         
         # Create magic link token
         token = create_magic_link_token(user)

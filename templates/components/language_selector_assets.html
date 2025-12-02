@@ -102,6 +102,9 @@
                     e.preventDefault();
                     const lang = this.dataset.language;
                     
+                    // Save language to sessionStorage for form submission
+                    sessionStorage.setItem('currentLanguage', lang);
+                    
                     fetch('/api/language/set', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
