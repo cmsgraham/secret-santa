@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Test</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container" style="padding: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>🌍 Translation Test Page</h1>
+            {% include 'components/language_selector.html' %}
+        </div>
+
+        <div style="background: #f0f9ff; padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
+            <h2>Debug Info</h2>
+            <p><strong>Current Locale:</strong> {{ locale }}</p>
+            <p><strong>Supported Locales:</strong> {{ SUPPORTED_LOCALES }}</p>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 8px; border: 2px solid #e5e7eb;">
+            <h2>Translation Examples</h2>
+            
+            <p><strong>Form Labels:</strong></p>
+            <ul>
+                <li>{{ t('form_email_label') }}</li>
+                <li>{{ t('form_password_label') }}</li>
+                <li>{{ t('form_login') }}</li>
+            </ul>
+
+            <p><strong>Buttons:</strong></p>
+            <ul>
+                <li>{{ t('button_yes') }}</li>
+                <li>{{ t('button_no') }}</li>
+                <li>{{ t('button_cancel') }}</li>
+                <li>{{ t('nav_logout') }}</li>
+            </ul>
+
+            <p><strong>Event Labels:</strong></p>
+            <ul>
+                <li>{{ t('event_status_registration_open') }}</li>
+                <li>{{ t('event_status_draw_completed') }}</li>
+                <li>{{ t('event_status_closed') }}</li>
+            </ul>
+
+            <p><strong>Participant Labels:</strong></p>
+            <ul>
+                <li>{{ t('participants_title') }}</li>
+                <li>{{ t('event_header_event_code') }}</li>
+                <li>{{ t('participants_registered') }}</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="{{ url_for('dashboard') }}" style="color: #667eea; text-decoration: none;">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
