@@ -214,7 +214,7 @@ class FeedComment(Base):
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     post_id = Column(String(100), nullable=False)  # Can be a UUID or pseudo-ID like "hint_<uuid>"
-    participant_id = Column(String(36), ForeignKey('participants.id'), nullable=False)
+    participant_id = Column(String(36), ForeignKey('participants.id', ondelete='CASCADE'), nullable=False)
     
     # Comment content
     nickname = Column(String(255), nullable=False)  # Anonymous nickname for display
@@ -234,7 +234,7 @@ class FeedLike(Base):
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     post_id = Column(String(100), nullable=False)  # Can be a UUID or pseudo-ID like "hint_<uuid>"
-    participant_id = Column(String(36), ForeignKey('participants.id'), nullable=False)
+    participant_id = Column(String(36), ForeignKey('participants.id', ondelete='CASCADE'), nullable=False)
     
     # Like metadata
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

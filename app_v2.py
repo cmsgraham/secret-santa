@@ -1239,13 +1239,13 @@ def remove_participant(code, participant_id):
     
     # Delete pseudo-feed entries for this participant (hints, ideas, etc)
     # These use post_id format like "hint_<participant_id>" and "idea_<participant_id>"
+    # They don't have proper foreign keys, so we need to delete them manually
     pseudo_post_ids = [f"hint_{participant_id}", f"idea_{participant_id}"]
     for pseudo_id in pseudo_post_ids:
         db.session.query(FeedComment).filter_by(post_id=pseudo_id).delete()
         db.session.query(FeedLike).filter_by(post_id=pseudo_id).delete()
-    db.session.commit()
     
-    # Now delete the participant (cascade will delete feed_posts, feed_comments, feed_likes)
+    # Now delete the participant and all related data (cascade delete handles feed_posts, and FK cascade handles feed_comments/likes by participant_id)
     db.session.delete(participant)
     db.session.commit()
     
