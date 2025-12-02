@@ -340,7 +340,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_draw_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', '{{ t("manage_event_draw_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 2000);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_draw") }}');
@@ -376,7 +376,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_reopen_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', '{{ t("manage_event_reopen_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_reopen") }}');
@@ -423,7 +423,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_close_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', '{{ t("manage_event_close_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_close") }}');
@@ -457,7 +457,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_guessing_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', '{{ t("manage_event_guessing_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_guessing") }}');
@@ -490,7 +490,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_remove_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
+                    showMessage('success', '{{ t("manage_event_remove_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_remove") }}');
