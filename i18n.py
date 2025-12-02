@@ -98,6 +98,7 @@ def detect_locale_from_header(accept_language: Optional[str]) -> str:
             language, country = lang.split('-')
             locale = COUNTRY_TO_LOCALE.get(country.upper(), f'{language}_{country.upper()}')
         else:
+            language = lang
             locale = language
 
         # Check if supported
