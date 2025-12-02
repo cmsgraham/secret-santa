@@ -219,23 +219,32 @@ def create_magic_link_token(user):
     return token
 
 def send_magic_link_email(user, token):
-    """Send magic link email for authentication"""
+    """Send magic link email for authentication in user's preferred language"""
     magic_link = url_for('verify_magic_link', token=token, _external=True)
     
-    subject = "🎄 Your Secret Santa Login Link"
-    body = f"""
-    Hi {user.name}!
+    # Get user's preferred language, default to English
+    locale = user.preferred_language if user.preferred_language else 'en'
     
-    Click the link below to log in to your Secret Santa account:
+    # Get translated strings
+    subject = get_translation('email_magic_link_subject', locale)
+    greeting = get_translation('email_magic_link_greeting', locale).replace('{{ name }}', user.name)
+    click_link = get_translation('email_magic_link_click_link', locale)
+    expires = get_translation('email_magic_link_expires', locale)
+    ignore = get_translation('email_magic_link_ignore', locale)
+    closing = get_translation('email_magic_link_closing', locale)
     
-    {magic_link}
-    
-    This link will expire in 1 hour.
-    
-    If you didn't request this, you can safely ignore this email.
-    
-    Happy gifting! 🎁
-    """
+    body = f"""{greeting}
+
+{click_link}
+
+{magic_link}
+
+{expires}
+
+{ignore}
+
+{closing}
+"""
     
     return send_email(user.email, subject, body)
 
@@ -267,23 +276,37 @@ def send_email(to_email, subject, body):
         return False
 
 def send_assignment_email(participant, receiver_name, event):
-    """Send Secret Santa assignment email to participant"""
-    subject = f"🎅 Your Secret Santa Assignment - {event.name}"
-    body = f"""
-    Hi {participant.name}!
+    """Send Secret Santa assignment email in participant's preferred language"""
+    # Get participant's preferred language, default to English
+    locale = participant.preferred_language if participant.preferred_language else 'en'
     
-    Your Secret Santa assignment for "{event.name}" is ready! 🎁
+    # Get translated strings
+    subject_template = get_translation('email_assignment_subject', locale)
+    subject = subject_template.replace('{{ event_name }}', event.name)
     
-    You are the Secret Santa for: {receiver_name}
+    greeting = get_translation('email_assignment_greeting', locale).replace('{{ name }}', participant.name)
+    ready_msg = get_translation('email_assignment_ready', locale).replace('{{ event_name }}', event.name)
+    you_are_giving = get_translation('email_assignment_you_are_giving', locale).replace('{{ recipient_name }}', receiver_name)
+    keep_secret = get_translation('email_assignment_keep_secret', locale)
+    event_details = get_translation('email_assignment_event_details', locale)
+    event_label = get_translation('email_assignment_event_name_label', locale)
+    organizer_label = get_translation('email_assignment_organizer_label', locale)
+    closing = get_translation('email_assignment_closing', locale)
     
-    Keep it secret, and have fun shopping for the perfect gift!
-    
-    Event Details:
-    - Event: {event.name}
-    - Organized by: {event.organizer.name}
-    
-    Happy gifting! 🎄
-    """
+    body = f"""{greeting}
+
+{ready_msg}
+
+{you_are_giving}
+
+{keep_secret}
+
+{event_details}
+- {event_label} {event.name}
+- {organizer_label} {event.organizer.name}
+
+{closing}
+"""
     
     success = send_email(participant.email, subject, body)
     

@@ -573,26 +573,26 @@
                     </div>
                     <div class="event-name">🎁 {{ event.name }}</div>
                     <div class="participant-info">{{ participant.email }}</div>
-                    <button class="edit-profile-btn" onclick="openProfileModal()">✏️ Change Picture</button>
-                    <div class="save-message" id="nicknameSaved" style="margin-top: 5px;">✓ Nickname saved!</div>
+                    <button class="edit-profile-btn" onclick="openProfileModal()">{{ t('member_change_picture_button') }}</button>
+                    <div class="save-message" id="nicknameSaved" style="margin-top: 5px;">{{ t('member_picture_saved') }}</div>
                 </div>
             </div>
             {% if event.status.value == 'registration_open' %}
-                <span class="status-badge status-registration">Registration Open</span>
+                <span class="status-badge status-registration">{{ t('member_registration_open_status') }}</span>
             {% elif event.status.value == 'draw_completed' %}
-                <span class="status-badge status-drawn">Draw Completed</span>
+                <span class="status-badge status-drawn">{{ t('member_draw_completed_status') }}</span>
             {% elif event.status.value == 'event_closed' %}
-                <span class="status-badge status-closed">Event Closed</span>
+                <span class="status-badge status-closed">{{ t('member_event_closed_status') }}</span>
             {% endif %}
         </div>
 
         <!-- Your Secret Santa Assignment (if draw is complete) -->
         {% if event.status.value in ['draw_completed', 'event_closed'] and assignment %}
         <div class="card">
-            <h2><span class="icon">🎅</span> Your Secret Santa Assignment</h2>
-            <p>You are the Secret Santa for:</p>
+            <h2><span class="icon">🎅</span> {{ t('member_your_assignment_title') }}</h2>
+            <p>{{ t('member_you_are_giving_to') }}</p>
             <div class="assignment-box">
-                <h3>🎁 You're giving to:</h3>
+                <h3>{{ t('member_your_recipient') }}</h3>
                 <div class="assignment-name">{{ assignment.receiver.name }}</div>
                 {% if assignment.receiver.nickname and assignment.receiver.nickname != assignment.receiver.name %}
                 <div style="font-size: 20px; color: #92400e; margin-top: 5px;">
@@ -603,7 +603,7 @@
                 
                 {% if assignment.receiver.gift_preferences %}
                 <div style="margin-top: 15px;">
-                    <strong style="color: #b45309; font-size: 16px;">🎁 Gift Ideas:</strong>
+                    <strong style="color: #b45309; font-size: 16px;">{{ t('member_gift_ideas_for_recipient') }}</strong>
                     {% set preferences = assignment.receiver.gift_preferences.split('\n') %}
                     {% if preferences|length > 1 %}
                         <ol class="preference-list">
@@ -621,7 +621,7 @@
                 
                 {% if assignment.receiver.hints %}
                 <div style="margin-top: 15px;">
-                    <strong style="color: #1e40af; font-size: 16px;">💡 Hints about them:</strong>
+                    <strong style="color: #1e40af; font-size: 16px;">{{ t('member_hints_about_recipient') }}</strong>
                     {% set hints_list = assignment.receiver.hints.split('\n') %}
                     {% if hints_list|length > 1 %}
                         <ul style="list-style: none; padding: 0; margin: 10px 0 0 0;">
@@ -642,8 +642,8 @@
 
         <!-- About You - Hints Section -->
         <div class="card">
-            <h2><span class="icon">💡</span> Hints About You</h2>
-            <p>Add fun hints about yourself so others can try to guess who you are! Each hint in its own box.</p>
+            <h2><span class="icon">💡</span> {{ t('member_hints_title') }}</h2>
+            <p>{{ t('member_hints_description') }}</p>
             <form id="hintsForm">
                 <div id="hintsContainer">
                     {% set hints_list = (participant.hints or '').split('\n') if participant.hints else [''] %}
@@ -656,16 +656,16 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="addHintInput()">+ Add Another Hint</button>
-                <button type="submit" class="btn" style="margin-left: 10px;">Save All Hints</button>
-                <div class="save-message" id="hintsSaved">✓ Hints saved successfully!</div>
+                <button type="button" class="btn btn-secondary" onclick="addHintInput()">{{ t('member_add_hint_button') }}</button>
+                <button type="submit" class="btn" style="margin-left: 10px;">{{ t('member_save_hints_button') }}</button>
+                <div class="save-message" id="hintsSaved">{{ t('member_hints_saved') }}</div>
             </form>
         </div>
 
         <!-- Gift Preferences Section -->
         <div class="card">
-            <h2><span class="icon">🎁</span> Gift Preferences</h2>
-            <p>Share gift ideas, preferences, or links. Each gift idea in its own box!</p>
+            <h2><span class="icon">🎁</span> {{ t('member_gift_preferences_title') }}</h2>
+            <p>{{ t('member_gift_preferences_description') }}</p>
             <form id="preferencesForm">
                 <div id="preferencesContainer">
                     {% set prefs_list = (participant.gift_preferences or '').split('\n') if participant.gift_preferences else [''] %}
@@ -678,9 +678,9 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="addPrefInput()">+ Add Another Gift Idea</button>
-                <button type="submit" class="btn" style="margin-left: 10px;">Save All Preferences</button>
-                <div class="save-message" id="preferencesSaved">✓ Preferences saved successfully!</div>
+                <button type="button" class="btn btn-secondary" onclick="addPrefInput()">{{ t('member_add_gift_idea_button') }}</button>
+                <button type="submit" class="btn" style="margin-left: 10px;">{{ t('member_save_gift_ideas_button') }}</button>
+                <div class="save-message" id="preferencesSaved">{{ t('member_gift_ideas_saved') }}</div>
             </form>
         </div>
 

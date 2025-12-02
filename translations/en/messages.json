@@ -3,34 +3,27 @@
   "nav_back_to_dashboard": "← Back to Dashboard",
   "nav_logout": "Logout",
   "nav_profile": "Profile",
-  
   "page_title_manage_event": "Manage {{ event_name }}",
   "page_title_member_page": "{{ participant_name }}'s Member Page",
   "page_title_create_event": "Create New Event",
   "page_title_login": "Login",
   "page_title_register": "Register for Event",
-  
   "event_status_registration_open": "🟢 Registration Open",
   "event_status_draw_ready": "🟠 Ready for Draw",
   "event_status_draw_completed": "✅ Draw Completed",
   "event_status_closed": "🔒 Closed",
-  
   "event_header_event_code": "Event Code",
   "event_header_created": "Created",
   "event_header_budget": "Budget",
-  
   "event_actions_share_link": "📤 Share this link with participants",
   "event_actions_copy": "📋 Copy",
   "event_actions_qr_code": "📱 Or scan this QR code",
-  
   "participants_title": "👥 Participants",
   "participants_registered": "Registered",
   "participants_remove_button": "🗑️ Remove",
   "participants_remove_confirm": "Remove {{ name }} from this event? This action cannot be undone.",
-  
   "warning_need_participants": "⚠️ Need at least {{ min_count }} participants to run the draw. ({{ remaining }} more needed)",
   "warning_not_ready": "⚠️ Not ready yet. Need at least {{ min_count }} participants to run the draw.",
-  
   "actions_title": "⚙️ Event Actions",
   "actions_run_draw": "🎲 Run the Draw!",
   "actions_run_draw_confirm": "Ready to run the draw? All participants will be emailed their assignments.",
@@ -45,10 +38,8 @@
   "actions_rerun_draw_confirm": "Rerun the draw? Everyone will receive NEW assignments.",
   "actions_toggle_guessing_confirm": "Enable guessing? Participants will be able to guess who their Secret Santa is.",
   "actions_toggle_guessing_disable": "Disable guessing phase?",
-  
   "draw_completed_message": "✅ Draw completed! All participants have been emailed their assignments.",
   "event_closed_message": "🔒 This event is closed.",
-  
   "success_message_draw": "🎉 {{ message }}",
   "success_message_registration_reopened": "✅ {{ message }}",
   "success_message_event_closed": "✅ {{ message }}",
@@ -56,7 +47,6 @@
   "success_message_participant_removed": "✅ {{ message }}",
   "error_message": "❌ {{ error }}",
   "error_generic": "❌ {{ error }}. Please try again.",
-  
   "form_email_label": "Email Address",
   "form_email_placeholder": "your.email@example.com",
   "form_password_label": "Password",
@@ -64,14 +54,12 @@
   "form_submit": "Submit",
   "form_register": "Register",
   "form_login": "Login",
-  
   "messages_comments": "💬 Comments",
   "messages_no_comments": "No comments yet",
   "messages_add_comment": "Add a comment...",
   "messages_post_comment": "Post",
   "messages_expand": "Show more",
   "messages_collapse": "Show less",
-  
   "guessing_section_title": "🔍 Guessing Phase",
   "guessing_your_assignment": "Your Secret Santa Assignment",
   "guessing_giver": "Your Secret Santa is: {{ name }}",
@@ -79,29 +67,24 @@
   "guessing_submit_guess": "Submit Guess",
   "guessing_guess_correct": "✅ Correct! {{ name }} was your Secret Santa!",
   "guessing_guess_wrong": "❌ Not quite. Keep guessing!",
-  
   "gift_ideas_title": "🎁 Gift Ideas",
   "gift_ideas_add": "Add gift idea",
   "gift_ideas_placeholder": "Suggest a gift idea...",
   "gift_ideas_like": "👍 Like",
   "gift_ideas_comment": "💬 Comment",
   "gift_ideas_delete": "🗑️ Delete",
-  
   "validation_email_invalid": "Invalid email address",
   "validation_email_required": "Email is required",
   "validation_password_required": "Password is required",
   "validation_password_weak": "Password must be at least 8 characters",
-  
   "copy_success": "✅ Link copied to clipboard!",
   "copy_error": "❌ Failed to copy. Please copy manually:",
   "copy_error_fallback": "❌ Failed to copy. Please copy manually: {{ url }}",
-  
   "api_error_generic": "An error occurred. Please try again.",
   "api_error_invalid_event": "Invalid event code",
   "api_error_not_found": "Not found",
   "api_error_unauthorized": "Unauthorized",
   "api_error_bad_request": "Invalid request",
-  
   "datetime_now": "now",
   "datetime_1min_ago": "1 minute ago",
   "datetime_mins_ago": "{{ count }} minutes ago",
@@ -109,7 +92,6 @@
   "datetime_hours_ago": "{{ count }} hours ago",
   "datetime_1day_ago": "1 day ago",
   "datetime_days_ago": "{{ count }} days ago",
-  
   "button_yes": "Yes",
   "button_no": "No",
   "button_ok": "OK",
@@ -117,7 +99,6 @@
   "button_save": "Save",
   "button_delete": "Delete",
   "button_edit": "Edit",
-  
   "dashboard_welcome": "Welcome back, {{ user_name }}!",
   "dashboard_title": "My Dashboard",
   "dashboard_events_created": "My Events",
@@ -141,7 +122,6 @@
   "dashboard_copied": "✅ Registration link copied to clipboard!",
   "dashboard_copy_failed": "❌ Failed to copy link",
   "dashboard_copy_prompt": "Copy this link",
-  
   "login_welcome": "Welcome Back!",
   "login_subtitle": "We'll send you a magic link to sign in",
   "login_email_label": "Email Address",
@@ -154,7 +134,6 @@
   "login_success": "✅ Magic link sent! Check your email.",
   "login_error": "❌ Error sending link. Please try again.",
   "login_generic_error": "❌ Something went wrong. Please try again.",
-  
   "register_title": "Create Your Account",
   "register_subtitle": "Sign up to start your Secret Santa journey",
   "register_name_label": "Full Name",
@@ -172,7 +151,6 @@
   "register_validation_email": "Valid email is required",
   "register_validation_password": "The password must be at least 8 characters",
   "register_validation_password_weak": "Password too weak. Use uppercase, lowercase, numbers, and symbols.",
-  
   "event_registration_title": "Join the Secret Santa!",
   "event_registration_subtitle": "Register to participate in this gift exchange",
   "event_registration_closed": "Registration Closed",
@@ -200,7 +178,6 @@
   "event_registration_member_access": "Access your member page and all your Secret Santa events:",
   "event_member_page_button": "🎁 Go to My Member Page",
   "event_member_page_hint": "You can add gift preferences, hints about yourself, and see your Secret Santa assignment when the draw happens!",
-  
   "create_event_title": "Create New Event",
   "create_event_subtitle_dashboard": "Let's set up your Secret Santa gift exchange!",
   "create_event_subtitle_participant": "Creating as {{ email }}",
@@ -224,7 +201,6 @@
   "create_event_generic_error": "❌ Something went wrong. Please try again.",
   "create_event_back_dashboard": "← Back to Dashboard",
   "create_event_hello": "Hello, {{ user_name }}!",
-  
   "member_page_title": "My Gift Ideas & Activity",
   "member_my_secret_santa": "👤 Your Secret Santa Assignment",
   "member_your_giver": "Your Secret Santa is: {{ name }}",
@@ -248,7 +224,6 @@
   "member_add_comment": "Add a comment...",
   "member_post_button": "Post",
   "member_back": "← Back to Dashboard",
-  
   "manage_event_title": "Manage {{ event_name }}",
   "manage_event_back": "← Back to Dashboard",
   "manage_event_share": "📤 Share this link with participants:",
@@ -292,11 +267,45 @@
   "manage_event_error_reopen": "❌ Failed to reopen registration.",
   "manage_event_error_close": "❌ Failed to close event.",
   "manage_event_error_guessing": "❌ Failed to toggle guessing.",
-  "manage_event_error_remove": "❌ Failed to remove participant."
+  "manage_event_error_remove": "❌ Failed to remove participant.",
+  "member_page_header_title": "My Member Page",
+  "member_change_picture_button": "✏️ Change Picture",
+  "member_picture_saved": "✓ Nickname saved!",
+  "member_registration_open_status": "🟢 Registration Open",
+  "member_draw_completed_status": "🎲 Draw Completed",
+  "member_event_closed_status": "🔒 Event Closed",
+  "member_your_assignment_title": "Your Secret Santa Assignment",
+  "member_you_are_giving_to": "You are the Secret Santa for:",
+  "member_your_recipient": "🎁 You're giving to:",
+  "member_gift_ideas_for_recipient": "🎁 Gift Ideas:",
+  "member_hints_about_recipient": "💡 Hints about them:",
+  "member_hints_title": "Hints About You",
+  "member_hints_description": "Add fun hints about yourself so others can try to guess who you are! Each hint in its own box.",
+  "member_add_hint_button": "+ Add Another Hint",
+  "member_save_hints_button": "Save All Hints",
+  "member_hints_saved": "✓ Hints saved successfully!",
+  "member_gift_preferences_title": "Gift Preferences",
+  "member_gift_preferences_description": "Share gift ideas, preferences, or links. Each gift idea in its own box!",
+  "member_add_gift_idea_button": "+ Add Another Gift Idea",
+  "member_save_gift_ideas_button": "Save All Preferences",
+  "member_gift_ideas_saved": "✓ Preferences saved!",
+  "member_update_nickname_prompt": "Enter your new nickname:",
+  "member_nickname_placeholder": "My awesome nickname",
+  "member_back_to_event": "← Back to Event",
+  "dashboard_delete_event": "🗑️ Delete",
+  "email_magic_link_subject": "🎄 Your Secret Santa Login Link",
+  "email_magic_link_greeting": "Hi {{ name }}!",
+  "email_magic_link_click_link": "Click the link below to log in to your Secret Santa account:",
+  "email_magic_link_expires": "This link will expire in 1 hour.",
+  "email_magic_link_ignore": "If you didn't request this, you can safely ignore this email.",
+  "email_magic_link_closing": "Happy gifting! 🎁",
+  "email_assignment_subject": "🎅 Your Secret Santa Assignment - {{ event_name }}",
+  "email_assignment_greeting": "Hi {{ name }}!",
+  "email_assignment_ready": "Your Secret Santa assignment for \"{{ event_name }}\" is ready! 🎁",
+  "email_assignment_you_are_giving": "You are the Secret Santa for: {{ recipient_name }}",
+  "email_assignment_keep_secret": "Keep it secret, and have fun shopping for the perfect gift!",
+  "email_assignment_event_details": "Event Details:",
+  "email_assignment_event_name_label": "Event:",
+  "email_assignment_organizer_label": "Organized by:",
+  "email_assignment_closing": "Happy gifting! 🎄"
 }
-
-
-
-
-
-

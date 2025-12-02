@@ -3,34 +3,27 @@
   "nav_back_to_dashboard": "← Volver al Panel",
   "nav_logout": "Cerrar Sesión",
   "nav_profile": "Perfil",
-  
   "page_title_manage_event": "Administrar {{ event_name }}",
   "page_title_member_page": "Página de {{ participant_name }}",
   "page_title_create_event": "Crear Nuevo Evento",
   "page_title_login": "Iniciar Sesión",
   "page_title_register": "Registrarse para el Evento",
-  
   "event_status_registration_open": "🟢 Registración Abierta",
   "event_status_draw_ready": "🟠 Listo para el Sorteo",
   "event_status_draw_completed": "✅ Sorteo Completado",
   "event_status_closed": "🔒 Cerrado",
-  
   "event_header_event_code": "Código del Evento",
   "event_header_created": "Creado",
   "event_header_budget": "Presupuesto",
-  
   "event_actions_share_link": "📤 Comparte este enlace con los participantes",
   "event_actions_copy": "📋 Copiar",
   "event_actions_qr_code": "📱 O escanea este código QR",
-  
   "participants_title": "👥 Participantes",
   "participants_registered": "Registrado",
   "participants_remove_button": "🗑️ Eliminar",
   "participants_remove_confirm": "¿Eliminar a {{ name }} de este evento? Esta acción no se puede deshacer.",
-  
   "warning_need_participants": "⚠️ Se necesitan al menos {{ min_count }} participantes para realizar el sorteo. ({{ remaining }} más necesarios)",
   "warning_not_ready": "⚠️ Aún no está listo. Se necesitan al menos {{ min_count }} participantes para realizar el sorteo.",
-  
   "actions_title": "⚙️ Acciones del Evento",
   "actions_run_draw": "🎲 ¡Realizar el Sorteo!",
   "actions_run_draw_confirm": "¿Listo para realizar el sorteo? Se enviará un correo a todos los participantes con sus asignaciones.",
@@ -45,10 +38,8 @@
   "actions_rerun_draw_confirm": "¿Repetir el sorteo? Todos recibirán NUEVAS asignaciones.",
   "actions_toggle_guessing_confirm": "¿Habilitar adivinanzas? Los participantes podrán adivinar quién es su Amigo Secreto.",
   "actions_toggle_guessing_disable": "¿Deshabilitar la fase de adivinanzas?",
-  
   "draw_completed_message": "✅ ¡Sorteo completado! Se ha enviado un correo a todos los participantes con sus asignaciones.",
   "event_closed_message": "🔒 Este evento está cerrado.",
-  
   "success_message_draw": "🎉 {{ message }}",
   "success_message_registration_reopened": "✅ {{ message }}",
   "success_message_event_closed": "✅ {{ message }}",
@@ -56,7 +47,6 @@
   "success_message_participant_removed": "✅ {{ message }}",
   "error_message": "❌ {{ error }}",
   "error_generic": "❌ {{ error }}. Por favor, intenta de nuevo.",
-  
   "form_email_label": "Correo Electrónico",
   "form_email_placeholder": "tu.correo@ejemplo.com",
   "form_password_label": "Contraseña",
@@ -64,14 +54,12 @@
   "form_submit": "Enviar",
   "form_register": "Registrarse",
   "form_login": "Iniciar Sesión",
-  
   "messages_comments": "💬 Comentarios",
   "messages_no_comments": "Sin comentarios aún",
   "messages_add_comment": "Añadir un comentario...",
   "messages_post_comment": "Publicar",
   "messages_expand": "Ver más",
   "messages_collapse": "Ver menos",
-  
   "guessing_section_title": "🔍 Fase de Adivinanzas",
   "guessing_your_assignment": "Tu Asignación de Amigo Secreto",
   "guessing_giver": "Tu Amigo Secreto es: {{ name }}",
@@ -79,29 +67,24 @@
   "guessing_submit_guess": "Enviar Adivinanza",
   "guessing_guess_correct": "✅ ¡Correcto! ¡{{ name }} era tu Amigo Secreto!",
   "guessing_guess_wrong": "❌ No del todo. ¡Sigue adivinando!",
-  
   "gift_ideas_title": "🎁 Ideas de Regalos",
   "gift_ideas_add": "Añadir idea de regalo",
   "gift_ideas_placeholder": "Sugiere una idea de regalo...",
   "gift_ideas_like": "👍 Me gusta",
   "gift_ideas_comment": "💬 Comentar",
   "gift_ideas_delete": "🗑️ Eliminar",
-  
   "validation_email_invalid": "Correo electrónico inválido",
   "validation_email_required": "El correo electrónico es requerido",
   "validation_password_required": "La contraseña es requerida",
   "validation_password_weak": "La contraseña debe tener al menos 8 caracteres",
-  
   "copy_success": "✅ ¡Enlace copiado al portapapeles!",
   "copy_error": "❌ Error al copiar. Por favor copia manualmente:",
   "copy_error_fallback": "❌ Error al copiar. Por favor copia manualmente: {{ url }}",
-  
   "api_error_generic": "Ocurrió un error. Por favor, intenta de nuevo.",
   "api_error_invalid_event": "Código de evento inválido",
   "api_error_not_found": "No encontrado",
   "api_error_unauthorized": "No autorizado",
   "api_error_bad_request": "Solicitud inválida",
-  
   "datetime_now": "ahora",
   "datetime_1min_ago": "hace 1 minuto",
   "datetime_mins_ago": "hace {{ count }} minutos",
@@ -109,7 +92,6 @@
   "datetime_hours_ago": "hace {{ count }} horas",
   "datetime_1day_ago": "hace 1 día",
   "datetime_days_ago": "hace {{ count }} días",
-  
   "button_yes": "Sí",
   "button_no": "No",
   "button_ok": "OK",
@@ -117,7 +99,6 @@
   "button_save": "Guardar",
   "button_delete": "Eliminar",
   "button_edit": "Editar",
-  
   "dashboard_welcome": "¡Bienvenido, {{ user_name }}!",
   "dashboard_title": "Mi Panel",
   "dashboard_events_created": "Mis Eventos",
@@ -141,7 +122,6 @@
   "dashboard_copied": "✅ ¡Enlace de registro copiado al portapapeles!",
   "dashboard_copy_failed": "❌ Error al copiar el enlace",
   "dashboard_copy_prompt": "Copiar este enlace",
-  
   "login_welcome": "¡Bienvenido de Nuevo!",
   "login_subtitle": "Te enviaremos un enlace mágico para iniciar sesión",
   "login_email_label": "Correo Electrónico",
@@ -154,7 +134,6 @@
   "login_success": "✅ ¡Enlace mágico enviado! Revisa tu correo.",
   "login_error": "❌ Error al enviar el enlace. Por favor, inténtalo de nuevo.",
   "login_generic_error": "❌ Algo salió mal. Por favor, inténtalo de nuevo.",
-  
   "register_title": "Crear Tu Cuenta",
   "register_subtitle": "Regístrate para comenzar tu viaje de Secret Santa",
   "register_name_label": "Nombre Completo",
@@ -172,7 +151,6 @@
   "register_validation_email": "Se requiere un correo válido",
   "register_validation_password": "La contraseña debe tener al menos 8 caracteres",
   "register_validation_password_weak": "Contraseña débil. Usa mayúsculas, minúsculas, números y símbolos.",
-  
   "event_registration_title": "¡Únete al Secret Santa!",
   "event_registration_subtitle": "Regístrate para participar en este intercambio de regalos",
   "event_registration_closed": "Registro Cerrado",
@@ -200,7 +178,6 @@
   "event_registration_member_access": "Accede a tu página de miembro y a todos tus eventos de Secret Santa:",
   "event_member_page_button": "🎁 Ir a Mi Página de Miembro",
   "event_member_page_hint": "¡Puedes añadir preferencias de regalo, pistas sobre ti mismo, y ver tu asignación de Secret Santa cuando se complete el sorteo!",
-  
   "create_event_title": "Crear Nuevo Evento",
   "create_event_subtitle_dashboard": "¡Vamos a configurar tu intercambio de Secret Santa!",
   "create_event_subtitle_participant": "Creando como {{ email }}",
@@ -224,7 +201,6 @@
   "create_event_generic_error": "❌ Algo salió mal. Por favor, inténtalo de nuevo.",
   "create_event_back_dashboard": "← Volver al Panel",
   "create_event_hello": "¡Hola, {{ user_name }}!",
-  
   "member_page_title": "Mis Ideas de Regalos y Actividad",
   "member_my_secret_santa": "👤 Tu Asignación de Secret Santa",
   "member_your_giver": "Tu Secret Santa es: {{ name }}",
@@ -248,7 +224,6 @@
   "member_add_comment": "Añade un comentario...",
   "member_post_button": "Publicar",
   "member_back": "← Volver al Panel",
-  
   "manage_event_title": "Administrar {{ event_name }}",
   "manage_event_back": "← Volver al Panel",
   "manage_event_share": "📤 Comparte este enlace con los participantes:",
@@ -292,7 +267,45 @@
   "manage_event_error_reopen": "❌ Error al reabrir el registro.",
   "manage_event_error_close": "❌ Error al cerrar el evento.",
   "manage_event_error_guessing": "❌ Error al cambiar la adivinanza.",
-  "manage_event_error_remove": "❌ Error al eliminar el participante."
+  "manage_event_error_remove": "❌ Error al eliminar el participante.",
+  "member_page_header_title": "Mi Página de Miembro",
+  "member_change_picture_button": "✏️ Cambiar Foto",
+  "member_picture_saved": "✓ ¡Apodo guardado!",
+  "member_registration_open_status": "🟢 Registro Abierto",
+  "member_draw_completed_status": "🎲 Sorteo Completado",
+  "member_event_closed_status": "🔒 Evento Cerrado",
+  "member_your_assignment_title": "Tu Asignación de Secret Santa",
+  "member_you_are_giving_to": "Eres el Secret Santa para:",
+  "member_your_recipient": "🎁 Estás dando para:",
+  "member_gift_ideas_for_recipient": "🎁 Ideas de Regalos:",
+  "member_hints_about_recipient": "💡 Pistas sobre ellos:",
+  "member_hints_title": "Pistas Sobre Ti",
+  "member_hints_description": "¡Añade pistas divertidas sobre ti para que otros puedan adivinar quién eres! Cada pista en su propio recuadro.",
+  "member_add_hint_button": "+ Añadir Otra Pista",
+  "member_save_hints_button": "Guardar Todas las Pistas",
+  "member_hints_saved": "✓ ¡Pistas guardadas exitosamente!",
+  "member_gift_preferences_title": "Preferencias de Regalos",
+  "member_gift_preferences_description": "Comparte ideas de regalos, preferencias o enlaces. ¡Cada idea en su propio recuadro!",
+  "member_add_gift_idea_button": "+ Añadir Otra Idea de Regalo",
+  "member_save_gift_ideas_button": "Guardar Todas las Preferencias",
+  "member_gift_ideas_saved": "✓ ¡Preferencias guardadas!",
+  "member_update_nickname_prompt": "Ingresa tu nuevo apodo:",
+  "member_nickname_placeholder": "Mi apodo increíble",
+  "member_back_to_event": "← Volver al Evento",
+  "dashboard_delete_event": "🗑️ Eliminar",
+  "email_magic_link_subject": "🎄 Tu Enlace de Inicio de Sesión de Secret Santa",
+  "email_magic_link_greeting": "¡Hola {{ name }}!",
+  "email_magic_link_click_link": "Haz clic en el enlace a continuación para iniciar sesión en tu cuenta de Secret Santa:",
+  "email_magic_link_expires": "Este enlace expirará en 1 hora.",
+  "email_magic_link_ignore": "Si no solicitaste esto, puedes ignorar este correo electrónico con seguridad.",
+  "email_magic_link_closing": "¡Feliz regalo! 🎁",
+  "email_assignment_subject": "🎅 Tu Asignación de Secret Santa - {{ event_name }}",
+  "email_assignment_greeting": "¡Hola {{ name }}!",
+  "email_assignment_ready": "¡Tu asignación de Secret Santa para \"{{ event_name }}\" está lista! 🎁",
+  "email_assignment_you_are_giving": "Eres el Secret Santa para: {{ recipient_name }}",
+  "email_assignment_keep_secret": "¡Mantenlo en secreto y diviértete comprando el regalo perfecto!",
+  "email_assignment_event_details": "Detalles del Evento:",
+  "email_assignment_event_name_label": "Evento:",
+  "email_assignment_organizer_label": "Organizado por:",
+  "email_assignment_closing": "¡Feliz regalo! 🎄"
 }
-
-

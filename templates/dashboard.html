@@ -198,19 +198,19 @@
 
                 <div class="event-actions">
                     <a href="{{ item.event.management_url }}" class="btn btn-primary" style="flex: 1;">
-                        ⚙️ {{ t('dashboard_manage') }}
+                        {{ t('dashboard_manage') }}
                     </a>
                     {% if item.is_participating %}
                     <a href="{{ item.member_url }}" class="btn btn-dark">
-                        👤 {{ t('dashboard_my_page') }}
+                        {{ t('dashboard_my_page') }}
                     </a>
                     {% elif item.event.status.value == 'registration_open' %}
                     <button onclick="joinEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-dark">
-                        🎁 {{ t('dashboard_join_event') }}
+                        {{ t('dashboard_join_event') }}
                     </button>
                     {% endif %}
                     <button onclick="copyLink('{{ item.event.registration_url }}')" class="btn btn-secondary">
-                        📋 {{ t('dashboard_copy_link') }}
+                        {{ t('dashboard_copy_link') }}
                     </button>
                     {% if item.event.status.value == 'event_closed' %}
                     <button onclick="deleteEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-danger btn-icon">
