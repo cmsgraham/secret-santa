@@ -3,19 +3,30 @@
  * Provides elegant, accessible notification messages for the Secret Santa app
  */
 
-class NotificationSystem {
-    constructor() {
-        this.container = null;
-        this.toasts = [];
-        this.init();
-    }
+// Prevent duplicate class declaration
+if (typeof NotificationSystem === 'undefined') {
+    class NotificationSystem {
+        constructor() {
+            this.container = null;
+            this.toasts = [];
+            this.init();
+        }
 
-    init() {
-        // Create container for toasts
-        this.container = document.createElement('div');
-        this.container.className = 'toast-container';
-        document.body.appendChild(this.container);
-    }
+        init() {
+            // Wait for DOM to be ready
+            if (!document.body) {
+                document.addEventListener('DOMContentLoaded', () => this.init());
+                return;
+            }
+            
+            // Only initialize once
+            if (this.container) return;
+            
+            // Create container for toasts
+            this.container = document.createElement('div');
+            this.container.className = 'toast-container';
+            document.body.appendChild(this.container);
+        }
 
     /**
      * Show a toast notification
@@ -229,6 +240,7 @@ class ConfirmationDialog {
         return div.innerHTML;
     }
 }
+} // Close the typeof check
 
 // Initialize notification system globally
 let notify = new NotificationSystem();
