@@ -6,6 +6,231 @@
     <title>{{ t('manage_event_title', event_name=event.name) }} - {{ t('app_name') }}</title>
     <script src="{{ url_for('static', filename='notifications.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=7">
+    <script>
+        function copyRegistrationLink() {
+            const input = document.getElementById('registrationLink');
+            const text = input.value;
+            
+            // Try modern Clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        notify.success('{{ t("manage_event_copy_success") }}');
+                    })
+                    .catch(() => {
+                        // Fallback to older method
+                        fallbackCopy(input);
+                    });
+            } else {
+                // Fallback for older browsers
+                fallbackCopy(input);
+            }
+        }
+
+        function fallbackCopy(input) {
+            try {
+                input.select();
+                input.setSelectionRange(0, 99999); // For mobile devices
+                document.execCommand('copy');
+                notify.success('{{ t("manage_event_copy_success") }}');
+            } catch (e) {
+                notify.error('Error', '{{ t("manage_event_copy_error") }}\n\n' + input.value);
+            }
+        }
+
+        async function runDraw() {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Run Draw',
+                message: '{{ t("manage_event_draw_confirm") }}',
+                confirmText: 'Draw',
+                cancelText: 'Cancel'
+            });
+            if (!confirmed) {
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '{{ t("manage_event_draw_running") }}';
+
+            try {
+                const response = await fetch('{{ url_for("run_draw", code=event.code) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '{{ t("manage_event_draw_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    setTimeout(() => window.location.reload(), 2000);
+                } else {
+                    showMessage('error', data.error || '{{ t("manage_event_error_draw") }}');
+                    btn.disabled = false;
+                    btn.textContent = '{{ t("manage_event_draw_button") }}';
+                }
+            } catch (error) {
+                showMessage('error', '{{ t("manage_event_error_draw") }}');
+                btn.disabled = false;
+                btn.textContent = '{{ t("manage_event_draw_button") }}';
+            }
+        }
+
+        async function reopenRegistration() {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Reopen Registration',
+                message: '{{ t("manage_event_reopen_confirm") }}',
+                confirmText: 'Reopen',
+                cancelText: 'Cancel',
+                isDangerous: true
+            });
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("reopen_event", code=event.code) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '{{ t("manage_event_reopen_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('error', data.error || '{{ t("manage_event_error_reopen") }}');
+                }
+            } catch (error) {
+                showMessage('error', '{{ t("manage_event_error_reopen") }}');
+            }
+        }
+
+        async function rerunDraw() {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Rerun Draw',
+                message: '{{ t("manage_event_rerun_confirm") }}',
+                confirmText: 'Rerun',
+                cancelText: 'Cancel',
+                isDangerous: true
+            });
+            if (!confirmed) {
+                return;
+            }
+
+            await runDraw();
+        }
+
+        async function closeEvent() {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Close Event',
+                message: '{{ t("manage_event_close_confirm") }}',
+                confirmText: 'Close',
+                cancelText: 'Cancel',
+                isDangerous: true
+            });
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("close_event", code=event.code) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '{{ t("manage_event_close_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('error', data.error || '{{ t("manage_event_error_close") }}');
+                }
+            } catch (error) {
+                showMessage('error', '{{ t("manage_event_error_close") }}');
+            }
+        }
+
+        async function toggleGuessing() {
+            const currentState = {{ 'true' if event.guessing_enabled else 'false' }};
+            const message = currentState ? '{{ t("manage_event_guessing_disable_confirm") }}' : '{{ t("manage_event_guessing_enable_confirm") }}';
+            
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Toggle Guessing',
+                message: message,
+                confirmText: currentState ? 'Disable' : 'Enable',
+                cancelText: 'Cancel'
+            });
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("toggle_guessing", code=event.code) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '{{ t("manage_event_guessing_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('error', data.error || '{{ t("manage_event_error_guessing") }}');
+                }
+            } catch (error) {
+                showMessage('error', '{{ t("manage_event_error_guessing") }}');
+            }
+        }
+
+        async function removeParticipant(participantId, participantName) {
+            const msg = '{{ t("manage_event_remove_confirm", name="PLACEHOLDER") }}'.replace('PLACEHOLDER', participantName);
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Remove Participant',
+                message: msg,
+                confirmText: 'Remove',
+                cancelText: 'Cancel',
+                isDangerous: true
+            });
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`{{ url_for("remove_participant", code=event.code, participant_id="PARTICIPANT_ID") }}`.replace('PARTICIPANT_ID', participantId), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '{{ t("manage_event_remove_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('error', data.error || '{{ t("manage_event_error_remove") }}');
+                }
+            } catch (error) {
+                showMessage('error', '{{ t("manage_event_error_remove") }}');
+            }
+        }
+
+        function showMessage(type, text) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
     <style>
         .manage-container {
             max-width: 900px;
@@ -284,230 +509,6 @@
     </div>
 
     <script>
-        function copyRegistrationLink() {
-            const input = document.getElementById('registrationLink');
-            const text = input.value;
-            
-            // Try modern Clipboard API first
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text)
-                    .then(() => {
-                        notify.success('{{ t("manage_event_copy_success") }}');
-                    })
-                    .catch(() => {
-                        // Fallback to older method
-                        fallbackCopy(input);
-                    });
-            } else {
-                // Fallback for older browsers
-                fallbackCopy(input);
-            }
-        }
-
-        function fallbackCopy(input) {
-            try {
-                input.select();
-                input.setSelectionRange(0, 99999); // For mobile devices
-                document.execCommand('copy');
-                notify.success('{{ t("manage_event_copy_success") }}');
-            } catch (e) {
-                notify.error('Error', '{{ t("manage_event_copy_error") }}\n\n' + input.value);
-            }
-        }
-
-        async function runDraw() {
-            const confirmed = await ConfirmationDialog.show({
-                title: 'Run Draw',
-                message: '{{ t("manage_event_draw_confirm") }}',
-                confirmText: 'Draw',
-                cancelText: 'Cancel'
-            });
-            if (!confirmed) {
-                return;
-            }
-
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '{{ t("manage_event_draw_running") }}';
-
-            try {
-                const response = await fetch('{{ url_for("run_draw", code=event.code) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage('success', '{{ t("manage_event_draw_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
-                    setTimeout(() => window.location.reload(), 2000);
-                } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_draw") }}');
-                    btn.disabled = false;
-                    btn.textContent = '{{ t("manage_event_draw_button") }}';
-                }
-            } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_draw") }}');
-                btn.disabled = false;
-                btn.textContent = '{{ t("manage_event_draw_button") }}';
-            }
-        }
-
-        async function reopenRegistration() {
-            const confirmed = await ConfirmationDialog.show({
-                title: 'Reopen Registration',
-                message: '{{ t("manage_event_reopen_confirm") }}',
-                confirmText: 'Reopen',
-                cancelText: 'Cancel',
-                isDangerous: true
-            });
-            if (!confirmed) {
-                return;
-            }
-
-            try {
-                const response = await fetch('{{ url_for("reopen_event", code=event.code) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage('success', '{{ t("manage_event_reopen_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_reopen") }}');
-                }
-            } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_reopen") }}');
-            }
-        }
-
-        async function rerunDraw() {
-            const confirmed = await ConfirmationDialog.show({
-                title: 'Rerun Draw',
-                message: '{{ t("manage_event_rerun_confirm") }}',
-                confirmText: 'Rerun',
-                cancelText: 'Cancel',
-                isDangerous: true
-            });
-            if (!confirmed) {
-                return;
-            }
-
-            await runDraw();
-        }
-
-        async function closeEvent() {
-            const confirmed = await ConfirmationDialog.show({
-                title: 'Close Event',
-                message: '{{ t("manage_event_close_confirm") }}',
-                confirmText: 'Close',
-                cancelText: 'Cancel',
-                isDangerous: true
-            });
-            if (!confirmed) {
-                return;
-            }
-
-            try {
-                const response = await fetch('{{ url_for("close_event", code=event.code) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage('success', '{{ t("manage_event_close_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_close") }}');
-                }
-            } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_close") }}');
-            }
-        }
-
-        async function toggleGuessing() {
-            const currentState = {{ 'true' if event.guessing_enabled else 'false' }};
-            const message = currentState ? '{{ t("manage_event_guessing_disable_confirm") }}' : '{{ t("manage_event_guessing_enable_confirm") }}';
-            
-            const confirmed = await ConfirmationDialog.show({
-                title: 'Toggle Guessing',
-                message: message,
-                confirmText: currentState ? 'Disable' : 'Enable',
-                cancelText: 'Cancel'
-            });
-            if (!confirmed) {
-                return;
-            }
-
-            try {
-                const response = await fetch('{{ url_for("toggle_guessing", code=event.code) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage('success', '{{ t("manage_event_guessing_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_guessing") }}');
-                }
-            } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_guessing") }}');
-            }
-        }
-
-        async function removeParticipant(participantId, participantName) {
-            const msg = '{{ t("manage_event_remove_confirm", name="PLACEHOLDER") }}'.replace('PLACEHOLDER', participantName);
-            const confirmed = await ConfirmationDialog.show({
-                title: 'Remove Participant',
-                message: msg,
-                confirmText: 'Remove',
-                cancelText: 'Cancel',
-                isDangerous: true
-            });
-            if (!confirmed) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`{{ url_for("remove_participant", code=event.code, participant_id="PARTICIPANT_ID") }}`.replace('PARTICIPANT_ID', participantId), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage('success', '{{ t("manage_event_remove_success", message="PLACEHOLDER") }}'.replace('PLACEHOLDER', '') + data.message);
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    showMessage('error', data.error || '{{ t("manage_event_error_remove") }}');
-                }
-            } catch (error) {
-                showMessage('error', '{{ t("manage_event_error_remove") }}');
-            }
-        }
-
-        function showMessage(type, text) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.className = 'message ' + type;
-            messageDiv.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
         // Add event listener for remove participant buttons
         document.addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('remove-participant-btn')) {
