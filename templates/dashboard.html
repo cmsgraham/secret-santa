@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Secret Santa</title>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         .dashboard-header {
@@ -167,7 +168,124 @@
 
         /* Language Selector Styles - imported from components/language_selector_assets.html */
     </style>
+    <script>
+        function copyLink(url) {
+            const fullUrl = window.location.origin + url;
+            
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    notify.success('{{ t("dashboard_copied") }}');
+                }).catch(err => {
+                    console.error('Clipboard API failed:', err);
+                    fallbackCopy(fullUrl);
+                });
+            } else {
+                // Fallback for browsers that don't support clipboard API
+                fallbackCopy(fullUrl);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            // Create temporary textarea
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    notify.success('{{ t("dashboard_copied") }}');
+                } else {
+                    // If copy fails, show prompt
+                    prompt('{{ t("dashboard_copy_prompt") }}', text);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                prompt('{{ t("dashboard_copy_prompt") }}', text);
+            }
+            
+            document.body.removeChild(textarea);
+        }
+
+        async function deleteEvent(code, name) {
+            const confirmMsg = `{{ t('dashboard_delete_confirm') }}`.replace('{{ name }}', name);
+            const confirmed = await ConfirmationDialog.show({
+                title: '{{ t("delete_event_title") or "Delete Event" }}',
+                message: confirmMsg,
+                confirmText: '{{ t("delete") or "Delete" }}',
+                cancelText: '{{ t("cancel") or "Cancel" }}',
+                isDangerous: true
+            });
+            
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch(`/event/${code}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    notify.success('{{ t("dashboard_deleted") }}');
+                    window.location.reload();
+                } else {
+                    notify.error('{{ t("dashboard_delete_failed") }}', data.error);
+                }
+            } catch (error) {
+                notify.error('{{ t("dashboard_delete_failed") }}');
+                console.error(error);
+            }
+        }
+
+        async function joinEvent(code, name) {
+            const confirmMsg = `{{ t('dashboard_join_confirm') }}`.replace('{{ name }}', name);
+            const confirmed = await ConfirmationDialog.show({
+                title: '{{ t("join_event_title") or "Join Event" }}',
+                message: confirmMsg,
+                confirmText: '{{ t("join") or "Join" }}',
+                cancelText: '{{ t("cancel") or "Cancel" }}'
+            });
+            
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch(`/event/${code}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    notify.success('{{ t("success") or "Success" }}', data.message);
+                    // Redirect to member page
+                    setTimeout(() => {
+                        window.location.href = data.member_url;
+                    }, 1000);
+                } else {
+                    notify.error('{{ t("dashboard_join_failed") }}', data.error);
+                }
+            } catch (error) {
+                notify.error('{{ t("dashboard_join_failed") }}');
+                console.error(error);
+            }
+        }
+    </script>
+    <style>
+        /* Language Selector Styles - imported from components/language_selector_assets.html */
+    </style>
     {% include 'components/language_selector_assets.html' %}
+</head>
 <body>
     <div class="container">
         <div class="dashboard-header">
@@ -306,118 +424,5 @@
         {% endif %}
     </div>
 
-    <script>
-        function copyLink(url) {
-            const fullUrl = window.location.origin + url;
-            
-            // Try modern clipboard API first
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(fullUrl).then(() => {
-                    notify.success('{{ t("dashboard_copied") }}');
-                }).catch(err => {
-                    console.error('Clipboard API failed:', err);
-                    fallbackCopy(fullUrl);
-                });
-            } else {
-                // Fallback for browsers that don't support clipboard API
-                fallbackCopy(fullUrl);
-            }
-        }
-        
-        function fallbackCopy(text) {
-            // Create temporary textarea
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    notify.success('{{ t("dashboard_copied") }}');
-                } else {
-                    // If copy fails, show prompt
-                    prompt('{{ t("dashboard_copy_prompt") }}', text);
-                }
-            } catch (err) {
-                console.error('Fallback copy failed:', err);
-                prompt('{{ t("dashboard_copy_prompt") }}', text);
-            }
-            
-            document.body.removeChild(textarea);
-        }
-
-        async function deleteEvent(code, name) {
-            const confirmMsg = `{{ t('dashboard_delete_confirm') }}`.replace('{{ name }}', name);
-            ConfirmationDialog.show({
-                title: '{{ t("delete_event_title") or "Delete Event" }}',
-                message: confirmMsg,
-                confirmText: '{{ t("delete") or "Delete" }}',
-                cancelText: '{{ t("cancel") or "Cancel" }}',
-                isDangerous: true
-            }).then(async (confirmed) => {
-                if (!confirmed) return;
-
-                try {
-                    const response = await fetch(`/event/${code}/delete`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        notify.success('{{ t("dashboard_deleted") }}');
-                        window.location.reload();
-                    } else {
-                        notify.error('{{ t("dashboard_delete_failed") }}', data.error);
-                    }
-                } catch (error) {
-                    notify.error('{{ t("dashboard_delete_failed") }}');
-                    console.error(error);
-                }
-            });
-
-        async function joinEvent(code, name) {
-            const confirmMsg = `{{ t('dashboard_join_confirm') }}`.replace('{{ name }}', name);
-            const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("join_event_title") or "Join Event" }}',
-                message: confirmMsg,
-                confirmText: '{{ t("join") or "Join" }}',
-                cancelText: '{{ t("cancel") or "Cancel" }}'
-            });
-            
-            if (!confirmed) return;
-
-            try {
-                const response = await fetch(`/event/${code}/join`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    notify.success('{{ t("success") or "Success" }}', data.message);
-                    // Redirect to member page
-                    setTimeout(() => {
-                        window.location.href = data.member_url;
-                    }, 1000);
-                } else {
-                    notify.error('{{ t("dashboard_join_failed") }}', data.error);
-                }
-            } catch (error) {
-                notify.error('{{ t("dashboard_join_failed") }}');
-                console.error(error);
-            }
-        }
-    </script>
-    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
 </body>
 </html>
