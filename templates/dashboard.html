@@ -212,13 +212,21 @@
 
         async function deleteEvent(code, name) {
             const msg = '{{ t("dashboard_delete_confirm") }}'.replace('{{ name }}', name);
-            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_delete_title") or "Delete Event" }}',message: msg,confirmText: '{{ t("button_delete") }}',cancelText: '{{ t("button_cancel") }}',isDangerous: true
+            const confirmed = await ConfirmationDialog.show({
+                title: '{{ t("dialog_delete_title") or "Delete Event" }}',
+                message: msg,
+                confirmText: '{{ t("button_delete") }}',
+                cancelText: '{{ t("button_cancel") }}',
+                isDangerous: true
             });
             
             if (!confirmed) return;
 
             try {
-                const response = await fetch(`/event/${code}/delete`, {method: 'POST',headers: {'Content-Type': 'application/json'
+                const response = await fetch(`/event/${code}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
                 });
 
@@ -238,13 +246,20 @@
 
         async function joinEvent(code, name) {
             const msg = '{{ t("dashboard_join_confirm") }}'.replace('{{ name }}', name);
-            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_join_title") or "Join Event" }}',message: msg,confirmText: '{{ t("button_join") }}',cancelText: '{{ t("button_cancel") }}'
+            const confirmed = await ConfirmationDialog.show({
+                title: '{{ t("dialog_join_title") or "Join Event" }}',
+                message: msg,
+                confirmText: '{{ t("button_join") }}',
+                cancelText: '{{ t("button_cancel") }}'
             });
             
             if (!confirmed) return;
 
             try {
-                const response = await fetch(`/event/${code}/join`, {method: 'POST',headers: {'Content-Type': 'application/json'
+                const response = await fetch(`/event/${code}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
                 });
 
@@ -253,7 +268,8 @@
                 if (data.success) {
                     notify.success('{{ t("success") or "Success" }}', data.message);
                     // Redirect to member page
-                    setTimeout(() => {window.location.href = data.member_url;
+                    setTimeout(() => {
+                        window.location.href = data.member_url;
                     }, 1000);
                 } else {
                     notify.error('{{ t("dashboard_join_failed") }}', data.error);
