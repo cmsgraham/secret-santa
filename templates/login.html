@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Secret Santa</title>
+    <title>{{ t('page_title_login') }} - {{ t('app_name') }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         .login-container {
@@ -72,31 +72,31 @@
 <body>
     <div class="container">
         <nav style="margin-bottom: 2rem;">
-            <a href="{{ url_for('index') }}" style="color: #667eea; text-decoration: none; font-weight: bold;">← Back to Home</a>
+            <a href="{{ url_for('index') }}" style="color: #667eea; text-decoration: none; font-weight: bold;">{{ t('login_back_home') }}</a>
         </nav>
 
         <div class="login-container">
             <div class="login-header">
-                <h1>🎅 Welcome Back!</h1>
-                <p>We'll send you a magic link to sign in</p>
+                <h1>🎅 {{ t('login_welcome') }}</h1>
+                <p>{{ t('login_subtitle') }}</p>
             </div>
 
             <div id="message" class="message"></div>
 
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus autocomplete="email">
+                    <label for="email">{{ t('login_email_label') }}</label>
+                    <input type="email" id="email" name="email" placeholder="{{ t('login_email_placeholder') }}" required autofocus autocomplete="email">
                 </div>
 
                 <button type="submit" style="all: revert; width: 100%; padding: 1rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
-                    Send Magic Link 🔗
+                    {{ t('login_send_link') }}
                 </button>
             </form>
 
             <div class="info-box">
-                <p><strong>No password needed!</strong></p>
-                <p>We'll email you a secure link to log in. The link expires in 1 hour.</p>
+                <p><strong>{{ t('login_info_no_password') }}</strong></p>
+                <p>{{ t('login_info_description') }}</p>
             </div>
         </div>
     </div>
@@ -123,7 +123,7 @@
             
             // Disable button and show loading
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending...';
+            submitBtn.textContent = '{{ t("login_sending") }}';
             messageDiv.style.display = 'none';
             
             const formData = {
@@ -142,19 +142,19 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    messageDiv.textContent = '✅ ' + data.message;
+                    messageDiv.textContent = '{{ t("login_success") }}';
                     messageDiv.className = 'message success';
                     messageDiv.style.display = 'block';
                     
                     // Clear form
                     e.target.reset();
                 } else {
-                    messageDiv.textContent = '❌ ' + data.error;
+                    messageDiv.textContent = data.error || '{{ t("login_error") }}';
                     messageDiv.className = 'message error';
                     messageDiv.style.display = 'block';
                 }
             } catch (error) {
-                messageDiv.textContent = '❌ Something went wrong. Please try again.';
+                messageDiv.textContent = '{{ t("login_generic_error") }}';
                 messageDiv.className = 'message error';
                 messageDiv.style.display = 'block';
             } finally {
