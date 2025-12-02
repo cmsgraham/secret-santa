@@ -3,9 +3,9 @@
  * Provides elegant, accessible notification messages for the Secret Santa app
  */
 
-// Prevent duplicate class declaration
+// Only declare the class if it doesn't exist
 if (typeof NotificationSystem === 'undefined') {
-    class NotificationSystem {
+    var NotificationSystem = class {
         constructor() {
             this.container = null;
             this.toasts = [];
@@ -13,7 +13,7 @@ if (typeof NotificationSystem === 'undefined') {
         }
 
         init() {
-            // Wait for DOM to be ready
+            // Wait for DOM if needed
             if (!document.body) {
                 document.addEventListener('DOMContentLoaded', () => this.init());
                 return;
@@ -159,13 +159,14 @@ if (typeof NotificationSystem === 'undefined') {
  * Confirmation Dialog System
  * Provides elegant confirmation prompts
  */
-class ConfirmationDialog {
-    /**
-     * Show a confirmation dialog
-     * @param {object} options - Configuration object
-     * @returns {Promise<boolean>} - Resolves to true if confirmed, false if cancelled
-     */
-    static show(options = {}) {
+if (typeof ConfirmationDialog === 'undefined') {
+    var ConfirmationDialog = class {
+        /**
+         * Show a confirmation dialog
+         * @param {object} options - Configuration object
+         * @returns {Promise<boolean>} - Resolves to true if confirmed, false if cancelled
+         */
+        static show(options = {}) {
         const {
             title = 'Confirm Action',
             message = 'Are you sure?',
@@ -239,11 +240,13 @@ class ConfirmationDialog {
         div.textContent = text;
         return div.innerHTML;
     }
-}
-} // Close the typeof check
+};
+} // End of typeof ConfirmationDialog check
 
-// Initialize notification system globally
-let notify = new NotificationSystem();
+// Initialize notification system globally (always, but only if not already done)
+if (typeof notify === 'undefined') {
+    var notify = new NotificationSystem();
+}
 
 // Compatibility layer for existing code using alert() and confirm()
 // This provides a migration path for the codebase
