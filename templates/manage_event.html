@@ -236,7 +236,7 @@
                     <div class="action-buttons">
                         <button onclick="reopenRegistration()" style="all: revert; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{{ t('manage_event_reopen_button') }}</button>
                         <button onclick="rerunDraw()" style="all: revert; padding: 0.75rem 1.5rem; background: #374151; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{{ t('manage_event_rerun_button') }}</button>
-                        <button onclick="toggleGuessing()" style="all: revert; padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{% if event.guessing_enabled %}🔍 {{ t('event_actions_guessing_enabled') }}{% else %}🔒 {{ t('event_actions_enable_guessing') }}{% endif %}</button>
+                        <button onclick="toggleGuessing()" style="all: revert; padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{{ t('manage_event_guessing_toggle', guessing_enabled=event.guessing_enabled) }}</button>
                         <button onclick="closeEvent()" style="all: revert; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">{{ t('manage_event_close_button') }}</button>
                     </div>
                 {% else %}
@@ -400,8 +400,6 @@
                 showMessage('error', '{{ t("manage_event_error_guessing") }}');
             }
         }
-
-        async function removeParticipant(participantId, participantName) {
             const msg = '{{ t("manage_event_remove_confirm", name='') }}'.replace('{{ name }}', participantName);
             if (!confirm(msg)) {
                 return;
