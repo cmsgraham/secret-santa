@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ t('manage_event_title', event_name=event.name) }} - {{ t('app_name') }}</title>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=7">
     <style>
         .manage-container {
@@ -339,7 +340,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_draw_success", message='') }}' + data.message);
+                    showMessage('success', '{{ t("manage_event_draw_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 2000);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_draw") }}');
@@ -375,7 +376,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_reopen_success", message='') }}' + data.message);
+                    showMessage('success', '{{ t("manage_event_reopen_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_reopen") }}');
@@ -422,7 +423,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_close_success", message='') }}' + data.message);
+                    showMessage('success', '{{ t("manage_event_close_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_close") }}');
@@ -456,7 +457,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_guessing_success", message='') }}' + data.message);
+                    showMessage('success', '{{ t("manage_event_guessing_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_guessing") }}');
@@ -467,7 +468,7 @@
         }
 
         async function removeParticipant(participantId, participantName) {
-            const msg = '{{ t("manage_event_remove_confirm", name="") }}'.replace('{{ name }}', participantName);
+            const msg = '{{ t("manage_event_remove_confirm", name="PLACEHOLDER") }}'.replace('PLACEHOLDER', participantName);
             const confirmed = await ConfirmationDialog.show({
                 title: 'Remove Participant',
                 message: msg,
@@ -489,7 +490,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', '{{ t("manage_event_remove_success", message='') }}' + data.message);
+                    showMessage('success', '{{ t("manage_event_remove_success", message="PLACEHOLDER") }}' .replace('PLACEHOLDER', '') + data.message);
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showMessage('error', data.error || '{{ t("manage_event_error_remove") }}');
@@ -535,6 +536,5 @@
         }, 10000);
         {% endif %}
     </script>
-    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
 </body>
 </html>
