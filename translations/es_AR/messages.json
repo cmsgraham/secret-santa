@@ -361,6 +361,7 @@
   "landing_nav_dashboard": "Panel",
   "landing_nav_logout": "Cerrar Sesión",
   "landing_nav_login": "Iniciar Sesión",
+  "dialog_delete_title": "Eliminar Evento",
   "dialog_run_draw_title": "Ejecutar Sorteo",
   "dialog_reopen_title": "Reabrir Registro",
   "dialog_rerun_title": "Reejecutar Sorteo",

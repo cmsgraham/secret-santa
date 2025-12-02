@@ -361,6 +361,7 @@
   "landing_nav_dashboard": "Dashboard",
   "landing_nav_logout": "Logout",
   "landing_nav_login": "Login",
+  "dialog_delete_title": "Delete Event",
   "dialog_run_draw_title": "Run Draw",
   "dialog_reopen_title": "Reopen Registration",
   "dialog_rerun_title": "Rerun Draw",

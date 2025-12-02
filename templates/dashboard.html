@@ -212,12 +212,12 @@
         }
 
         async function deleteEvent(code, name) {
-            const confirmMsg = `{{ t('dashboard_delete_confirm') }}`.replace('{{ name }}', name);
+            const msg = '{{ t("dashboard_delete_confirm") }}'.replace('{{ name }}', name);
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("delete_event_title") or "Delete Event" }}',
-                message: confirmMsg,
-                confirmText: '{{ t("delete") or "Delete" }}',
-                cancelText: '{{ t("cancel") or "Cancel" }}',
+                title: '{{ t("dialog_delete_title") or "Delete Event" }}',
+                message: msg,
+                confirmText: '{{ t("button_delete") }}',
+                cancelText: '{{ t("button_cancel") }}',
                 isDangerous: true
             });
             
