@@ -157,7 +157,7 @@
         }
 
         async function toggleGuessing() {
-            const currentState = {{ 'true' if event.guessing_enabled else 'false' }};
+            const currentState = {% if event.guessing_enabled %}true{% else %}false{% endif %};
             const message = currentState ? '{{ t("manage_event_guessing_disable_confirm") }}' : '{{ t("manage_event_guessing_enable_confirm") }}';
             
             const confirmed = await ConfirmationDialog.show({
