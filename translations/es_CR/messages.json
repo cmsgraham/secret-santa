@@ -362,6 +362,7 @@
   "landing_nav_logout": "Cerrar Sesión",
   "landing_nav_login": "Iniciar Sesión",
   "dialog_delete_title": "Eliminar Evento",
+  "dialog_join_title": "Unirse al Evento",
   "dialog_run_draw_title": "Ejecutar Sorteo",
   "dialog_reopen_title": "Reabrir Registro",
   "dialog_rerun_title": "Reejecutar Sorteo",
@@ -375,5 +376,6 @@
   "button_enable": "Habilitar",
   "button_disable": "Deshabilitar",
   "button_remove": "Eliminar",
+  "button_join": "Unirse",
   "button_cancel": "Cancelar"
 }

@@ -14,8 +14,7 @@
             // Try modern Clipboard API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text)
-                    .then(() => {
-                        notify.success('{{ t("manage_event_copy_success") }}');
+                    .then(() => {notify.success('{{ t("manage_event_copy_success") }}');
                     })
                     .catch(() => {
                         // Fallback to older method
@@ -39,11 +38,7 @@
         }
 
         async function runDraw() {
-            const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_run_draw_title") }}',
-                message: '{{ t("manage_event_draw_confirm") }}',
-                confirmText: '{{ t("button_draw") }}',
-                cancelText: '{{ t("button_cancel") }}'
+            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_run_draw_title") }}',message: '{{ t("manage_event_draw_confirm") }}',confirmText: '{{ t("button_draw") }}',cancelText: '{{ t("button_cancel") }}'
             });
             if (!confirmed) {
                 return;
@@ -54,10 +49,7 @@
             btn.textContent = '{{ t("manage_event_draw_running") }}';
 
             try {
-                const response = await fetch('{{ url_for("run_draw", code=event.code) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
+                const response = await fetch('{{ url_for("run_draw", code=event.code) }}', {method: 'POST',headers: { 'Content-Type': 'application/json' },credentials: 'include'
                 });
 
                 const data = await response.json();
@@ -78,22 +70,14 @@
         }
 
         async function reopenRegistration() {
-            const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_reopen_title") }}',
-                message: '{{ t("manage_event_reopen_confirm") }}',
-                confirmText: '{{ t("button_reopen") }}',
-                cancelText: '{{ t("button_cancel") }}',
-                isDangerous: true
+            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_reopen_title") }}',message: '{{ t("manage_event_reopen_confirm") }}',confirmText: '{{ t("button_reopen") }}',cancelText: '{{ t("button_cancel") }}',isDangerous: true
             });
             if (!confirmed) {
                 return;
             }
 
             try {
-                const response = await fetch('{{ url_for("reopen_event", code=event.code) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
+                const response = await fetch('{{ url_for("reopen_event", code=event.code) }}', {method: 'POST',headers: { 'Content-Type': 'application/json' },credentials: 'include'
                 });
 
                 const data = await response.json();
@@ -110,12 +94,7 @@
         }
 
         async function rerunDraw() {
-            const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_rerun_title") }}',
-                message: '{{ t("manage_event_rerun_confirm") }}',
-                confirmText: '{{ t("button_rerun") }}',
-                cancelText: '{{ t("button_cancel") }}',
-                isDangerous: true
+            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_rerun_title") }}',message: '{{ t("manage_event_rerun_confirm") }}',confirmText: '{{ t("button_rerun") }}',cancelText: '{{ t("button_cancel") }}',isDangerous: true
             });
             if (!confirmed) {
                 return;
@@ -125,22 +104,14 @@
         }
 
         async function closeEvent() {
-            const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_close_title") }}',
-                message: '{{ t("manage_event_close_confirm") }}',
-                confirmText: '{{ t("button_close") }}',
-                cancelText: '{{ t("button_cancel") }}',
-                isDangerous: true
+            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_close_title") }}',message: '{{ t("manage_event_close_confirm") }}',confirmText: '{{ t("button_close") }}',cancelText: '{{ t("button_cancel") }}',isDangerous: true
             });
             if (!confirmed) {
                 return;
             }
 
             try {
-                const response = await fetch('{{ url_for("close_event", code=event.code) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
+                const response = await fetch('{{ url_for("close_event", code=event.code) }}', {method: 'POST',headers: { 'Content-Type': 'application/json' },credentials: 'include'
                 });
 
                 const data = await response.json();
@@ -160,21 +131,14 @@
             const currentState = {% if event.guessing_enabled %}true{% else %}false{% endif %};
             const message = currentState ? '{{ t("manage_event_guessing_disable_confirm") }}' : '{{ t("manage_event_guessing_enable_confirm") }}';
             
-            const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_toggle_guessing_title") }}',
-                message: message,
-                confirmText: currentState ? '{{ t("button_disable") }}' : '{{ t("button_enable") }}',
-                cancelText: '{{ t("button_cancel") }}'
+            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_toggle_guessing_title") }}',message: message,confirmText: currentState ? '{{ t("button_disable") }}' : '{{ t("button_enable") }}',cancelText: '{{ t("button_cancel") }}'
             });
             if (!confirmed) {
                 return;
             }
 
             try {
-                const response = await fetch('{{ url_for("toggle_guessing", code=event.code) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
+                const response = await fetch('{{ url_for("toggle_guessing", code=event.code) }}', {method: 'POST',headers: { 'Content-Type': 'application/json' },credentials: 'include'
                 });
 
                 const data = await response.json();
@@ -192,22 +156,14 @@
 
         async function removeParticipant(participantId, participantName) {
             const msg = '{{ t("manage_event_remove_confirm", name="PLACEHOLDER") }}'.replace('PLACEHOLDER', participantName);
-            const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_remove_participant_title") }}',
-                message: msg,
-                confirmText: '{{ t("button_remove") }}',
-                cancelText: '{{ t("button_cancel") }}',
-                isDangerous: true
+            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_remove_participant_title") }}',message: msg,confirmText: '{{ t("button_remove") }}',cancelText: '{{ t("button_cancel") }}',isDangerous: true
             });
             if (!confirmed) {
                 return;
             }
 
             try {
-                const response = await fetch(`{{ url_for("remove_participant", code=event.code, participant_id="PARTICIPANT_ID") }}`.replace('PARTICIPANT_ID', participantId), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
+                const response = await fetch(`{{ url_for("remove_participant", code=event.code, participant_id="PARTICIPANT_ID") }}`.replace('PARTICIPANT_ID', participantId), {method: 'POST',headers: { 'Content-Type': 'application/json' },credentials: 'include'
                 });
 
                 const data = await response.json();
@@ -520,10 +476,8 @@
 
         // Auto-refresh participant count every 10 seconds during registration
         {% if event.status.value == 'registration_open' %}
-        setInterval(async () => {
-            try {
-                const response = await fetch('{{ url_for("get_participants", code=event.code) }}', {
-                    credentials: 'include'
+        setInterval(async () => {try {
+                const response = await fetch('{{ url_for("get_participants", code=event.code) }}', {credentials: 'include'
                 });
                 const data = await response.json();
                 
