@@ -174,7 +174,8 @@
             
             // Try modern clipboard API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(fullUrl).then(() => {notify.success('{{ t("dashboard_copied") }}');
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    notify.success('{{ t("dashboard_copied") }}');
                 }).catch(err => {
                     console.error('Clipboard API failed:', err);
                     fallbackCopy(fullUrl);
@@ -245,12 +246,12 @@
         }
 
         async function joinEvent(code, name) {
-            const msg = '{{ t("dashboard_join_confirm") }}'.replace('{{ name }}', name);
+            const confirmMsg = `{{ t('dashboard_join_confirm') }}`.replace('{{ name }}', name);
             const confirmed = await ConfirmationDialog.show({
-                title: '{{ t("dialog_join_title") or "Join Event" }}',
-                message: msg,
-                confirmText: '{{ t("button_join") }}',
-                cancelText: '{{ t("button_cancel") }}'
+                title: '{{ t("join_event_title") or "Join Event" }}',
+                message: confirmMsg,
+                confirmText: '{{ t("join") or "Join" }}',
+                cancelText: '{{ t("cancel") or "Cancel" }}'
             });
             
             if (!confirmed) return;
