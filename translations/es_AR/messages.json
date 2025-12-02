@@ -116,5 +116,30 @@
   "button_cancel": "Cancelar",
   "button_save": "Guardar",
   "button_delete": "Eliminar",
-  "button_edit": "Editar"
+  "button_edit": "Editar",
+  
+  "dashboard_welcome": "¡Bienvenido, {{ user_name }}!",
+  "dashboard_title": "Mi Panel",
+  "dashboard_events_created": "Mis Eventos",
+  "dashboard_events_participating": "Eventos en los que Participo",
+  "dashboard_no_events": "Sin Eventos Aún",
+  "dashboard_no_events_description": "¡Comienza creando tu primer evento Secret Santa!",
+  "dashboard_copy_link": "📋 Copiar Enlace",
+  "dashboard_join_event": "🎁 Unirme al Evento",
+  "dashboard_manage": "⚙️ Administrar",
+  "dashboard_my_page": "👤 Mi Página",
+  "dashboard_view_page": "Ver Mi Página →",
+  "dashboard_participants": "{{ count }} participantes",
+  "dashboard_code": "Código",
+  "dashboard_registered": "Registrado {{ date }}",
+  "dashboard_your_nickname": "Tu apodo",
+  "dashboard_join_confirm": "¿Unirte a \"{{ name }}\" como participante?\n\n¡Podrás añadir pistas, preferencias de regalo y obtener tu asignación de Secret Santa!",
+  "dashboard_delete_confirm": "¿Estás seguro de que deseas eliminar \"{{ name }}\"?\n\nEsta acción no se puede deshacer y eliminará:\n- Todos los participantes\n- Todas las asignaciones\n- Todos los datos del evento",
+  "dashboard_deleted": "✅ ¡Evento eliminado exitosamente!",
+  "dashboard_join_failed": "❌ Error al unirse al evento",
+  "dashboard_delete_failed": "❌ Error al eliminar el evento",
+  "dashboard_copied": "✅ ¡Enlace de registro copiado al portapapeles!",
+  "dashboard_copy_failed": "❌ Error al copiar el enlace",
+  "dashboard_copy_prompt": "Copiar este enlace"
 }
+

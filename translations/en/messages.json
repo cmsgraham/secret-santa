@@ -116,5 +116,30 @@
   "button_cancel": "Cancel",
   "button_save": "Save",
   "button_delete": "Delete",
-  "button_edit": "Edit"
+  "button_edit": "Edit",
+  
+  "dashboard_welcome": "Welcome back, {{ user_name }}!",
+  "dashboard_title": "My Dashboard",
+  "dashboard_events_created": "My Events",
+  "dashboard_events_participating": "Events I'm Participating In",
+  "dashboard_no_events": "No Events Yet",
+  "dashboard_no_events_description": "Get started by creating your first Secret Santa event!",
+  "dashboard_copy_link": "📋 Copy Link",
+  "dashboard_join_event": "🎁 Join Event",
+  "dashboard_manage": "⚙️ Manage",
+  "dashboard_my_page": "👤 My Page",
+  "dashboard_view_page": "View My Page →",
+  "dashboard_participants": "{{ count }} participants",
+  "dashboard_code": "Code",
+  "dashboard_registered": "Registered {{ date }}",
+  "dashboard_your_nickname": "Your nickname",
+  "dashboard_join_confirm": "Join \"{{ name }}\" as a participant?\n\nYou'll be able to add hints, gift preferences, and get a Secret Santa assignment!",
+  "dashboard_delete_confirm": "Are you sure you want to delete \"{{ name }}\"?\n\nThis action cannot be undone and will delete:\n- All participants\n- All assignments\n- All event data",
+  "dashboard_deleted": "✅ Event deleted successfully!",
+  "dashboard_join_failed": "❌ Failed to join event",
+  "dashboard_delete_failed": "❌ Failed to delete event",
+  "dashboard_copied": "✅ Registration link copied to clipboard!",
+  "dashboard_copy_failed": "❌ Failed to copy link",
+  "dashboard_copy_prompt": "Copy this link"
 }
+

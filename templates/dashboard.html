@@ -145,8 +145,8 @@
     <div class="container">
         <div class="dashboard-header">
             <div>
-                <h1>🎅 My Dashboard</h1>
-                <p>Welcome back, {{ user.name }}!</p>
+                <h1>🎅 {{ t('dashboard_title') }}</h1>
+                <p>{{ t('dashboard_welcome', user_name=user.name) }}</p>
             </div>
             <div style="display: flex; gap: 1rem; align-items: center;">
                 {% include 'components/language_selector.html' %}
@@ -161,7 +161,7 @@
 
         <!-- Events I Created -->
         {% if created_events %}
-        <h2 style="margin: 2rem 0 1rem 0; color: #374151;">🎄 My Events</h2>
+        <h2 style="margin: 2rem 0 1rem 0; color: #374151;">🎄 {{ t('dashboard_events_created') }}</h2>
         <div class="event-grid">
             {% for item in created_events %}
             <div class="event-card">
@@ -169,11 +169,11 @@
                 
                 <span class="event-status status-{{ item.event.status.value }}">
                     {% if item.event.status.value == 'registration_open' %}
-                        🟢 Registration Open
+                        🟢 {{ t('event_status_registration_open') }}
                     {% elif item.event.status.value == 'draw_completed' %}
-                        🎲 Draw Completed
+                        🎲 {{ t('event_status_draw_completed') }}
                     {% else %}
-                        🔒 Closed
+                        🔒 {{ t('event_status_closed') }}
                     {% endif %}
                 </span>
 
@@ -185,32 +185,32 @@
 
                 <div class="event-stats">
                     <div>
-                        <strong>{{ item.event.participant_count }}</strong> participants
+                        <strong>{{ item.event.participant_count }}</strong> {{ t('dashboard_participants', count=item.event.participant_count) }}
                     </div>
                     <div>
-                        Code: <strong>{{ item.event.code }}</strong>
+                        {{ t('dashboard_code') }}: <strong>{{ item.event.code }}</strong>
                     </div>
                 </div>
 
                 <div style="font-size: 0.85rem; color: #9ca3af; margin: 0.5rem 0;">
-                    Created {{ item.event.created_at.strftime('%b %d, %Y') }}
+                    {{ t('dashboard_registered', date=item.event.created_at.strftime('%b %d, %Y')) }}
                 </div>
 
                 <div class="event-actions">
                     <a href="{{ item.event.management_url }}" class="btn btn-primary" style="flex: 1;">
-                        ⚙️ Manage
+                        ⚙️ {{ t('dashboard_manage') }}
                     </a>
                     {% if item.is_participating %}
                     <a href="{{ item.member_url }}" class="btn btn-dark">
-                        👤 My Page
+                        👤 {{ t('dashboard_my_page') }}
                     </a>
                     {% elif item.event.status.value == 'registration_open' %}
                     <button onclick="joinEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-dark">
-                        🎁 Join Event
+                        🎁 {{ t('dashboard_join_event') }}
                     </button>
                     {% endif %}
                     <button onclick="copyLink('{{ item.event.registration_url }}')" class="btn btn-secondary">
-                        📋 Copy Link
+                        📋 {{ t('dashboard_copy_link') }}
                     </button>
                     {% if item.event.status.value == 'event_closed' %}
                     <button onclick="deleteEvent('{{ item.event.code }}', '{{ item.event.name }}')" class="btn btn-danger btn-icon">
@@ -225,7 +225,7 @@
 
         <!-- Events I'm Participating In -->
         {% if participating_events %}
-        <h2 style="margin: 2rem 0 1rem 0; color: #374151;">🎁 Events I'm Participating In</h2>
+        <h2 style="margin: 2rem 0 1rem 0; color: #374151;">🎁 {{ t('dashboard_events_participating') }}</h2>
         <div class="event-grid">
             {% for item in participating_events %}
             <div class="event-card">
@@ -233,30 +233,30 @@
                 
                 <span class="event-status status-{{ item.event.status.value }}">
                     {% if item.event.status.value == 'registration_open' %}
-                        📝 Registration Open
+                        📝 {{ t('event_status_registration_open') }}
                     {% elif item.event.status.value == 'draw_completed' %}
-                        🎅 Draw Completed
+                        🎅 {{ t('event_status_draw_completed') }}
                     {% else %}
-                        🔒 Closed
+                        🔒 {{ t('event_status_closed') }}
                     {% endif %}
                 </span>
 
                 <div style="background: #f3f4f6; padding: 10px; border-radius: 8px; margin: 1rem 0; font-size: 0.9rem;">
-                    <strong>Your nickname:</strong> {{ item.participant.nickname or item.participant.name }}
+                    <strong>{{ t('dashboard_your_nickname') }}:</strong> {{ item.participant.nickname or item.participant.name }}
                 </div>
 
                 <div class="event-stats">
                     <div>
-                        <strong>{{ item.event.participant_count }}</strong> participants
+                        <strong>{{ item.event.participant_count }}</strong> {{ t('dashboard_participants', count=item.event.participant_count) }}
                     </div>
                     <div>
-                        Registered {{ item.participant.registered_at.strftime('%b %d') }}
+                        {{ t('dashboard_registered', date=item.participant.registered_at.strftime('%b %d')) }}
                     </div>
                 </div>
 
                 <div class="event-actions">
                     <a href="{{ item.member_url }}" class="btn btn-primary" style="flex: 1;">
-                        View My Page →
+                        {{ t('dashboard_view_page') }}
                     </a>
                 </div>
             </div>
@@ -268,12 +268,12 @@
         {% if not created_events and not participating_events %}
         <div class="empty-state">
             <div class="empty-state-icon">🎁</div>
-            <h2>No Events Yet</h2>
+            <h2>{{ t('dashboard_no_events') }}</h2>
             <p style="color: #6b7280; margin: 1rem 0;">
-                Get started by creating your first Secret Santa event!
+                {{ t('dashboard_no_events_description') }}
             </p>
             <a href="{{ url_for('create_event') }}" class="btn btn-primary" style="margin-top: 1rem;">
-                ➕ Create Your First Event
+                ➕ {{ t('page_title_create_event') }}
             </a>
         </div>
         {% endif %}
@@ -286,7 +286,7 @@
             // Try modern clipboard API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(fullUrl).then(() => {
-                    alert('✅ Registration link copied to clipboard!');
+                    alert('{{ t("dashboard_copied") }}');
                 }).catch(err => {
                     console.error('Clipboard API failed:', err);
                     fallbackCopy(fullUrl);
@@ -309,21 +309,22 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    alert('✅ Registration link copied to clipboard!');
+                    alert('{{ t("dashboard_copied") }}');
                 } else {
                     // If copy fails, show prompt
-                    prompt('Copy this link:', text);
+                    prompt('{{ t("dashboard_copy_prompt") }}', text);
                 }
             } catch (err) {
                 console.error('Fallback copy failed:', err);
-                prompt('Copy this link:', text);
+                prompt('{{ t("dashboard_copy_prompt") }}', text);
             }
             
             document.body.removeChild(textarea);
         }
 
         async function deleteEvent(code, name) {
-            if (!confirm(`Are you sure you want to delete "${name}"?\n\nThis action cannot be undone and will delete:\n- All participants\n- All assignments\n- All event data`)) {
+            const confirmMsg = `{{ t('dashboard_delete_confirm') }}`.replace('{{ name }}', name);
+            if (!confirm(confirmMsg)) {
                 return;
             }
 
@@ -338,19 +339,20 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Event deleted successfully!');
+                    alert('{{ t("dashboard_deleted") }}');
                     window.location.reload();
                 } else {
-                    alert('❌ Error: ' + data.error);
+                    alert('{{ t("dashboard_delete_failed") }}: ' + data.error);
                 }
             } catch (error) {
-                alert('❌ Failed to delete event');
+                alert('{{ t("dashboard_delete_failed") }}');
                 console.error(error);
             }
         }
 
         async function joinEvent(code, name) {
-            if (!confirm(`Join "${name}" as a participant?\n\nYou'll be able to add hints, gift preferences, and get a Secret Santa assignment!`)) {
+            const confirmMsg = `{{ t('dashboard_join_confirm') }}`.replace('{{ name }}', name);
+            if (!confirm(confirmMsg)) {
                 return;
             }
 
@@ -369,10 +371,10 @@
                     // Redirect to member page
                     window.location.href = data.member_url;
                 } else {
-                    alert('❌ Error: ' + data.error);
+                    alert('{{ t("dashboard_join_failed") }}: ' + data.error);
                 }
             } catch (error) {
-                alert('❌ Failed to join event');
+                alert('{{ t("dashboard_join_failed") }}');
                 console.error(error);
             }
         }
