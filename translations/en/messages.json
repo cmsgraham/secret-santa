@@ -320,5 +320,13 @@
   "feed_back_to_dashboard": "← Dashboard",
   "feed_back": "← Back",
   "feed_like_tooltip": "Like",
-  "feed_comment_tooltip": "Comment"
+  "feed_comment_tooltip": "Comment",
+  "member_guess_your_santa_title": "Guess Your Secret Santa",
+  "member_guess_description": "The guessing phase is open! Who do you think is YOUR Secret Santa?",
+  "member_guess_submitted": "Guess submitted:",
+  "member_guess_results_pending": "Results will be revealed by the organizer!",
+  "member_guess_select_placeholder": "-- Select a participant --",
+  "member_guess_submit_button": "Submit Guess",
+  "member_other_hints_title": "Other Participants' Hints",
+  "member_other_hints_description": "Try to figure out who is who based on their hints!"
 }

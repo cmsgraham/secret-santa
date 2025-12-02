@@ -687,25 +687,25 @@
         <!-- Who's Your Secret Santa? (Guessing Section - only if enabled) -->
         {% if event.guessing_enabled and event.status.value in ['draw_completed', 'event_closed'] %}
         <div class="card">
-            <h2><span class="icon">🔍</span> Guess Your Secret Santa</h2>
-            <p>The guessing phase is open! Who do you think is YOUR Secret Santa?</p>
+            <h2><span class="icon">🔍</span> {{ t('member_guess_your_santa_title') }}</h2>
+            <p>{{ t('member_guess_description') }}</p>
             
             {% if participant.guessed_secret_santa_id %}
                 <div class="guess-result guess-pending">
-                    ✅ Guess submitted: {{ participant.guessed_secret_santa.nickname or participant.guessed_secret_santa.name }}
-                    <br><small>Results will be revealed by the organizer!</small>
+                    ✅ {{ t('member_guess_submitted') }} {{ participant.guessed_secret_santa.nickname or participant.guessed_secret_santa.name }}
+                    <br><small>{{ t('member_guess_results_pending') }}</small>
                 </div>
             {% else %}
                 <form id="guessForm">
                     <select class="participant-select" name="guess" required>
-                        <option value="">-- Select a participant --</option>
+                        <option value="">{{ t('member_guess_select_placeholder') }}</option>
                         {% for p in event.participants %}
                             {% if p.id != participant.id %}
                                 <option value="{{ p.id }}">{{ p.nickname or p.name }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn">Submit Guess</button>
+                    <button type="submit" class="btn">{{ t('member_guess_submit_button') }}</button>
                 </form>
             {% endif %}
         </div>
@@ -714,8 +714,8 @@
         <!-- Other Participants' Hints (only if draw is complete) -->
         {% if event.status.value in ['draw_completed', 'event_closed'] %}
         <div class="card">
-            <h2><span class="icon">👥</span> Other Participants' Hints</h2>
-            <p>Try to figure out who is who based on their hints!</p>
+            <h2><span class="icon">👥</span> {{ t('member_other_hints_title') }}</h2>
+            <p>{{ t('member_other_hints_description') }}</p>
             {% set has_hints = namespace(value=false) %}
             {% for p in event.participants %}
                 {% if p.id != participant.id and p.hints %}

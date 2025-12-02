@@ -320,5 +320,13 @@
   "feed_back_to_dashboard": "← Panel",
   "feed_back": "← Atrás",
   "feed_like_tooltip": "Me gusta",
-  "feed_comment_tooltip": "Comentario"
+  "feed_comment_tooltip": "Comentario",
+  "member_guess_your_santa_title": "Adivina a Tu Papá Noel",
+  "member_guess_description": "¡La fase de adivinanzas está abierta! ¿Quién crees que es TU Papá Noel?",
+  "member_guess_submitted": "Adivinanza enviada:",
+  "member_guess_results_pending": "¡Los resultados serán revelados por el organizador!",
+  "member_guess_select_placeholder": "-- Selecciona un participante --",
+  "member_guess_submit_button": "Enviar Adivinanza",
+  "member_other_hints_title": "Pistas de Otros Participantes",
+  "member_other_hints_description": "¡Intenta descubrir quién es quién basándote en sus pistas!"
 }
