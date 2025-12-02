@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Event - Secret Santa</title>
+    <title>{{ t('page_title_create_event') }} - {{ t('app_name') }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         .create-container {
@@ -55,27 +55,27 @@
     <div class="container">
         <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             {% if from_dashboard %}
-            <a href="{{ url_for('participant_dashboard') }}" style="color: #000000; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            <a href="{{ url_for('participant_dashboard') }}" style="color: #000000; text-decoration: none; font-weight: bold;">{{ t('create_event_back_dashboard') }}</a>
             {% else %}
-            <a href="{{ url_for('dashboard') }}" style="color: #000000; text-decoration: none; font-weight: bold;">← Back to Dashboard</a>
+            <a href="{{ url_for('dashboard') }}" style="color: #000000; text-decoration: none; font-weight: bold;">{{ t('create_event_back_dashboard') }}</a>
             {% endif %}
             <div>
-                <span>Hello, {{ user_name }}!</span>
+                <span>{{ t('create_event_hello', user_name=user_name) }}</span>
                 {% if from_dashboard %}
-                <a href="{{ url_for('participant_logout') }}" style="margin-left: 1rem; color: #000000;">Logout</a>
+                <a href="{{ url_for('participant_logout') }}" style="margin-left: 1rem; color: #000000;">{{ t('nav_logout') }}</a>
                 {% else %}
-                <a href="{{ url_for('logout') }}" style="margin-left: 1rem; color: #000000;">Logout</a>
+                <a href="{{ url_for('logout') }}" style="margin-left: 1rem; color: #000000;">{{ t('nav_logout') }}</a>
                 {% endif %}
             </div>
         </nav>
 
         <div class="create-container">
             <div style="text-align: center; margin-bottom: 2rem;">
-                <h1>🎄 Create New Event</h1>
+                <h1>🎄 {{ t('create_event_title') }}</h1>
                 {% if from_dashboard %}
-                <p>Creating as {{ user_email }}</p>
+                <p>{{ t('create_event_subtitle_participant', email=user_email) }}</p>
                 {% else %}
-                <p>Let's set up your Secret Santa gift exchange!</p>
+                <p>{{ t('create_event_subtitle_dashboard') }}</p>
                 {% endif %}
             </div>
 
@@ -83,8 +83,8 @@
 
             <form id="createEventForm">
                 <div class="form-section">
-                    <h3>Choose a Fun Event Name</h3>
-                    <p style="color: #6b7280; margin-bottom: 1rem;">Pick one of our suggestions or create your own:</p>
+                    <h3>{{ t('create_event_name_section') }}</h3>
+                    <p style="color: #6b7280; margin-bottom: 1rem;">{{ t('create_event_name_hint') }}</p>
                     
                     <div class="suggestions" id="suggestions">
                         {% for name in suggestions %}
@@ -96,37 +96,37 @@
 
                     <div style="text-align: center; margin: 1rem 0;">
                         <button type="button" style="all: revert; padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="loadMoreSuggestions()">
-                            🎲 Generate More Names
+                            {{ t('create_event_generate_names') }}
                         </button>
                     </div>
 
                     <div class="form-group">
-                        <label for="event_name">Or Enter Your Own Name:</label>
-                        <input type="text" id="event_name" name="event_name" placeholder="My Awesome Secret Santa" required>
+                        <label for="event_name">{{ t('create_event_custom_name') }}</label>
+                        <input type="text" id="event_name" name="event_name" placeholder="{{ t('create_event_custom_placeholder') }}" required>
                     </div>
                 </div>
 
                 <div class="form-section">
-                    <h3>Event Description (Optional)</h3>
+                    <h3>{{ t('create_event_description_section') }}</h3>
                     <div class="form-group">
-                        <label for="description">Add some details about your event:</label>
+                        <label for="description">{{ t('create_event_description_label') }}</label>
                         <textarea id="description" name="description" rows="3" 
-                                  placeholder="Annual family gift exchange, $25 limit, bring gifts to Christmas dinner!"
+                                  placeholder="{{ t('create_event_description_placeholder') }}"
                                   style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;"></textarea>
                     </div>
                 </div>
 
                 <div class="form-section" style="background: #eef2ff; border: 2px solid #667eea;">
-                    <h3>📋 What Happens Next?</h3>
+                    <h3>{{ t('create_event_next_steps') }}</h3>
                     <ol style="color: #374151; margin: 0;">
-                        <li>You'll get a unique event link to share</li>
-                        <li>Participants register themselves using the link</li>
-                        <li>When ready, you run the draw and everyone gets emailed!</li>
+                        <li>{{ t('create_event_step_1') }}</li>
+                        <li>{{ t('create_event_step_2') }}</li>
+                        <li>{{ t('create_event_step_3') }}</li>
                     </ol>
                 </div>
 
                 <button type="submit" style="all: revert; width: 100%; padding: 1rem; margin-top: 1rem; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
-                    🎁 Create Event
+                    {{ t('create_event_button') }}
                 </button>
             </form>
         </div>
@@ -153,7 +153,7 @@
             const suggestionsDiv = document.getElementById('suggestions');
             const button = event.target;
             button.disabled = true;
-            button.textContent = 'Generating...';
+            button.textContent = '{{ t("create_event_generating") }}';
             
             try {
                 const response = await fetch('{{ url_for("get_suggestions") }}?count=5');
@@ -168,7 +168,7 @@
                 console.error('Error loading suggestions:', error);
             } finally {
                 button.disabled = false;
-                button.textContent = '🎲 Generate More Names';
+                button.textContent = '{{ t("create_event_generate_names") }}';
             }
         }
 
@@ -180,7 +180,7 @@
             const originalBtnText = submitBtn.textContent;
             
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Creating...';
+            submitBtn.textContent = '{{ t("create_event_creating") }}';
             messageDiv.style.display = 'none';
             
             const formData = {
@@ -203,14 +203,14 @@
                     // Redirect to event management page
                     window.location.href = data.management_url;
                 } else {
-                    messageDiv.textContent = '❌ ' + (data.error || 'Failed to create event');
+                    messageDiv.textContent = data.error || '{{ t("create_event_error") }}';
                     messageDiv.className = 'message error';
                     messageDiv.style.display = 'block';
                     submitBtn.disabled = false;
                     submitBtn.textContent = originalBtnText;
                 }
             } catch (error) {
-                messageDiv.textContent = '❌ Something went wrong. Please try again.';
+                messageDiv.textContent = '{{ t("create_event_generic_error") }}';
                 messageDiv.className = 'message error';
                 messageDiv.style.display = 'block';
                 submitBtn.disabled = false;
