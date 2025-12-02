@@ -14,7 +14,7 @@ from functools import wraps
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, g
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.proxy_fix import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from email_validator import validate_email, EmailNotValidError
