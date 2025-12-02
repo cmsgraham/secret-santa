@@ -1,170 +1,73 @@
 """
-Funny and festive event name generator for Secret Santa
+Event name generator for Secret Santa - loads names from config/event_names.json
 Supports English and Spanish (multiple regions)
 """
 import random
 import string
+import json
+import os
+from functools import lru_cache
 
-# English word lists - Cultural events and celebrations
-ADJECTIVES_EN = [
-    "Merry", "Festive", "Magical", "Cozy", "Cheery", "Joyful", "Bright",
-    "Wonderful", "Fantastic", "Amazing", "Awesome", "Splendid", "Legendary"
-]
+# Path to configuration file
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config', 'event_names.json')
 
-NOUNS_EN = [
-    "Christmas Party", "Holiday Celebration", "Winter Festival", "Gift Exchange",
-    "Tree Trimming", "Caroling Night", "Ugly Sweater Party", "Cookie Exchange",
-    "Gingerbread Decorating", "Ornament Swap", "White Elephant", "Secret Santa",
-    "Holiday Potluck", "Eggnog Tasting", "Lights Tour", "Movie Marathon"
-]
+# Legacy naming for backward compatibility (fallback)
+ADJECTIVES_EN = ["Merry", "Festive", "Magical", "Cozy", "Cheery"]
+NOUNS_EN = ["Christmas Party", "Holiday Celebration", "Winter Festival"]
+ACTIVITIES_EN = ["2025", "Celebration", "Party"]
+YEARS_EN = ["2025"]
+THEMES_EN = ["Winter Wonderland Secret Santa", "North Pole Gift Exchange"]
 
-ACTIVITIES_EN = [
-    "2025", "Celebration", "Party", "Gathering", "Exchange", "Bash"
-]
-
-YEARS_EN = [
-    "2025"
-]
-
-THEMES_EN = [
-    "Winter Wonderland Secret Santa",
-    "North Pole Gift Exchange",
-    "Festive Holiday Celebration",
-    "Cozy Christmas Gathering",
-    "Magical Winter Party",
-    "Joyful Holiday Exchange",
-    "Merry Christmas Bash",
-    "Bright Holiday Festival"
-]
-
-# Spanish word lists - Cultural events and celebrations
-# Using names that make sense: festivals, TV shows, parties, cultural events
-
-# Mexico: Día de Muertos, Posadas, Carnaval, Las Mañanitas
-ADJECTIVES_ES_MX = [
-    "Festivo", "Navideño", "Colorido", "Alegre", "Tradicional", "Mágico", "Especial"
-]
-
-NOUNS_ES_MX = [
-    "Posadas", "Navidad", "Intercambio Navideño", "Fiesta Familiar",
-    "Cena Navideña", "Reunión Festiva", "Celebración Decembrina",
-    "Piñata Party", "Convivio", "Festejo Navideño", "Compartir Regalos"
-]
-
-ACTIVITIES_ES_MX = [
-    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Festejo"
-]
-
-THEMES_ES_MX = [
-    "Posadas Navideñas",
-    "Navidad Mexicana",
-    "Fiesta de Intercambio",
-    "Celebración Decembrina",
-    "Reunión Festiva"
-]
-
-# Costa Rica: Luces de Navidad, Las Festividades, Típicos
-ADJECTIVES_ES_CR = [
-    "Festivo", "Navideño", "Tico", "Alegre", "Especial", "Mágico", "Cálido"
-]
-
-NOUNS_ES_CR = [
-    "Luces de Navidad", "Navidad Tica", "Intercambio Festivo",
-    "Cena Navideña", "Fiesta Familiar", "Convivio Navideño",
-    "Típicos Navideños", "Posada Tica", "Reunión Decembrina", "Celebración Costarricense"
-]
-
-ACTIVITIES_ES_CR = [
-    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Convivio"
-]
-
-THEMES_ES_CR = [
-    "Luces de Navidad Costa Rica",
-    "Navidad Tica",
-    "Fiesta Costarricense",
-    "Celebración Tica",
-    "Reunión Festiva"
-]
-
-# Colombia: Festival de Luces, Navidad, Cumbia
-ADJECTIVES_ES_CO = [
-    "Festivo", "Navideño", "Colorido", "Alegre", "Tradicional", "Mágico", "Caluroso"
-]
-
-NOUNS_ES_CO = [
-    "Festival de Luces", "Navidad Colombiana", "Intercambio Navideño",
-    "Fiesta Familiar", "Cena Navideña", "Celebración Decembrina",
-    "Convivio Navideño", "Reunión Festiva", "Cumbia Navideña", "Compartir Regalos"
-]
-
-ACTIVITIES_ES_CO = [
-    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Festival"
-]
-
-THEMES_ES_CO = [
-    "Festival de Luces",
-    "Navidad Colombiana",
-    "Fiesta de Intercambio",
-    "Celebración Navideña",
-    "Reunión Festiva"
-]
-
-# Argentina: Asado Navideño, Tango, Fiesta
-ADJECTIVES_ES_AR = [
-    "Festivo", "Navideño", "Argentino", "Alegre", "Especial", "Mágico", "Caluroso"
-]
-
-NOUNS_ES_AR = [
-    "Asado Navideño", "Navidad Argentina", "Intercambio de Regalos",
-    "Fiesta Familiar", "Cena Navideña", "Reunión Festiva",
-    "Convivio Navideño", "Abrazo Navideño", "Celebración Decembrina", "Compartir en Familia"
-]
-
-ACTIVITIES_ES_AR = [
-    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Abrazo"
-]
-
-THEMES_ES_AR = [
-    "Asado Navideño",
-    "Navidad Argentina",
-    "Fiesta de Intercambio",
-    "Celebración Navideña",
-    "Reunión Familiar"
-]
-
-# Spain: Nochebuena, Roscón de Reyes, Cena Navideña
-ADJECTIVES_ES_ES = [
-    "Festivo", "Navideño", "Español", "Alegre", "Tradicional", "Mágico", "Especial"
-]
-
-NOUNS_ES_ES = [
-    "Nochebuena", "Roscón de Reyes", "Cena Navideña",
-    "Intercambio Navideño", "Fiesta Familiar", "Reunión Festiva",
-    "Celebración Española", "Convivio Navideño", "Turrón Party", "Champagne y Uvas"
-]
-
-ACTIVITIES_ES_ES = [
-    "2025", "Celebración", "Fiesta", "Reunión", "Intercambio", "Cena"
-]
-
-THEMES_ES_ES = [
-    "Nochebuena Española",
-    "Navidad Española",
-    "Roscón de Reyes",
-    "Celebración Navideña",
-    "Reunión Festiva"
-]
-
-# Legacy naming for backward compatibility
 ADJECTIVES = ADJECTIVES_EN
 NOUNS = NOUNS_EN
 ACTIVITIES = ACTIVITIES_EN
 YEARS = YEARS_EN
 THEMES = THEMES_EN
 
+
+@lru_cache(maxsize=1)
+def _load_event_names_config():
+    """Load event names configuration from JSON file"""
+    try:
+        if os.path.exists(CONFIG_PATH):
+            with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Warning: Could not load event names config: {e}")
+    
+    # Return a minimal fallback if config file not found
+    return {
+        'en': {
+            'adjectives': ADJECTIVES_EN,
+            'nouns': NOUNS_EN,
+            'activities': ACTIVITIES_EN,
+            'themes': THEMES_EN
+        }
+    }
+
+
+def _get_config_for_locale(locale="en"):
+    """Get configuration for a specific locale"""
+    config = _load_event_names_config()
+    
+    if locale in config:
+        return config[locale]
+    
+    # Fallback to English
+    if 'en' in config:
+        return config['en']
+    
+    # Last resort: use hardcoded defaults
+    return {
+        'adjectives': ADJECTIVES_EN,
+        'nouns': NOUNS_EN,
+        'activities': ACTIVITIES_EN,
+        'themes': THEMES_EN
+    }
+
 def generate_event_name(style="default", locale="en"):
     """
-    Generate a meaningful Secret Santa event name based on cultural references
+    Generate a meaningful Secret Santa event name based on language configuration
     
     Args:
         style: Type of name to generate
@@ -172,57 +75,22 @@ def generate_event_name(style="default", locale="en"):
             - "theme": Theme-based name
             - "year": Name with year
             - "funny": Extra adjective + noun combination
-        locale: Language code
-            - "en": English (default)
-            - "es_MX": Spanish (Mexico)
-            - "es_CR": Spanish (Costa Rica)
-            - "es_CO": Spanish (Colombia)
-            - "es_AR": Spanish (Argentina)
-            - "es_ES": Spanish (Spain)
+        locale: Language code (e.g., "en", "es_MX", "es_CR", "es_CO", "es_AR", "es_ES")
     
     Returns:
-        str: Generated event name
+        str: Generated event name loaded from config
     """
-    # Select word lists based on locale
-    if locale == 'es_MX':
-        adjectives = ADJECTIVES_ES_MX
-        nouns = NOUNS_ES_MX
-        activities = ACTIVITIES_ES_MX
-        years = ACTIVITIES_ES_MX  # Just year format
-        themes = THEMES_ES_MX
-    elif locale == 'es_CR':
-        adjectives = ADJECTIVES_ES_CR
-        nouns = NOUNS_ES_CR
-        activities = ACTIVITIES_ES_CR
-        years = ACTIVITIES_ES_CR
-        themes = THEMES_ES_CR
-    elif locale == 'es_CO':
-        adjectives = ADJECTIVES_ES_CO
-        nouns = NOUNS_ES_CO
-        activities = ACTIVITIES_ES_CO
-        years = ACTIVITIES_ES_CO
-        themes = THEMES_ES_CO
-    elif locale == 'es_AR':
-        adjectives = ADJECTIVES_ES_AR
-        nouns = NOUNS_ES_AR
-        activities = ACTIVITIES_ES_AR
-        years = ACTIVITIES_ES_AR
-        themes = THEMES_ES_AR
-    elif locale == 'es_ES':
-        adjectives = ADJECTIVES_ES_ES
-        nouns = NOUNS_ES_ES
-        activities = ACTIVITIES_ES_ES
-        years = ACTIVITIES_ES_ES
-        themes = THEMES_ES_ES
-    else:
-        # English (default)
-        adjectives = ADJECTIVES_EN
-        nouns = NOUNS_EN
-        activities = ACTIVITIES_EN
-        years = YEARS_EN
-        themes = THEMES_EN
+    config = _get_config_for_locale(locale)
     
-    if style == "theme":
+    adjectives = config.get('adjectives', [])
+    nouns = config.get('nouns', [])
+    activities = config.get('activities', [])
+    themes = config.get('themes', [])
+    
+    if not adjectives or not nouns:
+        return "Secret Santa 2025"  # Fallback
+    
+    if style == "theme" and themes:
         theme = random.choice(themes)
         return f"{theme} 2025"
     

@@ -1,0 +1,45 @@
+{
+  "en": [
+    "Super Santa", "Magical Rudolph", "Lucky Buddy", "Jolly Krampus", "Happy Mrs. Claus",
+    "Brilliant Elf", "Clever Scrooge", "Super Jack Frost", "Magical Frosty", "Lucky Grinch",
+    "Jolly Mariah", "Happy Kevin McCallister", "Brilliant Clark", "Clever Ralphie", "Super George Bailey",
+    "Magical Ebenezer", "Lucky Blitzen", "Jolly Donner", "Happy Cupid", "Brilliant Dancer",
+    "Clever Prancer", "Super Vixen", "Magical Comet", "Lucky Dasher", "Jolly Cupid Jr.",
+    "Happy Tinsel", "Brilliant Snowball", "Clever Holly", "Super Candy Cane", "Magical Stocking"
+  ],
+  "es_MX": [
+    "Super Cantinflas", "Mágico Chespirito", "Alegre Chavo", "Travieso Quico", "Ingenioso Doña Florinda",
+    "Astuto Don Ramón", "Valiente Kalimba", "Super Speedy González", "Mágico Pancho Villa", "Alegre La Catrina",
+    "Travieso Frida Kahlo", "Ingenioso Diego Rivera", "Astuto Mariachi", "Valiente Lucha Libre", "Super Godzilla",
+    "Mágico El Santo", "Alegre Pelé", "Travieso Guillermo del Toro", "Ingenioso Salma Hayek", "Astuto Emiliano Zapata",
+    "Valiente María Félix", "Super Dolores Hidalgo", "Mágico Benito Juárez", "Alegre Emilio Fernández", "Travieso Octavio Paz"
+  ],
+  "es_CR": [
+    "Super Pura Vida", "Mágico Tico", "Tico Caballero de la Noche", "Alegre Oscar Arias", "Travieso Don Pepe",
+    "Ingenioso Manuel de Jesús", "Astuto Arenal", "Valiente Tarzan", "Super Sloth", "Mágico Howler Monkey",
+    "Alegre Quetzal", "Travieso Papagayo", "Ingenioso Eco-Warrior", "Astuto Ecoturista", "Valiente Campesino",
+    "Super Carero", "Mágico Bribri", "Alegre Cabécar", "Travieso Boruca", "Ingenioso Garabito",
+    "Astuto Monteverde", "Valiente Fortuna", "Super Sarapiquí", "Mágico Cahuita", "Alegre Manuel Antonio"
+  ],
+  "es_CO": [
+    "Super Gabriel García Márquez", "Mágico Fernando Botero", "Alegre Shakira", "Travieso Juanes", "Ingenioso Juan Pablo Montoya",
+    "Astuto Colombiana", "Valiente Vallenato", "Super Cumbiambero", "Mágico Paciencia", "Alegre Narino",
+    "Travieso Bolívar", "Ingenioso José Martí", "Astuto Che Guevara", "Valiente Gaitero", "Super Zapatista",
+    "Mágico Cafe Juan", "Alegre Cartagenero", "Travieso Medellín", "Ingenioso Cali Salsa", "Astuto Picaro",
+    "Valiente Coronado", "Super Mutis", "Mágico Vásquez Castillo", "Alegre Barranquilla", "Travieso Santander"
+  ],
+  "es_AR": [
+    "Super Maradona", "Mágico Messi", "Boludo Evita", "Astuto Juan Perón", "Ingenioso Jorge Luis Borges",
+    "Picante Carlos Gardel", "Valiente Tanguero", "Super Gauchos", "Mágico Borracho", "Alegre Diego",
+    "Travieso Che Guevara", "Ingenioso Alfonsina", "Astuto Cortázar", "Valiente Piazzolla", "Super Tango",
+    "Mágico Bonaerense", "Alegre Porteño", "Travieso Cocoliche", "Ingenioso Lunfardo", "Astuto Fierro",
+    "Picante Susanita", "Boludo Miguelito", "Valiente Libertad", "Super Belgrano", "Mágico San Martín"
+  ],
+  "es_ES": [
+    "Super Don Quijote", "Mágico Sancho Panza", "Español El Cid", "Alegre Zorro", "Travieso Cervantes",
+    "Ingenioso Dalí", "Astuto Picasso", "Valiente Gaudí", "Super Lorca", "Mágico Goya",
+    "Alegre Pablo Casals", "Travieso Almodóvar", "Ingenioso Iglesias", "Astuto Antonio Banderas", "Valiente Carmen",
+    "Super Don Aníbal", "Mágico Flamenco", "Alegre Matador", "Travieso Bullfighter", "Ingenioso Manchego",
+    "Astuto Toledano", "Picante Sancho", "Boludo Quixotic", "Valiente Felipe", "Super Reina Letizia"
+  ]
+}
