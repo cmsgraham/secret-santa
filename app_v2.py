@@ -798,7 +798,8 @@ def register_participant(code):
         # Auto-generate nickname if not provided
         if not nickname:
             from nickname_generator import generate_nickname
-            nickname = generate_nickname()
+            locale = getattr(g, 'locale', 'en')
+            nickname = generate_nickname(locale=locale)
         
         # Check if already registered
         existing = Participant.query.filter_by(event_id=event.id, email=email).first()
@@ -1054,14 +1055,16 @@ def get_participants(code):
 def generate_name():
     """Generate a random event name"""
     style = request.args.get('style', 'default')
-    name = generate_event_name(style)
+    locale = getattr(g, 'locale', 'en')
+    name = generate_event_name(style, locale=locale)
     return jsonify({'name': name})
 
 @app.route('/api/event-names/suggestions')
 def get_suggestions():
     """Get multiple event name suggestions"""
     count = int(request.args.get('count', 5))
-    names = get_random_event_names(count)
+    locale = getattr(g, 'locale', 'en')
+    names = get_random_event_names(count, locale=locale)
     return jsonify({'names': names})
 
 # ============================================================================
