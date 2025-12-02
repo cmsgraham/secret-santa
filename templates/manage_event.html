@@ -14,7 +14,8 @@
             // Try modern Clipboard API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text)
-                    .then(() => {notify.success('{{ t("manage_event_copy_success") }}');
+                    .then(() => {
+                        notify.success('{{ t("manage_event_copy_success") }}');
                     })
                     .catch(() => {
                         // Fallback to older method
@@ -38,7 +39,11 @@
         }
 
         async function runDraw() {
-            const confirmed = await ConfirmationDialog.show({title: '{{ t("dialog_run_draw_title") }}',message: '{{ t("manage_event_draw_confirm") }}',confirmText: '{{ t("button_draw") }}',cancelText: '{{ t("button_cancel") }}'
+            const confirmed = await ConfirmationDialog.show({
+                title: '{{ t("dialog_run_draw_title") }}',
+                message: '{{ t("manage_event_draw_confirm") }}',
+                confirmText: '{{ t("button_draw") }}',
+                cancelText: '{{ t("button_cancel") }}'
             });
             if (!confirmed) {
                 return;
@@ -515,8 +520,10 @@
 
         // Auto-refresh participant count every 10 seconds during registration
         {% if event.status.value == 'registration_open' %}
-        setInterval(async () => {try {
-                const response = await fetch('{{ url_for("get_participants", code=event.code) }}', {credentials: 'include'
+        setInterval(async () => {
+            try {
+                const response = await fetch('{{ url_for("get_participants", code=event.code) }}', {
+                    credentials: 'include'
                 });
                 const data = await response.json();
                 
