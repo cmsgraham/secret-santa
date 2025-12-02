@@ -160,7 +160,9 @@
             button.textContent = '{{ t("create_event_generating") }}';
             
             try {
-                const response = await fetch('{{ url_for("get_suggestions") }}?count=5');
+                const response = await fetch('{{ url_for("get_suggestions") }}?count=5', {
+                    credentials: 'include'
+                });
                 const data = await response.json();
                 
                 if (data.names) {
@@ -198,6 +200,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify(formData)
                 });
                 
