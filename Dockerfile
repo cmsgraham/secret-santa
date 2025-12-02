@@ -36,6 +36,7 @@ COPY models.py .
 COPY event_names.py .
 COPY nickname_generator.py .
 COPY init_db.py .
+COPY migrate_add_language_support.py .
 COPY i18n.py .
 COPY jinja_i18n.py .
 COPY language_selector.py .
