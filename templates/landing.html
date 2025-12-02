@@ -88,14 +88,14 @@
         </nav>
 
         <div class="hero">
-            <h1>🎅 Secret Santa Made Easy</h1>
-            <p>Organize magical gift exchanges for your team, family, or friends</p>
+            <h1>{{ t('landing_hero_title') }}</h1>
+            <p>{{ t('landing_hero_subtitle') }}</p>
             <div class="cta-buttons">
                 {% if user %}
-                    <a href="{{ url_for('create_event') }}" class="btn-primary">Create New Event</a>
-                    <a href="{{ url_for('dashboard') }}" class="btn-secondary">My Events</a>
+                    <a href="{{ url_for('create_event') }}" class="btn-primary">{{ t('landing_hero_button_create') }}</a>
+                    <a href="{{ url_for('dashboard') }}" class="btn-secondary">{{ t('landing_hero_button_events') }}</a>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="btn-primary">Get Started Free</a>
+                    <a href="{{ url_for('login') }}" class="btn-primary">{{ t('landing_hero_button_start') }}</a>
                 {% endif %}
             </div>
         </div>
@@ -103,57 +103,57 @@
         <div class="features">
             <div class="feature">
                 <div class="feature-icon">🎁</div>
-                <h3>Easy Setup</h3>
-                <p>Create an event in seconds with funny auto-generated names</p>
+                <h3>{{ t('landing_feature_easy_title') }}</h3>
+                <p>{{ t('landing_feature_easy_desc') }}</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">🔗</div>
-                <h3>Simple Sharing</h3>
-                <p>Share a unique link for participants to register themselves</p>
+                <h3>{{ t('landing_feature_sharing_title') }}</h3>
+                <p>{{ t('landing_feature_sharing_desc') }}</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">🎲</div>
-                <h3>Fair Drawings</h3>
-                <p>Automated random assignment ensures no one gets themselves</p>
+                <h3>{{ t('landing_feature_fair_title') }}</h3>
+                <p>{{ t('landing_feature_fair_desc') }}</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">📧</div>
-                <h3>Email Notifications</h3>
-                <p>Everyone receives their assignment via email automatically</p>
+                <h3>{{ t('landing_feature_email_title') }}</h3>
+                <p>{{ t('landing_feature_email_desc') }}</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">🔒</div>
-                <h3>Private & Secure</h3>
-                <p>Each event has its own space, organizer controls everything</p>
+                <h3>{{ t('landing_feature_secure_title') }}</h3>
+                <p>{{ t('landing_feature_secure_desc') }}</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">♻️</div>
-                <h3>Flexible Management</h3>
-                <p>Reopen registration or rerun the draw anytime you need</p>
+                <h3>{{ t('landing_feature_flexible_title') }}</h3>
+                <p>{{ t('landing_feature_flexible_desc') }}</p>
             </div>
         </div>
 
         <div style="text-align: center; margin-top: 4rem; padding: 2rem; background: #f3f4f6; border-radius: 8px;">
-            <h2>How It Works</h2>
+            <h2>{{ t('landing_how_title') }}</h2>
             <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 200px;">
-                    <h3>1️⃣ Create Event</h3>
-                    <p>Sign in and create your Secret Santa event with a fun name</p>
+                    <h3>{{ t('landing_how_step1_title') }}</h3>
+                    <p>{{ t('landing_how_step1_desc') }}</p>
                 </div>
                 <div style="flex: 1; min-width: 200px;">
-                    <h3>2️⃣ Invite Participants</h3>
-                    <p>Share your unique event link for people to register</p>
+                    <h3>{{ t('landing_how_step2_title') }}</h3>
+                    <p>{{ t('landing_how_step2_desc') }}</p>
                 </div>
                 <div style="flex: 1; min-width: 200px;">
-                    <h3>3️⃣ Run the Draw</h3>
-                    <p>Click the button and everyone gets their assignment by email</p>
+                    <h3>{{ t('landing_how_step3_title') }}</h3>
+                    <p>{{ t('landing_how_step3_desc') }}</p>
                 </div>
             </div>
         </div>
 
         <footer style="text-align: center; margin-top: 4rem; padding: 2rem; color: #6b7280;">
-            <p>Made with ❤️ for organizing gift exchanges</p>
-            <p><a href="https://github.com/cmsgraham/secret-santa" target="_blank">View on GitHub</a></p>
+            <p>{{ t('landing_footer_made_with') }}</p>
+            <p><a href="https://github.com/cmsgraham/secret-santa" target="_blank">{{ t('landing_footer_view_github') }}</a></p>
         </footer>
     </div>
 </body>
