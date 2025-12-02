@@ -2,7 +2,7 @@
 Database models for Secret Santa application
 """
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, DateTime, Integer, Boolean, ForeignKey, Text, Enum
+from sqlalchemy import Column, String, DateTime, Integer, Boolean, ForeignKey, ForeignKeyConstraint, Text, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import enum
@@ -211,10 +211,13 @@ class FeedPost(Base):
 class FeedComment(Base):
     """Comment on a feed post"""
     __tablename__ = 'feed_comments'
+    __table_args__ = (
+        ForeignKeyConstraint(['participant_id'], ['participants.id'], ondelete='CASCADE'),
+    )
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     post_id = Column(String(100), nullable=False)  # Can be a UUID or pseudo-ID like "hint_<uuid>"
-    participant_id = Column(String(36), ForeignKey('participants.id', ondelete='CASCADE'), nullable=False)
+    participant_id = Column(String(36), nullable=False)
     
     # Comment content
     nickname = Column(String(255), nullable=False)  # Anonymous nickname for display
@@ -231,10 +234,13 @@ class FeedComment(Base):
 class FeedLike(Base):
     """Like on a feed post"""
     __tablename__ = 'feed_likes'
+    __table_args__ = (
+        ForeignKeyConstraint(['participant_id'], ['participants.id'], ondelete='CASCADE'),
+    )
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     post_id = Column(String(100), nullable=False)  # Can be a UUID or pseudo-ID like "hint_<uuid>"
-    participant_id = Column(String(36), ForeignKey('participants.id', ondelete='CASCADE'), nullable=False)
+    participant_id = Column(String(36), nullable=False)
     
     # Like metadata
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
