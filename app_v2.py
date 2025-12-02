@@ -74,24 +74,24 @@ def make_session_permanent_on_request():
 @app.before_request
 def detect_language():
     """Detect and set language from session, user preference, or Accept-Language header"""
-    # Check session first
+    # Check session first (this is the most recent choice)
     if 'language' in session:
         g.locale = session['language']
         return
     
-    # Check user preference if logged in
+    # Check user preference if logged in (and it's been explicitly set to something other than default)
     if 'user_id' in session:
         user = db.session.get(User, session['user_id'])
-        if user and user.preferred_language:
+        if user and user.preferred_language and user.preferred_language != DEFAULT_LOCALE:
             g.locale = user.preferred_language
             session['language'] = user.preferred_language
             session.modified = True
             return
     
-    # Check participant preference if session participant exists
+    # Check participant preference if session participant exists (and it's been explicitly set)
     if 'participant_id' in session:
         participant = db.session.get(Participant, session['participant_id'])
-        if participant and participant.preferred_language:
+        if participant and participant.preferred_language and participant.preferred_language != DEFAULT_LOCALE:
             g.locale = participant.preferred_language
             session['language'] = participant.preferred_language
             session.modified = True
@@ -110,7 +110,6 @@ def detect_language():
 def inject_locale():
     """Inject locale into template context for each request"""
     locale_value = g.get('locale', DEFAULT_LOCALE)
-    logger.debug(f'[LOCALE] Injecting locale into template context: {locale_value} (g.locale={g.get("locale")})')
     return {
         'locale': locale_value,
         'SUPPORTED_LOCALES': ['en', 'es_MX', 'es_CR', 'es_CO', 'es_AR', 'es_ES']
@@ -373,11 +372,8 @@ def create_secret_santa_assignments(event):
     raise ValueError("Could not create valid assignments after multiple attempts")
 
 # ============================================================================
-# Session Management
+# Session Management & Routes
 # ============================================================================
-
-@app.before_request
-
 
 @app.route('/test-translations')
 def test_translations():
@@ -441,10 +437,21 @@ def verify_magic_link(token):
     user = auth_token.user
     user.last_login = datetime.now(timezone.utc)
     
+    # Preserve language preference if already set, otherwise use user's preference or default
+    current_language = session.get('language')
+    
     # Log in user
     session['user_id'] = user.id
     session['user_email'] = user.email
     session['user_name'] = user.name
+    
+    # Restore or set language
+    if current_language:
+        session['language'] = current_language
+    elif user.preferred_language and user.preferred_language != DEFAULT_LOCALE:
+        session['language'] = user.preferred_language
+    else:
+        session['language'] = DEFAULT_LOCALE
     
     db.session.commit()
     

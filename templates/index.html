@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <div style="position: absolute; top: 1rem; right: 1rem;">
+        {% include 'components/language_selector.html' %}
+    </div>
     <div class="container">
         <header>
             <h1>🎅 Secret Santa Organizer</h1>

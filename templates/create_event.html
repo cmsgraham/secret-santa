@@ -59,13 +59,16 @@
             {% else %}
             <a href="{{ url_for('dashboard') }}" style="color: #000000; text-decoration: none; font-weight: bold;">{{ t('create_event_back_dashboard') }}</a>
             {% endif %}
-            <div>
-                <span>{{ t('create_event_hello', user_name=user_name) }}</span>
-                {% if from_dashboard %}
-                <a href="{{ url_for('participant_logout') }}" style="margin-left: 1rem; color: #000000;">{{ t('nav_logout') }}</a>
-                {% else %}
-                <a href="{{ url_for('logout') }}" style="margin-left: 1rem; color: #000000;">{{ t('nav_logout') }}</a>
-                {% endif %}
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                {% include 'components/language_selector.html' %}
+                <div>
+                    <span>{{ t('create_event_hello', user_name=user_name) }}</span>
+                    {% if from_dashboard %}
+                    <a href="{{ url_for('participant_logout') }}" style="margin-left: 1rem; color: #000000;">{{ t('nav_logout') }}</a>
+                    {% else %}
+                    <a href="{{ url_for('logout') }}" style="margin-left: 1rem; color: #000000;">{{ t('nav_logout') }}</a>
+                    {% endif %}
+                </div>
             </div>
         </nav>
 
