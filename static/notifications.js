@@ -28,15 +28,15 @@ if (typeof NotificationSystem === 'undefined') {
             document.body.appendChild(this.container);
         }
 
-    /**
-     * Show a toast notification
-     * @param {string} type - 'success', 'error', 'warning', 'info'
-     * @param {string} title - Notification title
-     * @param {string} message - Optional detailed message
-     * @param {number} duration - Auto-dismiss time in ms (0 = manual)
-     */
-    show(type, title, message = '', duration = 5000) {
-        const toastId = `toast-${Date.now()}-${Math.random()}`;
+        /**
+         * Show a toast notification
+         * @param {string} type - 'success', 'error', 'warning', 'info'
+         * @param {string} title - Notification title
+         * @param {string} message - Optional detailed message
+         * @param {number} duration - Auto-dismiss time in ms (0 = manual)
+         */
+        show(type, title, message = '', duration = 5000) {
+            const toastId = `toast-${Date.now()}-${Math.random()}`;
         
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
@@ -153,7 +153,8 @@ if (typeof NotificationSystem === 'undefined') {
         div.textContent = text;
         return div.innerHTML;
     }
-}
+};
+} // End of typeof NotificationSystem check
 
 /**
  * Confirmation Dialog System
@@ -167,80 +168,80 @@ if (typeof ConfirmationDialog === 'undefined') {
          * @returns {Promise<boolean>} - Resolves to true if confirmed, false if cancelled
          */
         static show(options = {}) {
-        const {
-            title = 'Confirm Action',
-            message = 'Are you sure?',
-            confirmText = 'Confirm',
-            cancelText = 'Cancel',
-            isDangerous = false
-        } = options;
+            const {
+                title = 'Confirm Action',
+                message = 'Are you sure?',
+                confirmText = 'Confirm',
+                cancelText = 'Cancel',
+                isDangerous = false
+            } = options;
 
-        return new Promise((resolve) => {
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
 
-            const modal = document.createElement('div');
-            modal.className = 'modal';
+                const modal = document.createElement('div');
+                modal.className = 'modal';
 
-            modal.innerHTML = `
-                <div class="modal-header">
-                    <h3>${this.escapeHtml(title)}</h3>
-                </div>
-                <div class="modal-body">
-                    ${this.escapeHtml(message)}
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-cancel">${this.escapeHtml(cancelText)}</button>
-                    <button class="btn-confirm ${isDangerous ? 'danger' : ''}">${this.escapeHtml(confirmText)}</button>
-                </div>
-            `;
+                modal.innerHTML = `
+                    <div class="modal-header">
+                        <h3>${this.escapeHtml(title)}</h3>
+                    </div>
+                    <div class="modal-body">
+                        ${this.escapeHtml(message)}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-cancel">${this.escapeHtml(cancelText)}</button>
+                        <button class="btn-confirm ${isDangerous ? 'danger' : ''}">${this.escapeHtml(confirmText)}</button>
+                    </div>
+                `;
 
-            overlay.appendChild(modal);
-            document.body.appendChild(overlay);
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
 
-            const cancelBtn = modal.querySelector('.btn-cancel');
-            const confirmBtn = modal.querySelector('.btn-confirm');
+                const cancelBtn = modal.querySelector('.btn-cancel');
+                const confirmBtn = modal.querySelector('.btn-confirm');
 
-            const cleanup = () => {
-                overlay.style.animation = 'fadeOut 0.2s ease-out';
-                setTimeout(() => {
-                    if (overlay.parentNode) {
-                        overlay.parentNode.removeChild(overlay);
-                    }
-                }, 200);
-            };
+                const cleanup = () => {
+                    overlay.style.animation = 'fadeOut 0.2s ease-out';
+                    setTimeout(() => {
+                        if (overlay.parentNode) {
+                            overlay.parentNode.removeChild(overlay);
+                        }
+                    }, 200);
+                };
 
-            cancelBtn.addEventListener('click', () => {
-                cleanup();
-                resolve(false);
-            });
-
-            confirmBtn.addEventListener('click', () => {
-                cleanup();
-                resolve(true);
-            });
-
-            // Allow Escape key to cancel
-            const escapeHandler = (e) => {
-                if (e.key === 'Escape') {
-                    document.removeEventListener('keydown', escapeHandler);
+                cancelBtn.addEventListener('click', () => {
                     cleanup();
                     resolve(false);
-                }
-            };
-            document.addEventListener('keydown', escapeHandler);
-        });
-    }
+                });
 
-    /**
-     * Escape HTML to prevent XSS
-     */
-    static escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-};
+                confirmBtn.addEventListener('click', () => {
+                    cleanup();
+                    resolve(true);
+                });
+
+                // Allow Escape key to cancel
+                const escapeHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        document.removeEventListener('keydown', escapeHandler);
+                        cleanup();
+                        resolve(false);
+                    }
+                };
+                document.addEventListener('keydown', escapeHandler);
+            });
+        }
+
+        /**
+         * Escape HTML to prevent XSS
+         */
+        static escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    };
 } // End of typeof ConfirmationDialog check
 
 // Initialize notification system globally (always, but only if not already done)
