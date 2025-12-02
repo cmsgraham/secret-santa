@@ -568,8 +568,8 @@
                     </div>
                     <div id="nicknameEdit" style="display: none; margin-bottom: 5px;">
                         <input type="text" id="nicknameInput" value="{{ participant.nickname or participant.name }}" maxlength="100" style="padding: 8px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; font-weight: bold; width: 300px; max-width: 100%;">
-                        <button class="btn" onclick="saveNickname()" style="padding: 8px 15px; margin-left: 5px;">Save</button>
-                        <button class="btn btn-secondary" onclick="cancelEditNickname()" style="padding: 8px 15px; margin-left: 5px;">Cancel</button>
+                        <button class="btn" onclick="saveNickname()" style="padding: 8px 15px; margin-left: 5px;">{{ t('member_nickname_save_button') }}</button>
+                        <button class="btn btn-secondary" onclick="cancelEditNickname()" style="padding: 8px 15px; margin-left: 5px;">{{ t('member_nickname_cancel_button') }}</button>
                     </div>
                     <div class="event-name">🎁 {{ event.name }}</div>
                     <div class="participant-info">{{ participant.email }}</div>

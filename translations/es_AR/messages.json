@@ -355,5 +355,7 @@
   "landing_how_step3_desc": "Haz clic en el botón y todos reciben su asignación por correo",
   "landing_footer_made_with": "Hecho con ❤️ para organizar intercambios de regalos",
   "login_spam_note": "💬 Consejo: ¡Si no recibes el correo, por favor revisa tu carpeta de spam o correo no deseado!",
-  "member_back_to_dashboard": "Volver al Panel"
+  "member_back_to_dashboard": "Volver al Panel",
+  "member_nickname_save_button": "Guardar",
+  "member_nickname_cancel_button": "Cancelar"
 }
