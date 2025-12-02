@@ -555,7 +555,8 @@ def create_event():
         })
     
     # GET request - show form with name suggestions
-    suggestions = get_random_event_names(5)
+    locale = getattr(g, 'locale', 'en')
+    suggestions = get_random_event_names(5, locale=locale)
     user_email = session.get('user_email', '')
     user_name = session.get('user_name', '')
     return render_template('create_event.html', 
