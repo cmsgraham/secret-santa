@@ -360,5 +360,18 @@
   "member_nickname_cancel_button": "Cancelar",
   "landing_nav_dashboard": "Panel",
   "landing_nav_logout": "Cerrar Sesión",
-  "landing_nav_login": "Iniciar Sesión"
+  "landing_nav_login": "Iniciar Sesión",
+  "dialog_run_draw_title": "Ejecutar Sorteo",
+  "dialog_reopen_title": "Reabrir Registro",
+  "dialog_rerun_title": "Reejecutar Sorteo",
+  "dialog_close_title": "Cerrar Evento",
+  "dialog_toggle_guessing_title": "Alternar Adivinanza",
+  "dialog_remove_participant_title": "Eliminar Participante",
+  "button_draw": "Sorteo",
+  "button_reopen": "Reabrir",
+  "button_rerun": "Reejecutar",
+  "button_close": "Cerrar",
+  "button_enable": "Habilitar",
+  "button_disable": "Deshabilitar",
+  "button_remove": "Eliminar"
 }

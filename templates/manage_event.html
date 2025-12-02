@@ -40,10 +40,10 @@
 
         async function runDraw() {
             const confirmed = await ConfirmationDialog.show({
-                title: 'Run Draw',
+                title: '{{ t("dialog_run_draw_title") }}',
                 message: '{{ t("manage_event_draw_confirm") }}',
-                confirmText: 'Draw',
-                cancelText: 'Cancel'
+                confirmText: '{{ t("button_draw") }}',
+                cancelText: '{{ t("button_cancel") }}'
             });
             if (!confirmed) {
                 return;
@@ -79,10 +79,10 @@
 
         async function reopenRegistration() {
             const confirmed = await ConfirmationDialog.show({
-                title: 'Reopen Registration',
+                title: '{{ t("dialog_reopen_title") }}',
                 message: '{{ t("manage_event_reopen_confirm") }}',
-                confirmText: 'Reopen',
-                cancelText: 'Cancel',
+                confirmText: '{{ t("button_reopen") }}',
+                cancelText: '{{ t("button_cancel") }}',
                 isDangerous: true
             });
             if (!confirmed) {
@@ -111,10 +111,10 @@
 
         async function rerunDraw() {
             const confirmed = await ConfirmationDialog.show({
-                title: 'Rerun Draw',
+                title: '{{ t("dialog_rerun_title") }}',
                 message: '{{ t("manage_event_rerun_confirm") }}',
-                confirmText: 'Rerun',
-                cancelText: 'Cancel',
+                confirmText: '{{ t("button_rerun") }}',
+                cancelText: '{{ t("button_cancel") }}',
                 isDangerous: true
             });
             if (!confirmed) {
@@ -126,10 +126,10 @@
 
         async function closeEvent() {
             const confirmed = await ConfirmationDialog.show({
-                title: 'Close Event',
+                title: '{{ t("dialog_close_title") }}',
                 message: '{{ t("manage_event_close_confirm") }}',
-                confirmText: 'Close',
-                cancelText: 'Cancel',
+                confirmText: '{{ t("button_close") }}',
+                cancelText: '{{ t("button_cancel") }}',
                 isDangerous: true
             });
             if (!confirmed) {
@@ -161,10 +161,10 @@
             const message = currentState ? '{{ t("manage_event_guessing_disable_confirm") }}' : '{{ t("manage_event_guessing_enable_confirm") }}';
             
             const confirmed = await ConfirmationDialog.show({
-                title: 'Toggle Guessing',
+                title: '{{ t("dialog_toggle_guessing_title") }}',
                 message: message,
-                confirmText: currentState ? 'Disable' : 'Enable',
-                cancelText: 'Cancel'
+                confirmText: currentState ? '{{ t("button_disable") }}' : '{{ t("button_enable") }}',
+                cancelText: '{{ t("button_cancel") }}'
             });
             if (!confirmed) {
                 return;
@@ -193,10 +193,10 @@
         async function removeParticipant(participantId, participantName) {
             const msg = '{{ t("manage_event_remove_confirm", name="PLACEHOLDER") }}'.replace('PLACEHOLDER', participantName);
             const confirmed = await ConfirmationDialog.show({
-                title: 'Remove Participant',
+                title: '{{ t("dialog_remove_participant_title") }}',
                 message: msg,
-                confirmText: 'Remove',
-                cancelText: 'Cancel',
+                confirmText: '{{ t("button_remove") }}',
+                cancelText: '{{ t("button_cancel") }}',
                 isDangerous: true
             });
             if (!confirmed) {

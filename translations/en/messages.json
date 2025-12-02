@@ -360,5 +360,19 @@
   "member_nickname_cancel_button": "Cancel",
   "landing_nav_dashboard": "Dashboard",
   "landing_nav_logout": "Logout",
-  "landing_nav_login": "Login"
+  "landing_nav_login": "Login",
+  "dialog_run_draw_title": "Run Draw",
+  "dialog_reopen_title": "Reopen Registration",
+  "dialog_rerun_title": "Rerun Draw",
+  "dialog_close_title": "Close Event",
+  "dialog_toggle_guessing_title": "Toggle Guessing",
+  "dialog_remove_participant_title": "Remove Participant",
+  "button_draw": "Draw",
+  "button_reopen": "Reopen",
+  "button_rerun": "Rerun",
+  "button_close": "Close",
+  "button_enable": "Enable",
+  "button_disable": "Disable",
+  "button_remove": "Remove",
+  "button_cancel": "Cancel"
 }
