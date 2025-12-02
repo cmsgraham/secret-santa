@@ -432,6 +432,8 @@
                 showMessage('error', '{{ t("manage_event_error_guessing") }}');
             }
         }
+
+        async function removeParticipant(participantId, participantName) {
             const msg = '{{ t("manage_event_remove_confirm", name='') }}'.replace('{{ name }}', participantName);
             if (!confirm(msg)) {
                 return;
