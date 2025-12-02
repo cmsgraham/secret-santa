@@ -14,6 +14,7 @@ from functools import wraps
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, g
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.proxy_fix import ProxyFix
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from email_validator import validate_email, EmailNotValidError
@@ -50,12 +51,17 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///secretsanta.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
-app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
+app.config['SESSION_COOKIE_SECURE'] = os.getenv('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
+app.config['SESSION_COOKIE_HTTPONLY'] = os.getenv('SESSION_COOKIE_HTTPONLY', 'true').lower() == 'true'
 app.config['PERMANENT_SESSION_LIFETIME'] = 2592000  # 30 days in seconds
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 app.config['SESSION_PERMANENT'] = True
+
+# Trust X-Forwarded-Proto header from reverse proxy (Nginx)
+# This allows Flask to know it's behind HTTPS even if the connection to it is HTTP
+if os.getenv('TRUST_PROXY', 'false').lower() == 'true':
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
 # Initialize database
 db = SQLAlchemy(app, model_class=Base)
