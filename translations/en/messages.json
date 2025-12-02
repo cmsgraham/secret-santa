@@ -357,5 +357,8 @@
   "login_spam_note": "💬 Tip: If you don't receive the email, please check your spam or junk folder!",
   "member_back_to_dashboard": "Back to Dashboard",
   "member_nickname_save_button": "Save",
-  "member_nickname_cancel_button": "Cancel"
+  "member_nickname_cancel_button": "Cancel",
+  "landing_nav_dashboard": "Dashboard",
+  "landing_nav_logout": "Logout",
+  "landing_nav_login": "Login"
 }

@@ -357,5 +357,8 @@
   "login_spam_note": "💬 Consejo: ¡Si no recibes el correo, por favor revisa tu carpeta de spam o correo no deseado!",
   "member_back_to_dashboard": "Volver al Panel",
   "member_nickname_save_button": "Guardar",
-  "member_nickname_cancel_button": "Cancelar"
+  "member_nickname_cancel_button": "Cancelar",
+  "landing_nav_dashboard": "Panel",
+  "landing_nav_logout": "Cerrar Sesión",
+  "landing_nav_login": "Iniciar Sesión"
 }
