@@ -814,7 +814,7 @@
                     setTimeout(() => saved.classList.remove('show'), 3000);
                 }
             } catch (error) {
-                alert('Failed to save hints. Please try again.');
+                notify.error('{{ t("error") or "Error" }}', 'Failed to save hints. Please try again.');
             }
         });
 
@@ -847,7 +847,7 @@
                     setTimeout(() => saved.classList.remove('show'), 3000);
                 }
             } catch (error) {
-                alert('Failed to save preferences. Please try again.');
+                notify.error('{{ t("error") or "Error" }}', 'Failed to save preferences. Please try again.');
             }
         });
 
@@ -858,7 +858,12 @@
                 e.preventDefault();
                 const formData = new FormData(e.target);
                 
-                if (!confirm('Are you sure about your guess? You can only guess once!')) {
+                if (!await ConfirmationDialog.show({
+                    title: 'Confirm Guess',
+                    message: 'Are you sure about your guess? You can only guess once!',
+                    confirmText: 'Submit',
+                    cancelText: 'Cancel'
+                })) {
                     return;
                 }
                 
@@ -877,10 +882,10 @@
                     if (response.ok) {
                         window.location.reload();
                     } else {
-                        alert('Failed to submit guess. Please try again.');
+                        notify.error('{{ t("error") or "Error" }}', 'Failed to submit guess. Please try again.');
                     }
                 } catch (error) {
-                    alert('Failed to submit guess. Please try again.');
+                    notify.error('{{ t("error") or "Error" }}', 'Failed to submit guess. Please try again.');
                 }
             });
         }
@@ -997,10 +1002,10 @@
                         closeProfileModal();
                     }, 1000);
                 } else {
-                    alert('Failed to save profile picture. Please try again.');
+                    notify.error('{{ t("error") or "Error" }}', 'Failed to save profile picture. Please try again.');
                 }
             } catch (error) {
-                alert('Failed to save profile picture. Please try again.');
+                notify.error('{{ t("error") or "Error" }}', 'Failed to save profile picture. Please try again.');
             }
         }
         
@@ -1028,7 +1033,7 @@
             const nickname = document.getElementById('nicknameInput').value.trim();
             
             if (!nickname) {
-                alert('Nickname cannot be empty');
+                notify.error('{{ t("error") or "Error" }}', 'Nickname cannot be empty');
                 return;
             }
             
@@ -1055,10 +1060,10 @@
                     savedMsg.classList.add('show');
                     setTimeout(() => savedMsg.classList.remove('show'), 3000);
                 } else {
-                    alert('Failed to save nickname. Please try again.');
+                    notify.error('{{ t("error") or "Error" }}', 'Failed to save nickname. Please try again.');
                 }
             } catch (error) {
-                alert('Failed to save nickname. Please try again.');
+                notify.error('{{ t("error") or "Error" }}', 'Failed to save nickname. Please try again.');
             }
         }
         
@@ -1076,5 +1081,6 @@
             }
         });
     </script>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
 </body>
 </html>

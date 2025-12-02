@@ -542,7 +542,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    notify.error('Error', data.error);
                     return;
                 }
                 
@@ -586,8 +586,8 @@
             }
         }
 
-        function likeHint(participantId, button) {
-            fetch(`/feed/hint/${participantId}/like`, {
+        function commentLike(commentId, button) {
+            fetch(`/feed/comment/${commentId}/like`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -596,7 +596,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    notify.error('Error', data.error);
                     return;
                 }
                 
@@ -617,8 +617,8 @@
             .catch(error => console.error('Error:', error));
         }
 
-        function likeIdea(participantId, button) {
-            fetch(`/feed/idea/${participantId}/like`, {
+        function replyLike(replyId, button) {
+            fetch(`/feed/reply/${replyId}/like`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -627,7 +627,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    notify.error('Error', data.error);
                     return;
                 }
                 
@@ -773,14 +773,14 @@
                     submitBtn.textContent = originalText;
                 } else {
                     // Handle error
-                    alert('Error adding comment. Please try again.');
+                    notify.error('Error', 'Error adding comment. Please try again.');
                     submitBtn.disabled = false;
                     submitBtn.textContent = originalText;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error adding comment. Please try again.');
+                notify.error('Error', 'Error adding comment. Please try again.');
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
             });

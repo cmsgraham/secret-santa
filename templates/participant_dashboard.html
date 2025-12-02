@@ -195,7 +195,7 @@
             <a href="{{ url_for('create_event') }}" class="btn-create">
                 ➕ Create New Event
             </a>
-            <a href="{{ url_for('participant_dashboard') }}?logout=1" class="btn-logout" onclick="return confirm('Log out from participant dashboard?');">
+            <a href="{{ url_for('participant_dashboard') }}?logout=1" class="btn-logout" onclick="handleLogout(event); return false;">
                 🚪 Logout
             </a>
         </div>
@@ -250,5 +250,20 @@
         window.location.href = '{{ url_for("participant_logout") }}';
     </script>
     {% endif %}
+    <script>
+        async function handleLogout(event) {
+            event.preventDefault();
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Logout',
+                message: 'Log out from participant dashboard?',
+                confirmText: 'Logout',
+                cancelText: 'Cancel'
+            });
+            if (confirmed) {
+                window.location.href = '{{ url_for("participant_dashboard") }}?logout=1';
+            }
+        }
+    </script>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
 </body>
 </html>

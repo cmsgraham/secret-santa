@@ -313,7 +313,7 @@
             // Try modern clipboard API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(fullUrl).then(() => {
-                    alert('{{ t("dashboard_copied") }}');
+                    notify.success('{{ t("dashboard_copied") }}');
                 }).catch(err => {
                     console.error('Clipboard API failed:', err);
                     fallbackCopy(fullUrl);
@@ -336,7 +336,7 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    alert('{{ t("dashboard_copied") }}');
+                    notify.success('{{ t("dashboard_copied") }}');
                 } else {
                     // If copy fails, show prompt
                     prompt('{{ t("dashboard_copy_prompt") }}', text);
@@ -351,37 +351,47 @@
 
         async function deleteEvent(code, name) {
             const confirmMsg = `{{ t('dashboard_delete_confirm') }}`.replace('{{ name }}', name);
-            if (!confirm(confirmMsg)) {
-                return;
-            }
+            ConfirmationDialog.show({
+                title: '{{ t("delete_event_title") or "Delete Event" }}',
+                message: confirmMsg,
+                confirmText: '{{ t("delete") or "Delete" }}',
+                cancelText: '{{ t("cancel") or "Cancel" }}',
+                isDangerous: true
+            }).then(async (confirmed) => {
+                if (!confirmed) return;
 
-            try {
-                const response = await fetch(`/event/${code}/delete`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                try {
+                    const response = await fetch(`/event/${code}/delete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        notify.success('{{ t("dashboard_deleted") }}');
+                        window.location.reload();
+                    } else {
+                        notify.error('{{ t("dashboard_delete_failed") }}', data.error);
                     }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('{{ t("dashboard_deleted") }}');
-                    window.location.reload();
-                } else {
-                    alert('{{ t("dashboard_delete_failed") }}: ' + data.error);
+                } catch (error) {
+                    notify.error('{{ t("dashboard_delete_failed") }}');
+                    console.error(error);
                 }
-            } catch (error) {
-                alert('{{ t("dashboard_delete_failed") }}');
-                console.error(error);
-            }
-        }
+            });
 
         async function joinEvent(code, name) {
             const confirmMsg = `{{ t('dashboard_join_confirm') }}`.replace('{{ name }}', name);
-            if (!confirm(confirmMsg)) {
-                return;
-            }
+            const confirmed = await ConfirmationDialog.show({
+                title: '{{ t("join_event_title") or "Join Event" }}',
+                message: confirmMsg,
+                confirmText: '{{ t("join") or "Join" }}',
+                cancelText: '{{ t("cancel") or "Cancel" }}'
+            });
+            
+            if (!confirmed) return;
 
             try {
                 const response = await fetch(`/event/${code}/join`, {
@@ -394,17 +404,20 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ ' + data.message);
+                    notify.success('{{ t("success") or "Success" }}', data.message);
                     // Redirect to member page
-                    window.location.href = data.member_url;
+                    setTimeout(() => {
+                        window.location.href = data.member_url;
+                    }, 1000);
                 } else {
-                    alert('{{ t("dashboard_join_failed") }}: ' + data.error);
+                    notify.error('{{ t("dashboard_join_failed") }}', data.error);
                 }
             } catch (error) {
-                alert('{{ t("dashboard_join_failed") }}');
+                notify.error('{{ t("dashboard_join_failed") }}');
                 console.error(error);
             }
         }
     </script>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
 </body>
 </html>

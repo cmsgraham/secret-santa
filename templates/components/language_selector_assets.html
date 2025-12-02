@@ -113,9 +113,9 @@
                     .then(r => r.json())
                     .then(d => {
                         if (d.success) window.location.reload();
-                        else alert('Error: ' + d.error);
+                        else notify.error('Error', d.error);
                     })
-                    .catch(e => alert('Error changing language'));
+                    .catch(e => notify.error('Error', 'Error changing language'));
                 });
             });
         });
@@ -137,3 +137,5 @@
         initLanguageSelector();
     }
 </script>
+
+<script src="{{ url_for('static', filename='notifications.js') }}"></script>

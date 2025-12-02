@@ -185,3 +185,262 @@ header p {
         padding: 20px;
     }
 }
+
+/* Toast Notification Styles */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+}
+
+.toast {
+    background: white;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease-out;
+    min-height: 50px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+.toast.hide {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+.toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-content {
+    flex: 1;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.toast-title {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-close:hover {
+    color: #333;
+}
+
+/* Success Toast */
+.toast.success {
+    border-left: 4px solid #10b981;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+}
+
+.toast.success .toast-icon {
+    color: #10b981;
+}
+
+.toast.success .toast-content {
+    color: #047857;
+}
+
+/* Error Toast */
+.toast.error {
+    border-left: 4px solid #ef4444;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.toast.error .toast-icon {
+    color: #ef4444;
+}
+
+.toast.error .toast-content {
+    color: #b91c1c;
+}
+
+/* Warning Toast */
+.toast.warning {
+    border-left: 4px solid #f59e0b;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.toast.warning .toast-icon {
+    color: #f59e0b;
+}
+
+.toast.warning .toast-content {
+    color: #b45309;
+}
+
+/* Info Toast */
+.toast.info {
+    border-left: 4px solid #3b82f6;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.toast.info .toast-icon {
+    color: #3b82f6;
+}
+
+.toast.info .toast-content {
+    color: #1e40af;
+}
+
+/* Modal Confirmation Dialog */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+.modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px rgba(0,0,0,0.2);
+    max-width: 400px;
+    width: 90%;
+    padding: 0;
+    animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #111;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 16px 24px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.modal-footer button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-footer .btn-cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.modal-footer .btn-cancel:hover {
+    background: #e5e7eb;
+}
+
+.modal-footer .btn-confirm {
+    background: #3b82f6;
+    color: white;
+}
+
+.modal-footer .btn-confirm:hover {
+    background: #2563eb;
+}
+
+.modal-footer .btn-confirm.danger {
+    background: #ef4444;
+}
+
+.modal-footer .btn-confirm.danger:hover {
+    background: #dc2626;
+}

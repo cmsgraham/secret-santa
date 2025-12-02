@@ -137,14 +137,14 @@
                 if (d.success) {
                     window.location.reload();
                 } else {
-                    alert('Error: ' + d.error);
+                    notify.error('Error', d.error);
                     selector.style.opacity = '1';
                     selector.style.pointerEvents = 'auto';
                 }
             })
             .catch(e => {
                 console.error('Language switch error:', e);
-                alert('Error changing language');
+                notify.error('Error', 'Error changing language');
                 selector.style.opacity = '1';
                 selector.style.pointerEvents = 'auto';
             });
@@ -159,3 +159,5 @@
     });
 })();
 </script>
+
+<script src="{{ url_for('static', filename='notifications.js') }}"></script>

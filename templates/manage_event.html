@@ -291,7 +291,7 @@
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text)
                     .then(() => {
-                        alert('{{ t("manage_event_copy_success") }}');
+                        notify.success('{{ t("manage_event_copy_success") }}');
                     })
                     .catch(() => {
                         // Fallback to older method
@@ -308,14 +308,20 @@
                 input.select();
                 input.setSelectionRange(0, 99999); // For mobile devices
                 document.execCommand('copy');
-                alert('{{ t("manage_event_copy_success") }}');
+                notify.success('{{ t("manage_event_copy_success") }}');
             } catch (e) {
-                alert('{{ t("manage_event_copy_error") }}\n\n' + input.value);
+                notify.error('Error', '{{ t("manage_event_copy_error") }}\n\n' + input.value);
             }
         }
 
         async function runDraw() {
-            if (!confirm('{{ t("manage_event_draw_confirm") }}')) {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Run Draw',
+                message: '{{ t("manage_event_draw_confirm") }}',
+                confirmText: 'Draw',
+                cancelText: 'Cancel'
+            });
+            if (!confirmed) {
                 return;
             }
 
@@ -348,7 +354,14 @@
         }
 
         async function reopenRegistration() {
-            if (!confirm('{{ t("manage_event_reopen_confirm") }}')) {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Reopen Registration',
+                message: '{{ t("manage_event_reopen_confirm") }}',
+                confirmText: 'Reopen',
+                cancelText: 'Cancel',
+                isDangerous: true
+            });
+            if (!confirmed) {
                 return;
             }
 
@@ -373,7 +386,14 @@
         }
 
         async function rerunDraw() {
-            if (!confirm('{{ t("manage_event_rerun_confirm") }}')) {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Rerun Draw',
+                message: '{{ t("manage_event_rerun_confirm") }}',
+                confirmText: 'Rerun',
+                cancelText: 'Cancel',
+                isDangerous: true
+            });
+            if (!confirmed) {
                 return;
             }
 
@@ -381,7 +401,14 @@
         }
 
         async function closeEvent() {
-            if (!confirm('{{ t("manage_event_close_confirm") }}')) {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Close Event',
+                message: '{{ t("manage_event_close_confirm") }}',
+                confirmText: 'Close',
+                cancelText: 'Cancel',
+                isDangerous: true
+            });
+            if (!confirmed) {
                 return;
             }
 
@@ -409,7 +436,13 @@
             const currentState = {{ 'true' if event.guessing_enabled else 'false' }};
             const message = currentState ? '{{ t("manage_event_guessing_disable_confirm") }}' : '{{ t("manage_event_guessing_enable_confirm") }}';
             
-            if (!confirm(message)) {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Toggle Guessing',
+                message: message,
+                confirmText: currentState ? 'Disable' : 'Enable',
+                cancelText: 'Cancel'
+            });
+            if (!confirmed) {
                 return;
             }
 
@@ -435,7 +468,14 @@
 
         async function removeParticipant(participantId, participantName) {
             const msg = '{{ t("manage_event_remove_confirm", name='') }}'.replace('{{ name }}', participantName);
-            if (!confirm(msg)) {
+            const confirmed = await ConfirmationDialog.show({
+                title: 'Remove Participant',
+                message: msg,
+                confirmText: 'Remove',
+                cancelText: 'Cancel',
+                isDangerous: true
+            });
+            if (!confirmed) {
                 return;
             }
 
@@ -495,5 +535,6 @@
         }, 10000);
         {% endif %}
     </script>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
 </body>
 </html>
