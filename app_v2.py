@@ -379,16 +379,16 @@ def create_secret_santa_assignments(event):
 @app.before_request
 
 
+@app.route('/test-translations')
+def test_translations():
+    """Test page for translations - remove in production"""
+    return render_template('test_translation.html')
+
 @app.route('/')
 def index():
     """Landing page"""
     user = get_current_user()
     return render_template('landing.html', user=user)
-
-@app.route('/test-translations')
-def test_translations():
-    """Test page for translations - remove in production"""
-    return render_template('test_translation.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
