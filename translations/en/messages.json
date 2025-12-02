@@ -354,5 +354,6 @@
   "landing_how_step3_title": "3️⃣ Run the Draw",
   "landing_how_step3_desc": "Click the button and everyone gets their assignment by email",
   "landing_footer_made_with": "Made with ❤️ for organizing gift exchanges",
-  "login_spam_note": "💬 Tip: If you don't receive the email, please check your spam or junk folder!"
+  "login_spam_note": "💬 Tip: If you don't receive the email, please check your spam or junk folder!",
+  "member_back_to_dashboard": "Back to Dashboard"
 }

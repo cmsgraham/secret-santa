@@ -545,7 +545,7 @@
                 <div>
                     {% if session.get('user_id') or session.get('participant_email') %}
                     <a href="{{ url_for('dashboard') }}" class="dashboard-link">
-                        ← Back to Dashboard
+                        ← {{ t('member_back_to_dashboard') }}
                     </a>
                     <!-- Link to Santa's Secret Wall Feed -->
                     <a href="{{ url_for('feed', code=event.code) }}" class="btn" style="margin-bottom: 0; margin-left: 10px;">

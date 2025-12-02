@@ -354,5 +354,6 @@
   "landing_how_step3_title": "3️⃣ Ejecutar el Sorteo",
   "landing_how_step3_desc": "Haz clic en el botón y todos reciben su asignación por correo",
   "landing_footer_made_with": "Hecho con ❤️ para organizar intercambios de regalos",
-  "login_spam_note": "💬 Consejo: ¡Si no recibes el correo, por favor revisa tu carpeta de spam o correo no deseado!"
+  "login_spam_note": "💬 Consejo: ¡Si no recibes el correo, por favor revisa tu carpeta de spam o correo no deseado!",
+  "member_back_to_dashboard": "Volver al Panel"
 }
