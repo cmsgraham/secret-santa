@@ -185,7 +185,7 @@
 
                 <div class="event-stats">
                     <div>
-                        <strong>{{ item.event.participant_count }}</strong> {{ t('dashboard_participants', count=item.event.participant_count) }}
+                        {{ t('dashboard_participants', count=item.event.participant_count) }}
                     </div>
                     <div>
                         {{ t('dashboard_code') }}: <strong>{{ item.event.code }}</strong>
@@ -247,7 +247,7 @@
 
                 <div class="event-stats">
                     <div>
-                        <strong>{{ item.event.participant_count }}</strong> {{ t('dashboard_participants', count=item.event.participant_count) }}
+                        {{ t('dashboard_participants', count=item.event.participant_count) }}
                     </div>
                     <div>
                         {{ t('dashboard_registered', date=item.participant.registered_at.strftime('%b %d')) }}
