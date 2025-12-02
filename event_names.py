@@ -176,9 +176,8 @@ def get_random_event_names(count=5, locale="en"):
     for _ in range(count):
         style = random.choice(styles)
         name = generate_event_name(style=style, locale=locale)
-        names.append(name)
         while name in names:
-            name = generate_event_name(style)
+            name = generate_event_name(style=style, locale=locale)
         names.append(name)
     
     return names
