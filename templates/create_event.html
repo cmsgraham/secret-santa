@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ t('page_title_create_event') }} - {{ t('app_name') }}</title>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         .create-container {
@@ -50,6 +51,83 @@
             color: #374151;
         }
     </style>
+    <script>
+        let selectedSuggestion = null;
+
+        function selectSuggestion(name) {
+            document.querySelectorAll('.suggestion-card').forEach(card => card.classList.remove('selected'));
+            event.target.classList.add('selected');
+            selectedSuggestion = name;
+            document.getElementById('event_name').value = name;
+        }
+
+        async function loadMoreSuggestions() {
+            const suggestionsDiv = document.getElementById('suggestions');
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = '{{ t("create_event_generating") }}';
+            
+            try {
+                const response = await fetch('{{ url_for("get_suggestions") }}?count=5', { credentials: 'include' });
+                const data = await response.json();
+                if (data.names) {
+                    suggestionsDiv.innerHTML = data.names.map(name => `<div class="suggestion-card" onclick="selectSuggestion('${name}')">${name}</div>`).join('');
+                }
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+            } finally {
+                button.disabled = false;
+                button.textContent = '{{ t("create_event_generate_names") }}';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('createEventForm');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    const messageDiv = document.getElementById('message');
+                    const originalBtnText = submitBtn.textContent;
+                    
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '{{ t("create_event_creating") }}';
+                    messageDiv.style.display = 'none';
+                    
+                    const formData = {
+                        event_name: document.getElementById('event_name').value,
+                        description: document.getElementById('description').value
+                    };
+                    
+                    try {
+                        const response = await fetch('{{ url_for("create_event") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify(formData)
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            window.location.href = data.management_url;
+                        } else {
+                            messageDiv.textContent = data.error || '{{ t("create_event_error") }}';
+                            messageDiv.className = 'message error';
+                            messageDiv.style.display = 'block';
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        }
+                    } catch (error) {
+                        messageDiv.textContent = '{{ t("create_event_generic_error") }}';
+                        messageDiv.className = 'message error';
+                        messageDiv.style.display = 'block';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalBtnText;
+                    }
+                });
+            }
+        });
+    </script>
     {% include 'components/language_selector_assets.html' %}
 </head>
 <body>
@@ -136,95 +214,5 @@
         </div>
     </div>
 
-    <script>
-        let selectedSuggestion = null;
-
-        function selectSuggestion(name) {
-            // Remove previous selection
-            document.querySelectorAll('.suggestion-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Select this card
-            event.target.classList.add('selected');
-            selectedSuggestion = name;
-            
-            // Update input field
-            document.getElementById('event_name').value = name;
-        }
-
-        async function loadMoreSuggestions() {
-            const suggestionsDiv = document.getElementById('suggestions');
-            const button = event.target;
-            button.disabled = true;
-            button.textContent = '{{ t("create_event_generating") }}';
-            
-            try {
-                const response = await fetch('{{ url_for("get_suggestions") }}?count=5', {
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                
-                if (data.names) {
-                    suggestionsDiv.innerHTML = data.names.map(name => 
-                        `<div class="suggestion-card" onclick="selectSuggestion('${name}')">${name}</div>`
-                    ).join('');
-                }
-            } catch (error) {
-                console.error('Error loading suggestions:', error);
-            } finally {
-                button.disabled = false;
-                button.textContent = '{{ t("create_event_generate_names") }}';
-            }
-        }
-
-        document.getElementById('createEventForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const messageDiv = document.getElementById('message');
-            const originalBtnText = submitBtn.textContent;
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = '{{ t("create_event_creating") }}';
-            messageDiv.style.display = 'none';
-            
-            const formData = {
-                event_name: document.getElementById('event_name').value,
-                description: document.getElementById('description').value
-            };
-            
-            try {
-                const response = await fetch('{{ url_for("create_event") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(formData)
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Redirect to event management page
-                    window.location.href = data.management_url;
-                } else {
-                    messageDiv.textContent = data.error || '{{ t("create_event_error") }}';
-                    messageDiv.className = 'message error';
-                    messageDiv.style.display = 'block';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalBtnText;
-                }
-            } catch (error) {
-                messageDiv.textContent = '{{ t("create_event_generic_error") }}';
-                messageDiv.className = 'message error';
-                messageDiv.style.display = 'block';
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
-            }
-        });
-    </script>
-    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
 </body>
 </html>
