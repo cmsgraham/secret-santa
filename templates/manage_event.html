@@ -216,7 +216,7 @@
                             <span style="color: #10b981;">{{ t('manage_event_email_sent') }}</span>
                             {% endif %}
                             {% if event.status.value == 'registration_open' %}
-                            <button onclick="removeParticipant('{{ participant.id }}', '{{ participant.name }}')" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            <button data-participant-id="{{ participant.id }}" data-participant-name="{{ participant.name }}" class="btn btn-danger remove-participant-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
                                 {{ t('manage_event_remove') }}
                             </button>
                             {% endif %}
@@ -466,6 +466,15 @@
             messageDiv.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // Add event listener for remove participant buttons
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-participant-btn')) {
+                const participantId = e.target.getAttribute('data-participant-id');
+                const participantName = e.target.getAttribute('data-participant-name');
+                removeParticipant(participantId, participantName);
+            }
+        });
 
         // Auto-refresh participant count every 10 seconds during registration
         {% if event.status.value == 'registration_open' %}
