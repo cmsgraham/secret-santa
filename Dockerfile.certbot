@@ -1,0 +1,18 @@
+FROM certbot/certbot:latest
+
+# Install additional tools
+RUN apk add --no-cache bash openssl
+
+# Copy renewal script
+COPY certbot-renew.sh /usr/local/bin/certbot-renew.sh
+RUN chmod +x /usr/local/bin/certbot-renew.sh
+
+# Copy initialization script
+COPY init-certbot.sh /usr/local/bin/init-certbot.sh
+RUN chmod +x /usr/local/bin/init-certbot.sh
+
+# Run renewal every day at 3 AM
+RUN echo "0 3 * * * /usr/local/bin/certbot-renew.sh >> /var/log/certbot-renew.log 2>&1" | crontab -
+
+# Default command
+CMD ["crond", "-f"]
