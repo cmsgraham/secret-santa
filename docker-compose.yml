@@ -6,23 +6,7 @@ services:
     # No port binding - only accessible via Nginx on internal network
     env_file:
       - .env
-    environment:
-      - DATABASE_URL=postgresql://secret_santa:password@db:5432/secret_santa_db
-      - SECRET_KEY=your-super-secret-key-change-this
-      - DEBUG=false
-      - SMTP_SERVER=172.233.185.208
-      - SMTP_PORT=2587
-      - SMTP_USERNAME=secretsanta@nameinahat.com
-      - SMTP_PASSWORD=xiWbEMsDXggUKUXqYSwFIg==
-      - SMTP_FROM_EMAIL=secretsanta@nameinahat.com
-      - SMTP_FROM_NAME=Secret Santa
-      - SMTP_USE_TLS=true
-      - APP_URL=https://nameinahat.com
-      # Proxy settings for HTTPS
-      - TRUST_PROXY=true
-      - SESSION_COOKIE_SECURE=true
-      - SESSION_COOKIE_HTTPONLY=true
-      - SESSION_COOKIE_SAMESITE=Lax
+    # Environment variables from .env file will be used - don't override SMTP settings here
     depends_on:
       - db
       - redis
