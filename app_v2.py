@@ -21,6 +21,7 @@ from email_validator import validate_email, EmailNotValidError
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.utils import formatdate
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 import bleach
@@ -346,6 +347,8 @@ def send_email_with_html(to_email, subject, plain_text, html_body, user_id=None)
         msg['From'] = SMTP_USERNAME
         msg['To'] = to_email
         msg['Subject'] = subject
+        msg['Date'] = formatdate(localtime=False)  # RFC 2822 compliant date
+        msg['Message-ID'] = f"<{secrets.token_hex(16)}@{SMTP_USERNAME.split('@')[1]}>"
         
         # Add unsubscribe headers (RFC 8058) if user has token
         unsubscribe_url = None
@@ -363,7 +366,7 @@ def send_email_with_html(to_email, subject, plain_text, html_body, user_id=None)
                     msg['List-Unsubscribe'] = f"<{unsubscribe_url}>"
                     msg['List-Unsubscribe-Post'] = "List-Unsubscribe=One-Click"
         
-        # Attach plain text version
+        # Attach plain text version first
         if unsubscribe_url:
             plain_text_with_footer = f"""{plain_text}
 
@@ -389,6 +392,7 @@ Manage preferences: {resubscribe_url}
         else:
             html_with_footer = html_body
         
+        # Attach HTML version last (so it's preferred)
         msg.attach(MIMEText(html_with_footer, 'html', 'utf-8'))
         
         # Connect with timeout to prevent hanging
@@ -418,10 +422,13 @@ def send_email(to_email, subject, body, user_id=None):
         msg['From'] = SMTP_USERNAME
         msg['To'] = to_email
         msg['Subject'] = subject
+        msg['Date'] = formatdate(localtime=False)  # RFC 2822 compliant date
+        msg['Message-ID'] = f"<{secrets.token_hex(16)}@{SMTP_USERNAME.split('@')[1]}>"
         
         # Build plain text version with unsubscribe link
         plain_body = body
         unsubscribe_url = None
+        resubscribe_url = None
         
         # Add unsubscribe headers (RFC 8058) if user has token
         if user_id:
@@ -442,7 +449,7 @@ def send_email(to_email, subject, body, user_id=None):
                     plain_body += f"Unsubscribe: {unsubscribe_url}\n"
                     plain_body += f"Manage preferences: {resubscribe_url}\n"
         
-        # Attach plain text version
+        # Attach plain text version first
         msg.attach(MIMEText(plain_body, 'plain', 'utf-8'))
         
         # Create HTML version with styled unsubscribe link if we have a URL
@@ -457,6 +464,7 @@ def send_email(to_email, subject, body, user_id=None):
         else:
             html_body = plain_body
         
+        # Attach HTML version last (so it's preferred)
         msg.attach(MIMEText(html_body, 'html', 'utf-8'))
         
         # Connect with timeout to prevent hanging
