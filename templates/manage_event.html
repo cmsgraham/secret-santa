@@ -77,14 +77,35 @@
             }
         }
 
-        function shareViaWhatsApp() {
-            const input = document.getElementById('registrationLink');
-            const link = input.value;
-            // Get the current translated message from the hidden span
-            const messageEl = document.getElementById('whatsappMessageText');
-            const message = messageEl ? messageEl.textContent : manageTranslations.whatsappMessage;
-            const text = encodeURIComponent(`${message}\n\n${link}`);
-            window.open(`https://wa.me/?text=${text}`, '_blank');
+        async function shareViaWhatsApp() {
+            try {
+                const input = document.getElementById('registrationLink');
+                const link = input.value;
+                
+                // Fetch the translated message based on current language
+                const response = await fetch('/api/translate/manage_event_whatsapp_message');
+                const data = await response.json();
+                
+                if (!data.success) {
+                    // Fallback to stored translation if API fails
+                    const messageEl = document.getElementById('whatsappMessageText');
+                    const message = messageEl ? messageEl.textContent : manageTranslations.whatsappMessage;
+                    const text = encodeURIComponent(`${message}\n\n${link}`);
+                    window.open(`https://wa.me/?text=${text}`, '_blank');
+                    return;
+                }
+                
+                const message = data.text;
+                const text = encodeURIComponent(`${message}\n\n${link}`);
+                window.open(`https://wa.me/?text=${text}`, '_blank');
+            } catch (error) {
+                console.error('Error sharing via WhatsApp:', error);
+                // Fallback to stored translation
+                const messageEl = document.getElementById('whatsappMessageText');
+                const message = messageEl ? messageEl.textContent : manageTranslations.whatsappMessage;
+                const text = encodeURIComponent(`${message}\n\n${link}`);
+                window.open(`https://wa.me/?text=${text}`, '_blank');
+            }
         }
 
         async function runDraw() {

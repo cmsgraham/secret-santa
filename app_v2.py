@@ -1442,6 +1442,26 @@ def get_languages():
             'error': 'Failed to get languages'
         }), 500
 
+@app.route('/api/translate/<key>', methods=['GET'])
+def get_translation_api(key):
+    """Get a translated string based on current language"""
+    try:
+        from i18n import get_translation
+        current_locale = session.get('language', g.get('locale', DEFAULT_LOCALE))
+        translated = get_translation(key, current_locale)
+        return jsonify({
+            'success': True,
+            'key': key,
+            'locale': current_locale,
+            'text': translated
+        })
+    except Exception as e:
+        logger.error(f'Translation error: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': 'Failed to get translation'
+        }), 500
+
 @app.route('/event/<code>/join', methods=['POST'])
 @login_required
 def join_own_event(code):
