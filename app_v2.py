@@ -130,6 +130,24 @@ SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
 SMTP_USE_TLS = os.getenv('SMTP_USE_TLS', 'True').lower() == 'true'
 
 # ============================================================================
+# Email Preferences
+# ============================================================================
+
+def generate_unsubscribe_token(user_id):
+    """Generate a unique unsubscribe token for a user"""
+    import hashlib
+    import secrets
+    rand_token = secrets.token_hex(16)
+    return hashlib.sha256(f"{user_id}{rand_token}".encode()).hexdigest()
+
+def ensure_user_has_unsubscribe_token(user):
+    """Ensure user has an unsubscribe token, generate one if needed"""
+    if not user.unsubscribe_token:
+        user.unsubscribe_token = generate_unsubscribe_token(user.id)
+        db.session.commit()
+    return user.unsubscribe_token
+
+# ============================================================================
 # Authentication Helpers
 # ============================================================================
 
@@ -221,6 +239,10 @@ def create_or_get_user(email, name):
         user = User(email=email, name=name)
         db.session.add(user)
         db.session.commit()
+    
+    # Ensure user has an unsubscribe token
+    ensure_user_has_unsubscribe_token(user)
+    
     return user
 
 def create_magic_link_token(user):
@@ -272,13 +294,31 @@ def send_magic_link_email(user, token):
 # Email Functions
 # ============================================================================
 
-def send_email(to_email, subject, body):
-    """Send an email via SMTP"""
+def send_email(to_email, subject, body, user_id=None):
+    """Send an email via SMTP with optional unsubscribe support"""
     try:
+        # Check if user has opted out
+        if user_id:
+            user = db.session.get(User, user_id)
+            if user and user.email_opt_out:
+                print(f"Email to {to_email} skipped - user has opted out")
+                return False
+        
         msg = MIMEMultipart()
         msg['From'] = SMTP_USERNAME
         msg['To'] = to_email
         msg['Subject'] = subject
+        
+        # Add unsubscribe headers
+        if user_id:
+            user = db.session.get(User, user_id)
+            if user and user.unsubscribe_token:
+                unsubscribe_url = f"{url_for('unsubscribe', token=user.unsubscribe_token, _external=True)}"
+                # RFC 8058 - List-Unsubscribe-Post header
+                msg['List-Unsubscribe'] = f"<{unsubscribe_url}>"
+                msg['List-Unsubscribe-Post'] = "List-Unsubscribe=One-Click"
+                # Add unsubscribe link to email body
+                body = f"{body}\n\n{'='*60}\n{get_translation('email_unsubscribe_text', 'en')}\n{unsubscribe_url}\n"
         
         msg.attach(MIMEText(body, 'plain'))
         
@@ -519,6 +559,32 @@ def logout():
     session.clear()
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
+
+@app.route('/unsubscribe/<token>', methods=['GET', 'POST'])
+def unsubscribe(token):
+    """Unsubscribe user from emails"""
+    try:
+        # Find user by unsubscribe token
+        user = db.session.query(User).filter_by(unsubscribe_token=token).first()
+        
+        if not user:
+            flash('Invalid unsubscribe link', 'error')
+            return redirect(url_for('index'))
+        
+        if request.method == 'POST':
+            # Mark user as opted out
+            user.email_opt_out = True
+            db.session.commit()
+            flash('You have been unsubscribed from all Secret Santa emails', 'success')
+            return redirect(url_for('index'))
+        
+        # GET request - show confirmation page
+        return render_template('unsubscribe.html', email=user.email)
+    
+    except Exception as e:
+        print(f"Error in unsubscribe: {str(e)}")
+        flash('An error occurred', 'error')
+        return redirect(url_for('index'))
 
 # ============================================================================
 # Routes - Event Creation

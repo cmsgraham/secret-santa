@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Unsubscribe{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-envelope-open-text"></i> Unsubscribe from Email
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p>We're sorry to see you go!</p>
+                    
+                    <div class="alert alert-info">
+                        <strong>Email:</strong> <code>{{ email }}</code>
+                    </div>
+                    
+                    <p>If you confirm unsubscribe, you will no longer receive any emails from Secret Santa, including:</p>
+                    <ul>
+                        <li>Event invitations</li>
+                        <li>Secret Santa assignments</li>
+                        <li>Event notifications</li>
+                        <li>Account updates</li>
+                    </ul>
+                    
+                    <p class="text-muted"><small>You can re-enable emails by logging back into your account and updating your preferences.</small></p>
+                    
+                    <div class="mt-4">
+                        <form method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirm Unsubscribe
+                            </button>
+                        </form>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary ms-2">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
