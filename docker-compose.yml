@@ -10,7 +10,7 @@ services:
       - DATABASE_URL=postgresql://secret_santa:password@db:5432/secret_santa_db
       - SECRET_KEY=your-super-secret-key-change-this
       - DEBUG=false
-      - SMTP_SERVER=172.233.171.101
+      - SMTP_SERVER=172.233.185.208
       - SMTP_PORT=2587
       - SMTP_USERNAME=secretsanta@nameinahat.com
       - SMTP_PASSWORD=xiWbEMsDXggUKUXqYSwFIg==
