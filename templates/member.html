@@ -137,40 +137,51 @@
             gap: 10px;
             margin-bottom: 12px;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .input-group input[type="text"] {
             flex: 1;
+            min-width: 200px;
             padding: 12px 15px;
             border: 2px solid #e5e7eb;
             border-radius: 8px;
             font-size: 16px;
             font-family: inherit;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
         
         .input-group input[type="text"]:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .btn-remove {
             background: #ef4444;
             color: white;
-            padding: 8px 12px;
+            padding: 10px 12px;
             border: none;
             border-radius: 8px;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            min-width: 40px;
-            height: 40px;
+            min-width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         
         .btn-remove:hover {
             background: #dc2626;
             transform: scale(1.05);
+        }
+        
+        .btn-remove:active {
+            transform: scale(0.98);
         }
         
         .char-count {
@@ -181,9 +192,9 @@
         }
         
         .btn {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px 30px;
+            padding: 12px 24px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
@@ -192,18 +203,27 @@
             transition: all 0.3s;
             display: inline-block;
             text-decoration: none;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .btn:hover {
-            background: #5568d3;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            opacity: 0.95;
+        }
+        
+        .btn:active {
+            transform: translateY(0);
         }
         
         .btn:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
+            opacity: 0.6;
         }
         
         .btn-secondary {
@@ -212,6 +232,33 @@
         
         .btn-secondary:hover {
             background: #4b5563;
+        }
+        
+        .link-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .link-group input[type="text"],
+        .link-group input[type="url"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .link-group input[type="text"]:focus,
+        .link-group input[type="url"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .profile-section {
@@ -524,16 +571,181 @@
         }
         
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            .header {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+            
             .header h1 {
                 font-size: 24px;
             }
             
             .card {
                 padding: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .card h2 {
+                font-size: 18px;
+                margin-bottom: 15px;
             }
             
             .assignment-name {
-                font-size: 24px;
+                font-size: 20px;
+            }
+            
+            .profile-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .profile-picture {
+                width: 70px;
+                height: 70px;
+                font-size: 50px;
+            }
+            
+            .input-group {
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+            
+            .input-group input[type="text"] {
+                min-width: 150px;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            
+            .btn-remove {
+                min-width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                min-height: 40px;
+            }
+            
+            .btn-secondary {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .participant-select {
+                padding: 10px !important;
+                font-size: 14px !important;
+            }
+            
+            .receiver-info {
+                margin-bottom: 15px;
+            }
+            
+            .receiver-info h3 {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .card h2 {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+            
+            .profile-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .profile-picture {
+                width: 60px;
+                height: 60px;
+                font-size: 40px;
+            }
+            
+            .profile-details {
+                width: 100%;
+            }
+            
+            .input-group {
+                gap: 6px;
+                flex-direction: column;
+            }
+            
+            .input-group input[type="text"] {
+                width: 100%;
+                min-width: unset;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            
+            .btn-remove {
+                align-self: flex-end;
+                min-width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 10px 15px;
+                font-size: 14px;
+                min-height: 44px;
+                margin: 5px 0;
+            }
+            
+            .btn-secondary {
+                width: 100%;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .participant-select {
+                width: 100% !important;
+                padding: 10px !important;
+                font-size: 14px !important;
+            }
+            
+            .assignment-name {
+                font-size: 18px;
+            }
+            
+            #nicknameInput {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 8px 10px !important;
+                font-size: 14px !important;
+            }
+            
+            .receiver-info h3 {
+                font-size: 14px;
             }
         }
     </style>

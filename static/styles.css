@@ -6,10 +6,14 @@
 
 button {
     box-sizing: border-box;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
@@ -173,16 +177,67 @@ header p {
 }
 
 @media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+    
     .container {
-        padding: 0 15px;
+        padding: 0;
     }
     
     header h1 {
-        font-size: 2em;
+        font-size: 1.75em;
+    }
+    
+    header p {
+        font-size: 1em;
     }
     
     .card, .info-card {
         padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .card h2 {
+        font-size: 1.25em;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+    
+    .container {
+        padding: 0;
+    }
+    
+    header h1 {
+        font-size: 1.5em;
+        margin-bottom: 8px;
+    }
+    
+    header p {
+        font-size: 0.95em;
+    }
+    
+    .card, .info-card {
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .card h2 {
+        font-size: 1.1em;
+        margin-bottom: 15px;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        padding: 11px;
+        font-size: 16px;
     }
 }
 
@@ -407,16 +462,21 @@ header p {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .modal-footer button {
-    padding: 8px 16px;
+    padding: 10px 16px;
     border-radius: 6px;
     border: none;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-footer .btn-cancel {
