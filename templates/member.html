@@ -1125,23 +1125,27 @@
                 links = [];
             }
             
+            console.log('Parsed gift links:', links);
+            
             // Load existing links
             links.forEach(link => {
-                if (link && link.url && link.title) {
+                if (link && link.url) {
                     const linkGroup = document.createElement('div');
                     linkGroup.className = 'link-group';
                     linkGroup.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center;';
                     linkGroup.innerHTML = `
-                        <input type="text" class="link-title" placeholder="Link Title" maxlength="100" value="${escapeHtml(link.title)}" style="flex: 1; min-width: 150px; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                        <input type="text" class="link-title" placeholder="Link Title (e.g., Amazon Wishlist)" maxlength="100" value="${escapeHtml(link.title || '')}" style="flex: 1; min-width: 150px; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                         <input type="url" class="link-url" placeholder="https://example.com" maxlength="500" value="${escapeHtml(link.url)}" style="flex: 2; min-width: 200px; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                         <button type="button" class="btn-remove" onclick="removeLink(this)">✕</button>
                     `;
                     container.appendChild(linkGroup);
+                    console.log('✓ Added link:', link);
                 }
             });
             
             // Add at least one empty input if none exist
             if (container.children.length === 0) {
+                console.log('✓ No existing links, adding empty input');
                 addLinkInput();
             }
         }
@@ -1165,12 +1169,14 @@
             // Collect all link inputs
             const linkGroups = document.querySelectorAll('.link-group');
             const links = [];
+            let hasValidUrl = false;
             
             linkGroups.forEach(group => {
                 const title = group.querySelector('.link-title').value.trim();
                 const url = group.querySelector('.link-url').value.trim();
                 
                 if (url) {
+                    hasValidUrl = true;
                     // Validate URL
                     if (!url.startsWith('http://') && !url.startsWith('https://')) {
                         notify.error('Error', 'All URLs must start with http:// or https://');
@@ -1183,6 +1189,17 @@
                     });
                 }
             });
+            
+            // If no valid URLs, just show the empty state
+            if (!hasValidUrl) {
+                const container = document.getElementById('linksContainer');
+                container.innerHTML = '';
+                addLinkInput();
+                const saved = document.getElementById('linksSaved');
+                saved.classList.add('show');
+                setTimeout(() => saved.classList.remove('show'), 3000);
+                return;
+            }
             
             try {
                 const response = await fetch(window.location.pathname, {
@@ -1197,6 +1214,28 @@
                 });
                 
                 if (response.ok) {
+                    const responseData = await response.json();
+                    
+                    // Update the form to show saved links
+                    const container = document.getElementById('linksContainer');
+                    container.innerHTML = '';
+                    
+                    if (responseData.links && responseData.links.length > 0) {
+                        responseData.links.forEach(link => {
+                            const linkGroup = document.createElement('div');
+                            linkGroup.className = 'link-group';
+                            linkGroup.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center;';
+                            linkGroup.innerHTML = `
+                                <input type="text" class="link-title" placeholder="Link Title" maxlength="100" value="${escapeHtml(link.title)}" style="flex: 1; min-width: 150px; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                                <input type="url" class="link-url" placeholder="https://example.com" maxlength="500" value="${escapeHtml(link.url)}" style="flex: 2; min-width: 200px; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                                <button type="button" class="btn-remove" onclick="removeLink(this)">✕</button>
+                            `;
+                            container.appendChild(linkGroup);
+                        });
+                    } else {
+                        addLinkInput();
+                    }
+                    
                     const saved = document.getElementById('linksSaved');
                     saved.classList.add('show');
                     setTimeout(() => saved.classList.remove('show'), 3000);
