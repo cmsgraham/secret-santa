@@ -29,6 +29,10 @@ class User(Base):
     # Language preference
     preferred_language = Column(String(10), default='en', nullable=False)
     
+    # Email preferences
+    unsubscribe_token = Column(String(64), unique=True, nullable=True, index=True)  # Token for unsubscribe links
+    email_opt_out = Column(Boolean, default=False, nullable=False)  # Whether user has opted out of emails
+    
     # Relationships
     events = relationship("Event", back_populates="organizer", cascade="all, delete-orphan")
     

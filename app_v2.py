@@ -14,12 +14,14 @@ from functools import wraps
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, g
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from email_validator import validate_email, EmailNotValidError
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.utils import formatdate
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 import bleach
@@ -50,12 +52,17 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///secretsanta.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
-app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
+app.config['SESSION_COOKIE_SECURE'] = os.getenv('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
+app.config['SESSION_COOKIE_HTTPONLY'] = os.getenv('SESSION_COOKIE_HTTPONLY', 'true').lower() == 'true'
 app.config['PERMANENT_SESSION_LIFETIME'] = 2592000  # 30 days in seconds
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 app.config['SESSION_PERMANENT'] = True
+
+# Trust X-Forwarded-Proto header from reverse proxy (Nginx)
+# This allows Flask to know it's behind HTTPS even if the connection to it is HTTP
+if os.getenv('TRUST_PROXY', 'false').lower() == 'true':
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
 # Initialize database
 db = SQLAlchemy(app, model_class=Base)
@@ -122,6 +129,24 @@ SMTP_PORT = int(os.getenv('SMTP_PORT', 587))
 SMTP_USERNAME = os.getenv('SMTP_USERNAME')
 SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
 SMTP_USE_TLS = os.getenv('SMTP_USE_TLS', 'True').lower() == 'true'
+
+# ============================================================================
+# Email Preferences
+# ============================================================================
+
+def generate_unsubscribe_token(user_id):
+    """Generate a unique unsubscribe token for a user"""
+    import hashlib
+    import secrets
+    rand_token = secrets.token_hex(16)
+    return hashlib.sha256(f"{user_id}{rand_token}".encode()).hexdigest()
+
+def ensure_user_has_unsubscribe_token(user):
+    """Ensure user has an unsubscribe token, generate one if needed"""
+    if not user.unsubscribe_token:
+        user.unsubscribe_token = generate_unsubscribe_token(user.id)
+        db.session.commit()
+    return user.unsubscribe_token
 
 # ============================================================================
 # Authentication Helpers
@@ -215,6 +240,10 @@ def create_or_get_user(email, name):
         user = User(email=email, name=name)
         db.session.add(user)
         db.session.commit()
+    
+    # Ensure user has an unsubscribe token
+    ensure_user_has_unsubscribe_token(user)
+    
     return user
 
 def create_magic_link_token(user):
@@ -247,6 +276,7 @@ def send_magic_link_email(user, token):
     ignore = get_translation('email_magic_link_ignore', locale)
     closing = get_translation('email_magic_link_closing', locale)
     
+    # Build plain text body
     body = f"""{greeting}
 
 {click_link}
@@ -260,21 +290,182 @@ def send_magic_link_email(user, token):
 {closing}
 """
     
-    return send_email(user.email, subject, body)
+    # Send with HTML formatting for better appearance
+    return send_email_with_html(
+        to_email=user.email,
+        subject=subject,
+        plain_text=body,
+        html_body=f"""<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .greeting {{ font-size: 16px; line-height: 1.5; margin-bottom: 20px; }}
+        .button {{ display: inline-block; background-color: #667eea; color: white; padding: 12px 24px; border-radius: 5px; text-decoration: none; margin: 20px 0; font-weight: bold; }}
+        .button:hover {{ background-color: #5568d3; }}
+        .magic-link {{ word-break: break-all; color: #0066cc; }}
+        .info {{ color: #666; font-size: 14px; margin-top: 20px; }}
+        hr {{ border: none; border-top: 1px solid #e0e0e0; margin: 30px 0; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="greeting">{greeting}</p>
+        
+        <p>{click_link}</p>
+        
+        <a href="{magic_link}" class="button">Sign In</a>
+        
+        <p style="color: #999; font-size: 13px;">Or copy and paste this link:</p>
+        <p class="magic-link">{magic_link}</p>
+        
+        <p class="info">{expires}</p>
+        <p class="info">{ignore}</p>
+        <p style="margin-top: 30px; color: #999; font-size: 13px;">{closing}</p>
+    </div>
+</body>
+</html>""",
+        user_id=user.id
+    )
 
 # ============================================================================
 # Email Functions
 # ============================================================================
 
-def send_email(to_email, subject, body):
-    """Send an email via SMTP"""
+def send_email_with_html(to_email, subject, plain_text, html_body, user_id=None):
+    """Send an email with both plain text and HTML versions with RFC 8058 unsubscribe headers"""
     try:
-        msg = MIMEMultipart()
+        # Check if user has opted out
+        if user_id:
+            user = db.session.get(User, user_id)
+            if user and user.email_opt_out:
+                print(f"Email to {to_email} skipped - user has opted out")
+                return False
+        
+        # Create the main message container
+        msg = MIMEMultipart('alternative')
         msg['From'] = SMTP_USERNAME
         msg['To'] = to_email
         msg['Subject'] = subject
+        msg['Date'] = formatdate(localtime=False)  # RFC 2822 compliant date
+        msg['Message-ID'] = f"<{secrets.token_hex(16)}@{SMTP_USERNAME.split('@')[1]}>"
         
-        msg.attach(MIMEText(body, 'plain'))
+        # Add unsubscribe headers (RFC 8058) if user has token
+        unsubscribe_url = None
+        resubscribe_url = None
+        if user_id:
+            user = db.session.get(User, user_id)
+            if user:
+                # Ensure user has an unsubscribe token
+                ensure_user_has_unsubscribe_token(user)
+                if user.unsubscribe_token:
+                    unsubscribe_url = url_for('unsubscribe', token=user.unsubscribe_token, _external=True)
+                    resubscribe_url = url_for('resubscribe', token=user.unsubscribe_token, _external=True)
+                    
+                    # RFC 8058 - List-Unsubscribe header (shows unsubscribe link in Gmail/Outlook)
+                    msg['List-Unsubscribe'] = f"<{unsubscribe_url}>"
+                    msg['List-Unsubscribe-Post'] = "List-Unsubscribe=One-Click"
+        
+        # Build plain text version with footer
+        if unsubscribe_url:
+            plain_text_with_footer = f"""{plain_text}
+
+{'='*70}
+Unsubscribe: {unsubscribe_url}
+Manage preferences: {resubscribe_url}
+"""
+        else:
+            plain_text_with_footer = plain_text
+        
+        # Build HTML version with footer
+        if unsubscribe_url:
+            html_with_footer = f"""{html_body}
+
+<hr style="border: 1px solid #e0e0e0; margin: 30px 0;">
+<p style="color: #666; font-size: 12px; text-align: center;">
+    <a href="{unsubscribe_url}" style="color: #0066cc; text-decoration: none;">Unsubscribe</a> | 
+    <a href="{resubscribe_url}" style="color: #0066cc; text-decoration: none;">Manage Email Preferences</a>
+</p>
+"""
+        else:
+            html_with_footer = html_body
+        
+        # Attach plain text version FIRST
+        msg.attach(MIMEText(plain_text_with_footer, 'plain', 'utf-8'))
+        
+        # Attach HTML version SECOND (so it's preferred by RFC 2046)
+        msg.attach(MIMEText(html_with_footer, 'html', 'utf-8'))
+        
+        # Connect with timeout to prevent hanging
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
+        if SMTP_USE_TLS:
+            server.starttls()
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Error sending email to {to_email}: {str(e)}")
+        return False
+
+def send_email(to_email, subject, body, user_id=None):
+    """Send an email via SMTP with optional unsubscribe support (RFC 8058)"""
+    try:
+        # Check if user has opted out
+        if user_id:
+            user = db.session.get(User, user_id)
+            if user and user.email_opt_out:
+                print(f"Email to {to_email} skipped - user has opted out")
+                return False
+        
+        msg = MIMEMultipart('alternative')
+        msg['From'] = SMTP_USERNAME
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg['Date'] = formatdate(localtime=False)  # RFC 2822 compliant date
+        msg['Message-ID'] = f"<{secrets.token_hex(16)}@{SMTP_USERNAME.split('@')[1]}>"
+        
+        # Build plain text version with unsubscribe link
+        plain_body = body
+        unsubscribe_url = None
+        resubscribe_url = None
+        
+        # Add unsubscribe headers (RFC 8058) if user has token
+        if user_id:
+            user = db.session.get(User, user_id)
+            if user:
+                # Ensure user has an unsubscribe token
+                ensure_user_has_unsubscribe_token(user)
+                if user.unsubscribe_token:
+                    unsubscribe_url = url_for('unsubscribe', token=user.unsubscribe_token, _external=True)
+                    resubscribe_url = url_for('resubscribe', token=user.unsubscribe_token, _external=True)
+                    
+                    # RFC 8058 - List-Unsubscribe header (shows unsubscribe link in Gmail/Outlook)
+                    msg['List-Unsubscribe'] = f"<{unsubscribe_url}>"
+                    msg['List-Unsubscribe-Post'] = "List-Unsubscribe=One-Click"
+                    
+                    # Add unsubscribe info to plain text
+                    plain_body = f"{body}\n\n{'='*70}\n"
+                    plain_body += f"Unsubscribe: {unsubscribe_url}\n"
+                    plain_body += f"Manage preferences: {resubscribe_url}\n"
+        
+        # Attach plain text version FIRST
+        msg.attach(MIMEText(plain_body, 'plain', 'utf-8'))
+        
+        # Create HTML version with styled unsubscribe link
+        if unsubscribe_url:
+            html_body = f"""<html><body><pre style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; white-space: pre-wrap; word-wrap: break-word; color: #333; margin: 20px; max-width: 600px;">{body}
+
+{'='*70}
+<a href="{unsubscribe_url}">Unsubscribe</a> | <a href="{resubscribe_url}">Manage Email Preferences</a>
+</pre></body></html>"""
+        else:
+            html_body = f"""<html><body><pre style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; white-space: pre-wrap; word-wrap: break-word; color: #333; margin: 20px; max-width: 600px;">{body}</pre></body></html>"""
+        
+        # Attach HTML version SECOND (so it's preferred by RFC 2046)
+        msg.attach(MIMEText(html_body, 'html', 'utf-8'))
         
         # Connect with timeout to prevent hanging
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
@@ -322,7 +513,10 @@ def send_assignment_email(participant, receiver_name, event):
 {closing}
 """
     
-    success = send_email(participant.email, subject, body)
+    # Get or create user for this participant to ensure unsubscribe token
+    user = create_or_get_user(participant.email, participant.name)
+    
+    success = send_email(participant.email, subject, body, user_id=user.id)
     
     if success:
         participant.assignment_email_sent = True
@@ -513,6 +707,62 @@ def logout():
     session.clear()
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
+
+@app.route('/unsubscribe/<token>', methods=['GET', 'POST'])
+def unsubscribe(token):
+    """Unsubscribe user from emails"""
+    try:
+        # Find user by unsubscribe token
+        user = db.session.query(User).filter_by(unsubscribe_token=token).first()
+        
+        if not user:
+            flash('Invalid unsubscribe link', 'error')
+            return redirect(url_for('index'))
+        
+        if request.method == 'POST':
+            # Mark user as opted out
+            user.email_opt_out = True
+            db.session.commit()
+            flash('You have been unsubscribed from all Secret Santa emails', 'success')
+            return redirect(url_for('index'))
+        
+        # GET request - show confirmation page
+        return render_template('unsubscribe.html', email=user.email)
+    
+    except Exception as e:
+        print(f"Error in unsubscribe: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        flash('An error occurred', 'error')
+        return redirect(url_for('index'))
+
+@app.route('/resubscribe/<token>', methods=['GET', 'POST'])
+def resubscribe(token):
+    """Resubscribe user to emails"""
+    try:
+        # Find user by unsubscribe token
+        user = db.session.query(User).filter_by(unsubscribe_token=token).first()
+        
+        if not user:
+            flash('Invalid resubscribe link', 'error')
+            return redirect(url_for('index'))
+        
+        if request.method == 'POST':
+            # Mark user as opted in
+            user.email_opt_out = False
+            db.session.commit()
+            flash('✅ You have been resubscribed! You will now receive Secret Santa emails.', 'success')
+            return redirect(url_for('index'))
+        
+        # GET request - show confirmation page
+        return render_template('resubscribe.html', email=user.email, is_currently_unsubscribed=user.email_opt_out)
+    
+    except Exception as e:
+        print(f"Error in resubscribe: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        flash('An error occurred', 'error')
+        return redirect(url_for('index'))
 
 # ============================================================================
 # Routes - Event Creation
