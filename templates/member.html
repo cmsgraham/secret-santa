@@ -697,11 +697,35 @@
             }
             
             .header {
-                padding: 15px;
+                padding: 12px;
             }
             
             .header h1 {
-                font-size: 20px;
+                font-size: 18px;
+                margin-bottom: 5px;
+            }
+            
+            .header > div:first-child {
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .header > div:first-child > div:first-child {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+            
+            .dashboard-link {
+                font-size: 13px;
+            }
+            
+            .dashboard-link.btn {
+                width: 100%;
+                margin-left: 0 !important;
+                text-align: center;
             }
             
             .card {
@@ -717,6 +741,7 @@
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
+                gap: 10px;
             }
             
             .profile-picture {
@@ -727,6 +752,16 @@
             
             .profile-details {
                 width: 100%;
+            }
+            
+            .profile-details > div:first-child {
+                flex-direction: column;
+                gap: 6px;
+                align-items: center;
+            }
+            
+            .profile-details .event-name {
+                margin-top: 5px;
             }
             
             .input-group {
