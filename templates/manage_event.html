@@ -90,21 +90,39 @@
                     // Fallback to stored translation if API fails
                     const messageEl = document.getElementById('whatsappMessageText');
                     const message = messageEl ? messageEl.textContent : manageTranslations.whatsappMessage;
-                    const text = encodeURIComponent(`${message}\n\n${link}`);
-                    window.open(`https://wa.me/?text=${text}`, '_blank');
+                    openWhatsAppShare(message, link);
                     return;
                 }
                 
                 const message = data.text;
-                const text = encodeURIComponent(`${message}\n\n${link}`);
-                window.open(`https://wa.me/?text=${text}`, '_blank');
+                openWhatsAppShare(message, link);
             } catch (error) {
                 console.error('Error sharing via WhatsApp:', error);
                 // Fallback to stored translation
                 const messageEl = document.getElementById('whatsappMessageText');
                 const message = messageEl ? messageEl.textContent : manageTranslations.whatsappMessage;
-                const text = encodeURIComponent(`${message}\n\n${link}`);
-                window.open(`https://wa.me/?text=${text}`, '_blank');
+                openWhatsAppShare(message, link);
+            }
+        }
+        
+        function openWhatsAppShare(message, link) {
+            const fullText = `${message}\n\n${link}`;
+            const encodedText = encodeURIComponent(fullText);
+            
+            // Detect if it's iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            // Different URLs for different platforms
+            const waLink = isIOS 
+                ? `whatsapp://send?text=${encodedText}`  // iOS native WhatsApp
+                : `https://wa.me/?text=${encodedText}`;    // Web/Android
+            
+            // Try to open with a small delay to allow the app to open
+            const openTab = window.open(waLink, '_blank');
+            
+            // If web WhatsApp doesn't work on mobile, redirect to wa.me
+            if (!openTab || openTab.closed) {
+                window.location.href = `https://wa.me/?text=${encodedText}`;
             }
         }
 
