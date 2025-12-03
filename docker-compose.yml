@@ -6,7 +6,6 @@ services:
     # No port binding - only accessible via Nginx on internal network
     env_file:
       - .env
-    # Environment variables from .env file will be used - don't override SMTP settings here
     depends_on:
       - db
       - redis
