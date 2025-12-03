@@ -332,6 +332,46 @@
             font-weight: 800;
         }
         
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 2px solid;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .nav-button-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+        }
+        
+        .nav-button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+        }
+        
+        .nav-button-secondary {
+            background: white;
+            color: #667eea;
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .nav-button-secondary:hover {
+            background: #f8f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
         .back-link {
             color: #667eea;
             text-decoration: none;
@@ -385,6 +425,11 @@
             
             .feed-right {
                 display: none;
+            }
+            
+            .nav-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
             }
         }
         
@@ -527,6 +572,11 @@
                 font-size: 0.85rem;
             }
             
+            .nav-button {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            
             .back-link {
                 font-size: 0.85rem;
             }
@@ -554,6 +604,12 @@
             .feed-header > div {
                 width: 100%;
                 flex-wrap: wrap;
+            }
+            
+            .nav-button {
+                padding: 0.45rem 0.7rem;
+                font-size: 0.75rem;
+                flex: 0 1 auto;
             }
             
             .feed-top {
@@ -691,10 +747,14 @@
         <!-- Header -->
         <div class="feed-header">
             <h1>🎉 {{ t('feed_title') }}</h1>
-            <div style="display: flex; gap: 1rem; align-items: center;">
+            <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
                 {% include 'components/language_selector.html' %}
-                <a href="{{ url_for('dashboard') }}" class="back-link">{{ t('feed_back_to_dashboard') }}</a>
-                <a href="javascript:history.back()" class="back-link">{{ t('feed_back') }}</a>
+                <a href="{{ url_for('dashboard') }}" class="nav-button nav-button-primary">
+                    <span>📊</span> {{ t('feed_back_to_dashboard') }}
+                </a>
+                <a href="javascript:history.back()" class="nav-button nav-button-secondary">
+                    <span>←</span> {{ t('feed_back') }}
+                </a>
             </div>
         </div>
         <!-- Top: Member Avatars and Nicknames -->
