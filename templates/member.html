@@ -1114,11 +1114,10 @@
                 return;
             }
             
-            const giftLinksJson = '{{ participant.gift_links or "[]" | safe }}';
             let links = [];
-            
             try {
-                links = JSON.parse(giftLinksJson);
+                const giftLinksJson = {{ participant.gift_links or "[]" | safe }};
+                links = giftLinksJson;
                 if (!Array.isArray(links)) links = [];
             } catch (e) {
                 console.log('No existing gift links or invalid JSON', e);
