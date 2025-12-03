@@ -324,8 +324,10 @@
         .feed-header {
             grid-column: 1 / 4;
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 1rem;
             margin-bottom: 0.5rem;
             padding: 0;
         }
@@ -335,6 +337,7 @@
             color: #333;
             font-size: 2rem;
             font-weight: 800;
+            width: 100%;
         }
         
         .nav-button {
@@ -350,6 +353,7 @@
             border: 2px solid;
             cursor: pointer;
             white-space: nowrap;
+            min-height: 44px;
         }
         
         .nav-button-primary {
@@ -424,6 +428,14 @@
                 padding: 1rem;
             }
             
+            .feed-header {
+                gap: 0.75rem;
+            }
+            
+            .feed-header h1 {
+                font-size: 1.75rem;
+            }
+            
             .feed-top {
                 grid-column: 1 / 3;
             }
@@ -435,6 +447,7 @@
             .nav-button {
                 padding: 0.5rem 1rem;
                 font-size: 0.85rem;
+                min-height: 42px;
             }
         }
         
@@ -453,14 +466,23 @@
             
             .feed-header {
                 grid-column: 1;
-                flex-wrap: wrap;
-                gap: 0.5rem;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
                 padding: 0;
             }
             
             .feed-header h1 {
                 font-size: 1.5rem;
-                flex: 1;
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .feed-header > div {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                width: 100%;
             }
             
             .feed-top {
@@ -580,6 +602,10 @@
             .nav-button {
                 padding: 0.5rem 0.8rem;
                 font-size: 0.8rem;
+                min-height: 40px;
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
             }
             
             .back-link {
@@ -598,7 +624,7 @@
             .feed-header {
                 padding: 0;
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
                 gap: 0.5rem;
             }
             
@@ -613,15 +639,18 @@
                 display: flex;
                 flex-wrap: wrap;
                 gap: 0.5rem;
+                align-items: stretch;
             }
             
             .nav-button {
                 padding: 0.5rem 0.75rem;
-                font-size: 0.8rem;
-                flex: 0 1 auto;
-                min-height: 40px;
+                font-size: 0.75rem;
+                flex: 1;
+                min-height: 42px;
+                min-width: 100px;
                 display: flex;
                 align-items: center;
+                justify-content: center;
             }
             
             .feed-top {
