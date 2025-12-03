@@ -343,6 +343,7 @@ def send_email_with_html(to_email, subject, plain_text, html_body, user_id=None)
                 print(f"Email to {to_email} skipped - user has opted out")
                 return False
         
+        # Create the main message container
         msg = MIMEMultipart('alternative')
         msg['From'] = SMTP_USERNAME
         msg['To'] = to_email
@@ -366,7 +367,7 @@ def send_email_with_html(to_email, subject, plain_text, html_body, user_id=None)
                     msg['List-Unsubscribe'] = f"<{unsubscribe_url}>"
                     msg['List-Unsubscribe-Post'] = "List-Unsubscribe=One-Click"
         
-        # Attach plain text version first
+        # Build plain text version with footer
         if unsubscribe_url:
             plain_text_with_footer = f"""{plain_text}
 
@@ -377,9 +378,7 @@ Manage preferences: {resubscribe_url}
         else:
             plain_text_with_footer = plain_text
         
-        msg.attach(MIMEText(plain_text_with_footer, 'plain', 'utf-8'))
-        
-        # Add footer to HTML version if we have unsubscribe URL
+        # Build HTML version with footer
         if unsubscribe_url:
             html_with_footer = f"""{html_body}
 
@@ -392,7 +391,10 @@ Manage preferences: {resubscribe_url}
         else:
             html_with_footer = html_body
         
-        # Attach HTML version last (so it's preferred)
+        # Attach plain text version FIRST
+        msg.attach(MIMEText(plain_text_with_footer, 'plain', 'utf-8'))
+        
+        # Attach HTML version SECOND (so it's preferred by RFC 2046)
         msg.attach(MIMEText(html_with_footer, 'html', 'utf-8'))
         
         # Connect with timeout to prevent hanging
@@ -449,22 +451,20 @@ def send_email(to_email, subject, body, user_id=None):
                     plain_body += f"Unsubscribe: {unsubscribe_url}\n"
                     plain_body += f"Manage preferences: {resubscribe_url}\n"
         
-        # Attach plain text version first
+        # Attach plain text version FIRST
         msg.attach(MIMEText(plain_body, 'plain', 'utf-8'))
         
-        # Create HTML version with styled unsubscribe link if we have a URL
+        # Create HTML version with styled unsubscribe link
         if unsubscribe_url:
-            html_body = f"""{body}
+            html_body = f"""<html><body><pre style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; white-space: pre-wrap; word-wrap: break-word; color: #333; margin: 20px; max-width: 600px;">{body}
 
-<hr style="border: 1px solid #e0e0e0; margin: 30px 0;">
-<p style="color: #666; font-size: 12px; text-align: center;">
-    <a href="{unsubscribe_url}" style="color: #0066cc; text-decoration: none;">Unsubscribe</a> | 
-    <a href="{resubscribe_url}" style="color: #0066cc; text-decoration: none;">Manage Email Preferences</a>
-</p>"""
+{'='*70}
+<a href="{unsubscribe_url}">Unsubscribe</a> | <a href="{resubscribe_url}">Manage Email Preferences</a>
+</pre></body></html>"""
         else:
-            html_body = plain_body
+            html_body = f"""<html><body><pre style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; white-space: pre-wrap; word-wrap: break-word; color: #333; margin: 20px; max-width: 600px;">{body}</pre></body></html>"""
         
-        # Attach HTML version last (so it's preferred)
+        # Attach HTML version SECOND (so it's preferred by RFC 2046)
         msg.attach(MIMEText(html_body, 'html', 'utf-8'))
         
         # Connect with timeout to prevent hanging
