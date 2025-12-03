@@ -228,6 +228,8 @@
   "manage_event_back": "← Volver al Panel",
   "manage_event_share": "📤 Comparte este enlace con los participantes:",
   "manage_event_copy": "📋 Copiar",
+  "manage_event_whatsapp": "📱 WhatsApp",
+  "manage_event_whatsapp_message": "¡Únete a nuestro Amigo Invisible! 🎅",
   "manage_event_qr": "📱 O escanea este código QR:",
   "manage_event_participants_title": "👥 Participantes",
   "manage_event_no_participants": "¡Aún no hay participantes! ¡Comparte el enlace de registro arriba!",

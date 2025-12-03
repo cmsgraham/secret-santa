@@ -10,6 +10,7 @@
         const manageTranslations = {
             copySuccess: {{ t("manage_event_copy_success")|tojson }},
             copyErrorPrefix: {{ (t("manage_event_copy_error") ~ "\\n\\n")|tojson }},
+            whatsappMessage: {{ t("manage_event_whatsapp_message")|tojson }},
             dialogRunTitle: {{ t("dialog_run_draw_title")|tojson }},
             manageDrawConfirm: {{ t("manage_event_draw_confirm")|tojson }},
             buttonDraw: {{ t("button_draw")|tojson }},
@@ -79,7 +80,7 @@
         function shareViaWhatsApp() {
             const input = document.getElementById('registrationLink');
             const link = input.value;
-            const text = encodeURIComponent(`Join our Secret Santa! 🎅\n\n${link}`);
+            const text = encodeURIComponent(`${manageTranslations.whatsappMessage}\n\n${link}`);
             window.open(`https://wa.me/?text=${text}`, '_blank');
         }
 
@@ -445,7 +446,7 @@
                     <div class="share-link">
                         <input type="text" id="registrationLink" value="{{ request.url_root }}{{ event.registration_url[1:] }}" readonly>
                         <button style="all: revert; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="copyRegistrationLink()">{{ t('manage_event_copy') }}</button>
-                        <button style="all: revert; padding: 0.75rem 1.5rem; background: #25D366; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="shareViaWhatsApp()">📱 WhatsApp</button>
+                        <button style="all: revert; padding: 0.75rem 1.5rem; background: #25D366; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="shareViaWhatsApp()">{{ t('manage_event_whatsapp') }}</button>
                     </div>
                     {% if qr_code %}
                     <div style="margin-top: 1rem; text-align: center;">

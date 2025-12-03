@@ -228,6 +228,8 @@
   "manage_event_back": "← Back to Dashboard",
   "manage_event_share": "📤 Share this link with participants:",
   "manage_event_copy": "📋 Copy",
+  "manage_event_whatsapp": "📱 WhatsApp",
+  "manage_event_whatsapp_message": "Join our Secret Santa! 🎅",
   "manage_event_qr": "📱 Or scan this QR code:",
   "manage_event_participants_title": "👥 Participants",
   "manage_event_no_participants": "No participants yet. Share the registration link above!",
@@ -391,6 +393,5 @@
   "button_enable": "Enable",
   "button_disable": "Disable",
   "button_remove": "Remove",
-  "button_join": "Join",
-  "button_cancel": "Cancel"
+  "button_join": "Join"
 }
