@@ -288,7 +288,7 @@ def send_magic_link_email(user, token):
 {closing}
 """
     
-    return send_email(user.email, subject, body)
+    return send_email(user.email, subject, body, user_id=user.id)
 
 # ============================================================================
 # Email Functions
