@@ -275,6 +275,7 @@ def send_magic_link_email(user, token):
     ignore = get_translation('email_magic_link_ignore', locale)
     closing = get_translation('email_magic_link_closing', locale)
     
+    # Build plain text body
     body = f"""{greeting}
 
 {click_link}
@@ -288,11 +289,120 @@ def send_magic_link_email(user, token):
 {closing}
 """
     
-    return send_email(user.email, subject, body, user_id=user.id)
+    # Send with HTML formatting for better appearance
+    return send_email_with_html(
+        to_email=user.email,
+        subject=subject,
+        plain_text=body,
+        html_body=f"""<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .greeting {{ font-size: 16px; line-height: 1.5; margin-bottom: 20px; }}
+        .button {{ display: inline-block; background-color: #667eea; color: white; padding: 12px 24px; border-radius: 5px; text-decoration: none; margin: 20px 0; font-weight: bold; }}
+        .button:hover {{ background-color: #5568d3; }}
+        .magic-link {{ word-break: break-all; color: #0066cc; }}
+        .info {{ color: #666; font-size: 14px; margin-top: 20px; }}
+        hr {{ border: none; border-top: 1px solid #e0e0e0; margin: 30px 0; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="greeting">{greeting}</p>
+        
+        <p>{click_link}</p>
+        
+        <a href="{magic_link}" class="button">Sign In</a>
+        
+        <p style="color: #999; font-size: 13px;">Or copy and paste this link:</p>
+        <p class="magic-link">{magic_link}</p>
+        
+        <p class="info">{expires}</p>
+        <p class="info">{ignore}</p>
+        <p style="margin-top: 30px; color: #999; font-size: 13px;">{closing}</p>
+    </div>
+</body>
+</html>""",
+        user_id=user.id
+    )
 
 # ============================================================================
 # Email Functions
 # ============================================================================
+
+def send_email_with_html(to_email, subject, plain_text, html_body, user_id=None):
+    """Send an email with both plain text and HTML versions with RFC 8058 unsubscribe headers"""
+    try:
+        # Check if user has opted out
+        if user_id:
+            user = db.session.get(User, user_id)
+            if user and user.email_opt_out:
+                print(f"Email to {to_email} skipped - user has opted out")
+                return False
+        
+        msg = MIMEMultipart('alternative')
+        msg['From'] = SMTP_USERNAME
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        
+        # Add unsubscribe headers (RFC 8058) if user has token
+        unsubscribe_url = None
+        resubscribe_url = None
+        if user_id:
+            user = db.session.get(User, user_id)
+            if user:
+                # Ensure user has an unsubscribe token
+                ensure_user_has_unsubscribe_token(user)
+                if user.unsubscribe_token:
+                    unsubscribe_url = url_for('unsubscribe', token=user.unsubscribe_token, _external=True)
+                    resubscribe_url = url_for('resubscribe', token=user.unsubscribe_token, _external=True)
+                    
+                    # RFC 8058 - List-Unsubscribe header (shows unsubscribe link in Gmail/Outlook)
+                    msg['List-Unsubscribe'] = f"<{unsubscribe_url}>"
+                    msg['List-Unsubscribe-Post'] = "List-Unsubscribe=One-Click"
+        
+        # Attach plain text version
+        if unsubscribe_url:
+            plain_text_with_footer = f"""{plain_text}
+
+{'='*70}
+Unsubscribe: {unsubscribe_url}
+Manage preferences: {resubscribe_url}
+"""
+        else:
+            plain_text_with_footer = plain_text
+        
+        msg.attach(MIMEText(plain_text_with_footer, 'plain', 'utf-8'))
+        
+        # Add footer to HTML version if we have unsubscribe URL
+        if unsubscribe_url:
+            html_with_footer = f"""{html_body}
+
+<hr style="border: 1px solid #e0e0e0; margin: 30px 0;">
+<p style="color: #666; font-size: 12px; text-align: center;">
+    <a href="{unsubscribe_url}" style="color: #0066cc; text-decoration: none;">Unsubscribe</a> | 
+    <a href="{resubscribe_url}" style="color: #0066cc; text-decoration: none;">Manage Email Preferences</a>
+</p>
+"""
+        else:
+            html_with_footer = html_body
+        
+        msg.attach(MIMEText(html_with_footer, 'html', 'utf-8'))
+        
+        # Connect with timeout to prevent hanging
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
+        if SMTP_USE_TLS:
+            server.starttls()
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Error sending email to {to_email}: {str(e)}")
+        return False
 
 def send_email(to_email, subject, body, user_id=None):
     """Send an email via SMTP with optional unsubscribe support (RFC 8058)"""
@@ -395,7 +505,10 @@ def send_assignment_email(participant, receiver_name, event):
 {closing}
 """
     
-    success = send_email(participant.email, subject, body)
+    # Get or create user for this participant to ensure unsubscribe token
+    user = create_or_get_user(participant.email, participant.name)
+    
+    success = send_email(participant.email, subject, body, user_id=user.id)
     
     if success:
         participant.assignment_email_sent = True
