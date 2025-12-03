@@ -69,8 +69,6 @@ db = SQLAlchemy(app, model_class=Base)
 # Initialize i18n with Jinja2
 i18n_context = add_i18n_to_jinja(app, DEFAULT_LOCALE)
 
-print("DEBUG: App initialized at startup", flush=True)
-
 # ============================================================================
 # Language Detection Middleware
 # ============================================================================
@@ -562,12 +560,9 @@ def logout():
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
 
-print("DEBUG: About to register unsubscribe route", flush=True)
-
 @app.route('/unsubscribe/<token>', methods=['GET', 'POST'])
 def unsubscribe(token):
     """Unsubscribe user from emails"""
-    print(f"DEBUG: unsubscribe route called with token={token}", flush=True)
     try:
         # Find user by unsubscribe token
         user = db.session.query(User).filter_by(unsubscribe_token=token).first()
