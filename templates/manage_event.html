@@ -80,7 +80,10 @@
         function shareViaWhatsApp() {
             const input = document.getElementById('registrationLink');
             const link = input.value;
-            const text = encodeURIComponent(`${manageTranslations.whatsappMessage}\n\n${link}`);
+            // Get the current translated message from the hidden span
+            const messageEl = document.getElementById('whatsappMessageText');
+            const message = messageEl ? messageEl.textContent : manageTranslations.whatsappMessage;
+            const text = encodeURIComponent(`${message}\n\n${link}`);
             window.open(`https://wa.me/?text=${text}`, '_blank');
         }
 
@@ -448,6 +451,7 @@
                         <button style="all: revert; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="copyRegistrationLink()">{{ t('manage_event_copy') }}</button>
                         <button style="all: revert; padding: 0.75rem 1.5rem; background: #25D366; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;" onclick="shareViaWhatsApp()">{{ t('manage_event_whatsapp') }}</button>
                     </div>
+                    <span id="whatsappMessageText" style="display: none;">{{ t('manage_event_whatsapp_message') }}</span>
                     {% if qr_code %}
                     <div style="margin-top: 1rem; text-align: center;">
                         <strong>{{ t('manage_event_qr') }}</strong>
