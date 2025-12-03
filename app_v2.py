@@ -564,10 +564,15 @@ def logout():
 def unsubscribe(token):
     """Unsubscribe user from emails"""
     try:
+        print(f"DEBUG: Unsubscribe called with token: {token}")
+        print(f"DEBUG: Token length: {len(token)}")
+        
         # Find user by unsubscribe token
         user = db.session.query(User).filter_by(unsubscribe_token=token).first()
+        print(f"DEBUG: User found: {user}")
         
         if not user:
+            print(f"DEBUG: No user found for token, redirecting to index")
             flash('Invalid unsubscribe link', 'error')
             return redirect(url_for('index'))
         
@@ -579,10 +584,13 @@ def unsubscribe(token):
             return redirect(url_for('index'))
         
         # GET request - show confirmation page
+        print(f"DEBUG: Rendering unsubscribe.html for {user.email}")
         return render_template('unsubscribe.html', email=user.email)
     
     except Exception as e:
         print(f"Error in unsubscribe: {str(e)}")
+        import traceback
+        traceback.print_exc()
         flash('An error occurred', 'error')
         return redirect(url_for('index'))
 
