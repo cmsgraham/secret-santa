@@ -477,6 +477,9 @@
                                 </span>
                                 {% endif %}
                                 <div style="font-size: 0.85rem; color: #6b7280;">
+                                    📧 {{ participant.email }}
+                                </div>
+                                <div style="font-size: 0.85rem; color: #6b7280;">
                                     {{ t('manage_event_registered', date=participant.registered_at.strftime('%b %d at %I:%M %p')) }}
                                 </div>
                             </div>
