@@ -542,6 +542,21 @@
                 </div>
                 {% endif %}
                 
+                <!-- Gift Links -->
+                {% if idea.gift_links %}
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+                    <div style="font-size: 0.85rem; color: #667eea; font-weight: 600; margin-bottom: 0.5rem;">🔗 Links:</div>
+                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                        {% for link in idea.gift_links %}
+                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.75rem; background: #eef2ff; border: 1px solid #dbeafe; border-radius: 6px; color: #1e3a8a; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s;">
+                            <span style="font-size: 1rem;">🔗</span>
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ link.title or 'Link' }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
                 <!-- Idea Actions -->
                 <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.85rem;">
                     <button class="action-btn like-btn idea-like-btn" data-participant-id="{{ idea.participant.id }}" data-liked="{{ 'true' if idea.user_has_liked else 'false' }}" style="background: none; border: none; cursor: pointer; padding: 0;">

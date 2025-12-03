@@ -106,7 +106,8 @@ class Participant(Base):
     
     # Member page content
     hints = Column(Text)  # Hints about themselves for others to guess
-    gift_preferences = Column(Text)  # Gift ideas, preferences, links
+    gift_preferences = Column(Text)  # Gift ideas, preferences
+    gift_links = Column(Text)  # JSON list of gift links [{url, title}]
     profile_picture = Column(String(500))  # Icon selection (emoji:🎅) or uploaded image path
     
     # Guessing

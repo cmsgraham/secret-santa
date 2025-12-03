@@ -9,6 +9,7 @@ import io
 import base64
 import logging
 import re
+import json
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
@@ -1250,6 +1251,25 @@ def member_page(code, participant_id):
             db.session.commit()
             return jsonify({'success': True, 'message': 'Preferences saved successfully'})
         
+        elif action == 'save_gift_links':
+            links = data.get('gift_links', [])
+            # Validate and clean links
+            cleaned_links = []
+            for link in links:
+                if isinstance(link, dict):
+                    url = link.get('url', '').strip()
+                    title = link.get('title', '').strip()
+                    # Validate URL format (basic validation)
+                    if url and (url.startswith('http://') or url.startswith('https://')):
+                        cleaned_links.append({
+                            'url': url[:500],  # Limit URL length
+                            'title': sanitize_text(title[:100], max_length=100) or 'Link'
+                        })
+            # Store as JSON
+            participant.gift_links = json.dumps(cleaned_links) if cleaned_links else None
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Gift links saved successfully', 'links': cleaned_links})
+        
         elif action == 'submit_guess':
             if not event.guessing_enabled:
                 return jsonify({'success': False, 'error': 'Guessing is not enabled yet'}), 400
@@ -1697,9 +1717,18 @@ def feed(code):
             ).order_by(FeedComment.created_at).all()
             idea_topics = extract_topics(member.gift_preferences)
             
+            # Parse gift links if they exist
+            gift_links = []
+            if member.gift_links:
+                try:
+                    gift_links = json.loads(member.gift_links)
+                except (json.JSONDecodeError, TypeError):
+                    gift_links = []
+            
             ideas_data.append({
                 'participant': member,
                 'content': member.gift_preferences if not idea_topics else '',
+                'gift_links': gift_links,
                 'like_count': idea_likes,
                 'user_has_liked': user_has_liked_idea,
                 'comment_count': idea_comments,
