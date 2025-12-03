@@ -261,6 +261,16 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
+        .link-group .link-title {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .link-group .link-url {
+            flex: 1.5;
+            min-width: 180px;
+        }
+        
         .profile-section {
             display: flex;
             align-items: center;
@@ -654,6 +664,31 @@
             .receiver-info h3 {
                 font-size: 16px;
             }
+            
+            .link-group {
+                gap: 8px;
+            }
+            
+            .link-group input[type="text"],
+            .link-group input[type="url"] {
+                min-width: 120px;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            
+            .link-group .link-title {
+                min-width: 110px;
+            }
+            
+            .link-group .link-url {
+                min-width: 130px;
+            }
+            
+            .modal-content {
+                margin: 30px auto;
+                padding: 20px;
+                max-width: 90%;
+            }
         }
         
         @media (max-width: 480px) {
@@ -746,6 +781,62 @@
             
             .receiver-info h3 {
                 font-size: 14px;
+            }
+            
+            .link-group {
+                gap: 6px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .link-group input[type="text"],
+            .link-group input[type="url"] {
+                width: 100%;
+                min-width: unset;
+                padding: 10px 12px;
+                font-size: 14px;
+                flex: none;
+            }
+            
+            .link-group .link-title {
+                min-width: unset;
+            }
+            
+            .link-group .link-url {
+                min-width: unset;
+            }
+            
+            .link-group .btn-remove {
+                align-self: flex-end;
+                margin-top: -36px;
+                margin-right: 2px;
+            }
+            
+            .modal-content {
+                margin: 20px auto;
+                padding: 15px;
+                max-width: 95%;
+                border-radius: 12px;
+            }
+            
+            .modal-header h3 {
+                font-size: 20px;
+            }
+            
+            .icon-grid {
+                grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+                gap: 8px;
+            }
+            
+            .icon-option {
+                width: 45px;
+                height: 45px;
+                font-size: 28px;
+            }
+            
+            div[style*="display: flex"][style*="justify-content: space-between"] {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
