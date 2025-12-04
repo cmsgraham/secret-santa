@@ -30,6 +30,32 @@
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-actions .btn {
+            margin-bottom: 0;
+            margin-left: 0;
+        }
+
+        .header-lang {
+            display: flex;
+            align-items: center;
+        }
         
         .dashboard-link {
             display: inline-block;
@@ -664,6 +690,21 @@
             .receiver-info h3 {
                 font-size: 16px;
             }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .header-lang {
+                width: 100%;
+                justify-content: flex-end;
+            }
             
             .link-group {
                 gap: 8px;
@@ -698,6 +739,22 @@
             
             .header {
                 padding: 12px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .header-actions {
+                justify-content: flex-start;
+                width: 100%;
+            }
+
+            .header-lang {
+                width: 100%;
+                justify-content: flex-start;
             }
             
             .header h1 {
@@ -880,19 +937,19 @@
 <body>
     <div class="container">
         <div class="header">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div>
+            <div class="header-top">
+                <div class="header-actions">
                     {% if session.get('user_id') or session.get('participant_email') %}
                     <a href="{{ url_for('dashboard') }}" class="dashboard-link">
                         ← {{ t('member_back_to_dashboard') }}
                     </a>
                     <!-- Link to Santa's Secret Wall Feed -->
-                    <a href="{{ url_for('feed', code=event.code) }}" class="btn" style="margin-bottom: 0; margin-left: 10px;">
+                    <a href="{{ url_for('feed', code=event.code) }}" class="btn">
                         🎉 {{ t('feed_title') }}
                     </a>
                     {% endif %}
                 </div>
-                <div>
+                <div class="header-lang">
                     {% include 'components/language_selector.html' %}
                 </div>
             </div>
