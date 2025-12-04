@@ -40,6 +40,21 @@
             flex-wrap: wrap;
         }
 
+        .header-lang {
+            width: 240px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-lang .language-selector {
+            width: 100%;
+        }
+
+        .header-lang .language-selector .current-language {
+            display: flex;
+            justify-content: space-between;
+        }
+
         .header-actions {
             display: flex;
             gap: 10px;
@@ -47,14 +62,59 @@
             flex-wrap: wrap;
         }
 
+        .header-actions .dashboard-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            background: #f4f6ff;
+            color: #334155;
+            font-weight: 600;
+            text-decoration: none;
+            min-height: 44px;
+        }
+
+        .header-actions .dashboard-link:hover {
+            background: #e0e7ff;
+            border-color: #5568d3;
+            color: #1e3a8a;
+        }
+
         .header-actions .btn {
             margin-bottom: 0;
             margin-left: 0;
         }
 
-        .header-lang {
+        .profile-picture-area {
             display: flex;
             align-items: center;
+            gap: 12px;
+        }
+
+        .profile-picture-btn {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 40px;
+        }
+
+        .profile-picture-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .profile-name-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         .dashboard-link {
@@ -649,6 +709,26 @@
                 height: 70px;
                 font-size: 50px;
             }
+
+            .header-lang {
+                width: 100%;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-actions .dashboard-link {
+                flex: 1;
+                width: 100%;
+            }
             
             .input-group {
                 gap: 8px;
@@ -691,21 +771,6 @@
                 font-size: 16px;
             }
 
-            .header-top {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .header-actions {
-                width: 100%;
-                justify-content: flex-start;
-            }
-
-            .header-lang {
-                width: 100%;
-                justify-content: flex-end;
-            }
-            
             .link-group {
                 gap: 8px;
             }
@@ -754,7 +819,11 @@
 
             .header-lang {
                 width: 100%;
-                justify-content: flex-start;
+            }
+
+            .header-actions .dashboard-link {
+                flex: 1;
+                width: 100%;
             }
             
             .header h1 {
@@ -805,6 +874,17 @@
                 width: 60px;
                 height: 60px;
                 font-size: 40px;
+            }
+
+            .profile-picture-area {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .profile-picture-btn {
+                width: auto;
+                min-width: 140px;
             }
             
             .profile-details {
@@ -938,6 +1018,9 @@
     <div class="container">
         <div class="header">
             <div class="header-top">
+                <div class="header-lang">
+                    {% include 'components/language_selector.html' %}
+                </div>
                 <div class="header-actions">
                     {% if session.get('user_id') or session.get('participant_email') %}
                     <a href="{{ url_for('dashboard') }}" class="dashboard-link">
@@ -949,18 +1032,18 @@
                     </a>
                     {% endif %}
                 </div>
-                <div class="header-lang">
-                    {% include 'components/language_selector.html' %}
-                </div>
             </div>
             <div class="profile-section">
-                <div class="profile-picture" onclick="openProfileModal()" title="Click to change profile picture">
-                    {{ participant.profile_picture or '👤' }}
+                <div class="profile-picture-area">
+                    <div class="profile-picture" onclick="openProfileModal()" title="Click to change profile picture">
+                        {{ participant.profile_picture or '👤' }}
+                    </div>
+                    <button class="edit-profile-btn profile-picture-btn" onclick="openProfileModal()">{{ t('member_change_picture_button') }}</button>
                 </div>
                 <div class="profile-details">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                        <h1 id="nicknameDisplay" style="margin: 0;">👋 {{ participant.nickname or participant.name }}</h1>
-                        <button class="edit-profile-btn" onclick="editNickname()" style="margin: 0;">✏️</button>
+                    <div class="profile-name-row">
+                        <h1 id="nicknameDisplay" style="margin: 0; display: flex; align-items: center;">👋 {{ participant.nickname or participant.name }}</h1>
+                        <button class="edit-profile-btn" onclick="editNickname()">✏️</button>
                     </div>
                     <div id="nicknameEdit" style="display: none; margin-bottom: 5px;">
                         <input type="text" id="nicknameInput" value="{{ participant.nickname or participant.name }}" maxlength="100" style="padding: 8px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; font-weight: bold; width: 300px; max-width: 100%;">
@@ -969,7 +1052,6 @@
                     </div>
                     <div class="event-name">🎁 {{ event.name }}</div>
                     <div class="participant-info">{{ participant.email }}</div>
-                    <button class="edit-profile-btn" onclick="openProfileModal()">{{ t('member_change_picture_button') }}</button>
                     <div class="save-message" id="nicknameSaved" style="margin-top: 5px;">{{ t('member_picture_saved') }}</div>
                 </div>
             </div>

@@ -68,6 +68,15 @@
             gap: 0.5rem;
             margin-top: 1rem;
         }
+
+        .logout-footer {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .logout-footer .btn-secondary {
+            min-width: 160px;
+        }
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -163,6 +172,9 @@
             }
             .event-actions .btn {
                 width: 100%;
+            }
+            .logout-footer {
+                justify-content: center;
             }
         }
 
@@ -298,9 +310,6 @@
                 <a href="{{ url_for('create_event') }}" class="btn btn-primary">
                     ➕ {{ t('page_title_create_event') }}
                 </a>
-                <a href="{{ url_for('logout') }}" class="btn btn-secondary">
-                    {{ t('nav_logout') }}
-                </a>
             </div>
         </div>
 
@@ -426,6 +435,11 @@
             </a>
         </div>
         {% endif %}
+        <div class="logout-footer">
+            <a href="{{ url_for('logout') }}" class="btn btn-secondary">
+                {{ t('nav_logout') }}
+            </a>
+        </div>
     </div>
 
 </body>
